@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geodinâmica – Geologia e Soluções Ambientais</title>
+<meta name="description" content="Geodinâmica – Mapeando Soluções em Geologia, Topografia e Consultoria Ambiental. Serra Catarinense | Urubici | Lages | São Joaquim.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --verde: #005849;
+    --verde-escuro: #003d33;
+    --verde-claro: #E1F5EE;
+    --pedra: #2C2C2A;
+    --pedra-medio: #5F5E5A;
+    --branco: #ffffff;
+    --acento: #EF9F27;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--pedra); color: var(--branco); overflow-x: hidden; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 3rem;
+    background: rgba(44,44,42,0.93);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 0.75rem;
+    text-decoration: none;
+  }
+  .nav-logo img { width: 36px; height: 36px; object-fit: contain; }
+  .nav-logo-text {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.05rem;
+    letter-spacing: 0.04em; color: var(--branco);
+  }
+  .nav-logo-text span { color: var(--verde); }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.82rem; font-weight: 400; letter-spacing: 0.08em;
+    text-transform: uppercase; color: rgba(255,255,255,0.55); text-decoration: none; transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--verde); }
+  .nav-cta {
+    font-size: 0.78rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+    color: #ffffff; background: var(--verde);
+    padding: 0.5rem 1.2rem; border-radius: 2px; text-decoration: none; transition: background 0.2s;
+  }
+  .nav-cta:hover { background: #67C187; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr;
+    align-items: center; padding: 0 3rem; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 80% at 70% 50%, rgba(0,88,73,0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 20% 80%, rgba(239,159,39,0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-grid-overlay {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 60px 60px; pointer-events: none;
+  }
+  .hero-content { position: relative; z-index: 1; padding-top: 6rem; }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-size: 0.72rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--verde); border: 1px solid rgba(0,88,73,0.3);
+    padding: 0.35rem 0.85rem; border-radius: 2px; margin-bottom: 2rem;
+  }
+  .hero-tag::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--verde); animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .hero h1 {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: clamp(2.8rem, 5vw, 4.5rem); line-height: 1.0;
+    letter-spacing: -0.02em; margin-bottom: 1.5rem;
+  }
+  .hero h1 em { font-style: normal; color: var(--verde); }
+  .hero-sub {
+    font-size: 1rem; font-weight: 300; line-height: 1.75;
+    color: rgba(255,255,255,0.55); max-width: 460px; margin-bottom: 2.5rem;
+  }
+  .hero-actions { display: flex; gap: 1rem; align-items: center; }
+  .btn-primary {
+    font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 500;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: #ffffff; background: var(--verde); border: none;
+    padding: 0.9rem 2rem; border-radius: 2px; text-decoration: none; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-primary:hover { background: #67C187; transform: translateY(-1px); }
+  .btn-ghost {
+    font-size: 0.82rem; font-weight: 400; color: rgba(255,255,255,0.45);
+    text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: color 0.2s;
+  }
+  .btn-ghost:hover { color: var(--branco); }
+  .btn-ghost svg { transition: transform 0.2s; }
+  .btn-ghost:hover svg { transform: translateX(3px); }
+
+  /* HERO VISUAL */
+  .hero-visual { position: relative; z-index: 1; padding-top: 6rem; display: flex; justify-content: center; align-items: center; }
+  .hero-card {
+    width: 100%; max-width: 420px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;
+  }
+  .hero-card-header {
+    padding: 0.9rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .hero-card-viewer {
+    aspect-ratio: 4/3;
+    background: linear-gradient(135deg, #0a1a14 0%, #0d2b1e 50%, #0a1a14 100%);
+    display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;
+  }
+  .terrain-svg { width: 100%; height: 100%; position: absolute; inset: 0; }
+  .hero-card-footer {
+    padding: 0.85rem 1.25rem; display: flex; justify-content: space-between; align-items: center;
+  }
+  .card-label { font-size: 0.78rem; color: rgba(255,255,255,0.35); font-weight: 300; }
+  .card-badge {
+    font-size: 0.68rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--verde); background: rgba(0,88,73,0.12); border: 1px solid rgba(0,88,73,0.2);
+    padding: 0.2rem 0.6rem; border-radius: 2px;
+  }
+
+  /* SERVIÇOS */
+  .section { padding: 6rem 3rem; }
+  .section-header { margin-bottom: 4rem; }
+  .section-tag {
+    font-size: 0.68rem; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--verde); margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: clamp(1.8rem, 3vw, 2.8rem); line-height: 1.1; letter-spacing: -0.02em; max-width: 600px;
+  }
+  .services-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.06);
+  }
+  .service-card { background: var(--pedra); padding: 2.5rem; transition: background 0.3s; cursor: default; }
+  .service-card:hover { background: #353533; }
+  .service-icon {
+    width: 50px; height: 50px; border-radius: 4px;
+    background: rgba(0,88,73,0.08); border: 1px solid rgba(0,88,73,0.18);
+    display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;
+  }
+  .service-icon svg { width: 26px; height: 26px; stroke: var(--verde); fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+  .service-title { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 1.1rem; margin-bottom: 1rem; color: var(--branco); }
+  .service-items { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+  .service-items li {
+    font-size: 0.85rem; font-weight: 300; color: rgba(255,255,255,0.48);
+    padding-left: 1rem; position: relative;
+  }
+  .service-items li::before { content: '—'; position: absolute; left: 0; color: var(--verde); font-size: 0.7rem; top: 1px; }
+
+  /* MODELOS */
+  .modelos-section { padding: 6rem 3rem; background: rgba(255,255,255,0.01); border-top: 1px solid rgba(255,255,255,0.06); }
+  .modelos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 3rem; }
+  .modelo-card {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 4px;
+    overflow: hidden; transition: border-color 0.3s, transform 0.3s; text-decoration: none; display: block; color: inherit;
+  }
+  .modelo-card:hover { border-color: rgba(0,88,73,0.3); transform: translateY(-3px); }
+  .modelo-thumb {
+    aspect-ratio: 16/10; background: linear-gradient(135deg, #0a1a14, #0f2d20);
+    display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;
+  }
+  .modelo-thumb-label {
+    position: absolute; bottom: 0.75rem; left: 0.75rem;
+    font-size: 0.62rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--verde); background: rgba(8,80,65,0.85); padding: 0.25rem 0.6rem; border-radius: 2px;
+  }
+  .modelo-info { padding: 1rem 1.25rem 1.25rem; }
+  .modelo-nome { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.35rem; }
+  .modelo-meta { font-size: 0.78rem; font-weight: 300; color: rgba(255,255,255,0.38); }
+  .modelo-placeholder { border: 1px dashed rgba(255,255,255,0.1); background: transparent; }
+  .modelo-placeholder .modelo-thumb { background: transparent; flex-direction: column; gap: 0.75rem; }
+  .modelo-placeholder .modelo-thumb svg { width: 28px; height: 28px; stroke: rgba(255,255,255,0.15); fill: none; stroke-width: 1.5; }
+  .modelo-placeholder .modelo-thumb span { font-size: 0.72rem; color: rgba(255,255,255,0.18); font-weight: 300; }
+
+  /* SOBRE */
+  .sobre-section {
+    padding: 6rem 3rem; display: grid; grid-template-columns: 1fr 1fr;
+    gap: 6rem; align-items: center; border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .sobre-content p { font-size: 1rem; font-weight: 300; line-height: 1.8; color: rgba(255,255,255,0.55); margin-bottom: 1.5rem; }
+  .sobre-details { display: flex; flex-direction: column; gap: 1.25rem; }
+  .detail-item {
+    display: flex; align-items: flex-start; gap: 1rem; padding: 1.25rem;
+    background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 2px;
+  }
+  .detail-icon {
+    width: 36px; height: 36px; min-width: 36px;
+    background: rgba(0,88,73,0.1); border-radius: 2px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .detail-icon svg { width: 16px; height: 16px; stroke: var(--verde); fill: none; stroke-width: 1.5; stroke-linecap: round; }
+  .detail-text strong { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.2rem; }
+  .detail-text span { font-size: 0.8rem; font-weight: 300; color: rgba(255,255,255,0.42); }
+
+  /* CONTATO */
+  .contato-section {
+    padding: 6rem 3rem; border-top: 1px solid rgba(255,255,255,0.06);
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: start;
+  }
+  .contato-info h2 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 2.2rem; letter-spacing: -0.02em; margin-bottom: 1rem; line-height: 1.1; }
+  .contato-info p { font-size: 0.95rem; font-weight: 300; color: rgba(255,255,255,0.48); line-height: 1.7; margin-bottom: 2.5rem; }
+  .contato-items { display: flex; flex-direction: column; gap: 1rem; }
+  .contato-item { display: flex; align-items: center; gap: 1rem; font-size: 0.9rem; color: rgba(255,255,255,0.65); text-decoration: none; transition: color 0.2s; }
+  .contato-item:hover { color: var(--verde); }
+  .contato-item-icon {
+    width: 38px; height: 38px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 2px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .contato-item-icon svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .contato-form { display: flex; flex-direction: column; gap: 1rem; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+  .form-group label { font-size: 0.72rem; font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.38); }
+  .form-group input, .form-group textarea {
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 300;
+    color: var(--branco); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 2px; padding: 0.75rem 1rem; outline: none; transition: border-color 0.2s; width: 100%;
+  }
+  .form-group input:focus, .form-group textarea:focus { border-color: rgba(0,88,73,0.5); }
+  .form-group textarea { resize: vertical; min-height: 120px; }
+  .btn-submit {
+    font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    color: #ffffff; background: var(--verde); border: none; padding: 1rem 2rem; border-radius: 2px;
+    cursor: pointer; transition: all 0.2s; align-self: flex-start;
+  }
+  .btn-submit:hover { background: #67C187; }
+
+  /* FOOTER */
+  footer { padding: 2rem 3rem; border-top: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center; }
+  .footer-logo { display: flex; align-items: center; gap: 0.6rem; }
+  .footer-logo img { width: 24px; height: 24px; object-fit: contain; opacity: 0.5; }
+  .footer-logo-text { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem; color: rgba(255,255,255,0.35); }
+  .footer-logo-text span { color: var(--verde); opacity: 0.7; }
+  .footer-text { font-size: 0.72rem; font-weight: 300; color: rgba(255,255,255,0.22); }
+  .crea-badge { font-size: 0.68rem; font-weight: 400; letter-spacing: 0.06em; color: rgba(255,255,255,0.28); border: 1px solid rgba(255,255,255,0.1); padding: 0.25rem 0.75rem; border-radius: 2px; }
+
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .hero { grid-template-columns: 1fr; padding: 0 1.5rem; }
+    .hero-visual { display: none; }
+    .section, .modelos-section, .contato-section, .sobre-section { padding: 4rem 1.5rem; }
+    .services-grid, .modelos-grid { grid-template-columns: 1fr; }
+    .sobre-section, .contato-section { grid-template-columns: 1fr; gap: 3rem; }
+    .form-row { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Semicircle background like brand symbol -->
+      <path d="M4,28 A14,14 0 0,1 28,28 Z" fill="#67C187" opacity="0.25"/>
+      <!-- Mountain peaks -->
+      <polyline points="4,28 12,12 18,20 22,14 28,28" fill="none" stroke="#005849" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+      <!-- River/water curve at base -->
+      <path d="M4,26 Q10,24 16,26 Q22,28 28,26" fill="none" stroke="#005849" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+    <span class="nav-logo-text">GEO<span>DINÂMICA</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#servicos">Serviços</a></li>
+    <li><a href="#modelos">Modelos 3D</a></li>
+    <li><a href="#sobre">Sobre</a></li>
+    <li><a href="#contato">Contato</a></li>
+  </ul>
+  <a href="#contato" class="nav-cta">Solicitar orçamento</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <div class="hero-grid-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-tag">Serra Catarinense · Urubici · SC</div>
+    <h1><em>Mapeando</em><br>Soluções</h1>
+    <p class="hero-sub">Geologia, topografia e consultoria ambiental para viabilizar seus projetos com precisão e conformidade legal.</p>
+    <div class="hero-actions">
+      <a href="#servicos" class="btn-primary">Ver serviços</a>
+      <a href="#modelos" class="btn-ghost">
+        Modelos 3D
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 8h10M9 4l4 4-4 4"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-card">
+      <div class="hero-card-header">
+        <div class="dot" style="background:#ff5f57"></div>
+        <div class="dot" style="background:#ffbc2e"></div>
+        <div class="dot" style="background:#28c840"></div>
+        <span style="font-size:0.68rem;color:rgba(255,255,255,0.28);margin-left:0.5rem;font-weight:300">modelo_topografico.glb</span>
+      </div>
+      <div class="hero-card-viewer">
+        <svg class="terrain-svg" viewBox="0 0 420 315" xmlns="http://www.w3.org/2000/svg">
+          <line x1="0" y1="52" x2="420" y2="52" stroke="rgba(0,88,73,0.08)" stroke-width="0.5"/>
+          <line x1="0" y1="105" x2="420" y2="105" stroke="rgba(0,88,73,0.08)" stroke-width="0.5"/>
+          <line x1="0" y1="157" x2="420" y2="157" stroke="rgba(0,88,73,0.08)" stroke-width="0.5"/>
+          <line x1="0" y1="210" x2="420" y2="210" stroke="rgba(0,88,73,0.08)" stroke-width="0.5"/>
+          <line x1="0" y1="262" x2="420" y2="262" stroke="rgba(0,88,73,0.08)" stroke-width="0.5"/>
+          <line x1="60" y1="0" x2="60" y2="315" stroke="rgba(0,88,73,0.08)" stroke-width="0.5"/>
+          <line x1="120" y1="0" x2="120" y2="315" stroke="rgba(0,88,73,0.08)" stroke-width="0.5"/>
+          <line x1="180" y1="0" x2="180" y2="315" stroke="rgba(0,88,73,0.08)" stroke-width="0.5"/>
+          <line x1="240" y1="0" x2="240" y2="315" stroke="rgba(0,88,73,0.08)" stroke-width="0.5"/>
+          <line x1="300" y1="0" x2="300" y2="315" stroke="rgba(0,88,73,0.08)" stroke-width="0.5"/>
+          <line x1="360" y1="0" x2="360" y2="315" stroke="rgba(0,88,73,0.08)" stroke-width="0.5"/>
+          <path d="M20,280 Q80,260 140,240 Q200,220 260,200 Q320,180 380,170 Q400,165 420,162" fill="none" stroke="rgba(0,88,73,0.2)" stroke-width="1"/>
+          <path d="M20,250 Q70,225 130,205 Q190,185 250,165 Q310,145 370,135 Q395,130 420,128" fill="none" stroke="rgba(0,88,73,0.25)" stroke-width="1"/>
+          <path d="M20,215 Q65,190 125,170 Q185,150 245,130 Q300,112 360,102 Q390,97 420,95" fill="none" stroke="rgba(0,88,73,0.3)" stroke-width="1"/>
+          <path d="M60,185 Q110,158 170,138 Q230,118 285,100 Q335,84 390,75 Q405,72 420,70" fill="none" stroke="rgba(0,88,73,0.38)" stroke-width="1.2"/>
+          <path d="M100,165 Q148,138 205,118 Q260,98 315,82 Q360,68 400,60" fill="none" stroke="rgba(0,88,73,0.45)" stroke-width="1.2"/>
+          <path d="M150,148 Q195,122 248,103 Q298,84 348,68 Q375,60 400,53" fill="none" stroke="rgba(0,88,73,0.52)" stroke-width="1.5"/>
+          <path d="M200,135 Q240,110 288,92 Q335,75 375,62 Q390,57 405,53" fill="none" stroke="rgba(103,193,135,0.6)" stroke-width="1.5"/>
+          <path d="M250,125 Q285,100 328,84 Q368,68 395,58" fill="none" stroke="rgba(103,193,135,0.7)" stroke-width="2"/>
+          <path d="M300,118 Q332,96 365,80 Q385,70 400,63" fill="none" stroke="rgba(103,193,135,0.8)" stroke-width="2"/>
+          <circle cx="370" cy="58" r="4" fill="rgba(239,159,39,0.8)" stroke="rgba(239,159,39,0.25)" stroke-width="8"/>
+          <line x1="370" y1="45" x2="370" y2="30" stroke="rgba(239,159,39,0.55)" stroke-width="1"/>
+          <rect x="372" y="20" width="50" height="14" rx="2" fill="rgba(239,159,39,0.12)" stroke="rgba(239,159,39,0.35)" stroke-width="0.5"/>
+          <text x="397" y="30" text-anchor="middle" font-size="8" fill="rgba(239,159,39,0.85)" font-family="monospace">1.482m</text>
+          <circle cx="60" cy="220" r="2.5" fill="rgba(0,88,73,0.7)"/>
+          <circle cx="140" cy="195" r="2.5" fill="rgba(0,88,73,0.7)"/>
+          <circle cx="220" cy="160" r="2.5" fill="rgba(0,88,73,0.7)"/>
+          <circle cx="300" cy="128" r="2.5" fill="rgba(0,88,73,0.7)"/>
+          <circle cx="360" cy="105" r="2.5" fill="rgba(0,88,73,0.7)"/>
+          <polyline points="60,220 140,195 220,160 300,128 360,105" fill="none" stroke="rgba(0,88,73,0.35)" stroke-width="1" stroke-dasharray="4,3"/>
+        </svg>
+      </div>
+      <div class="hero-card-footer">
+        <span class="card-label">Visualização interativa · Three.js</span>
+        <span class="card-badge">3D · GLB</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVIÇOS -->
+<section class="section" id="servicos">
+  <div class="section-header">
+    <div class="section-tag">O que fazemos</div>
+    <h2 class="section-title">Soluções técnicas do levantamento ao licenciamento</h2>
+  </div>
+  <div class="services-grid">
+
+    <!-- GEOLOGIA — dois martelos geológicos cruzados -->
+    <div class="service-card">
+      <div class="service-icon">
+        <svg viewBox="0 0 26 26" fill="none" stroke="#005849" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <!-- Montanha principal (pico esquerdo, maior) -->
+          <polyline points="2,22 10,6 16,15 20,9 24,22"/>
+          <!-- Linha de base -->
+          <line x1="2" y1="22" x2="24" y2="22"/>
+          <!-- Neve no pico (traço curto horizontal) -->
+          <line x1="8" y1="9" x2="12" y2="9"/>
+        </svg>
+      </div>
+      <div class="service-title">Geologia</div>
+      <ul class="service-items">
+        <li>Laudo hidrogeológico</li>
+        <li>Avaliação de áreas de risco</li>
+        <li>Regularização e licenciamento da mineração</li>
+        <li>Estabilidade de taludes</li>
+      </ul>
+    </div>
+
+    <!-- TOPOGRAFIA — tripé de teodolito -->
+    <div class="service-card">
+      <div class="service-icon">
+        <svg viewBox="0 0 26 26" fill="none" stroke="#005849" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <!-- Instrumento no topo -->
+          <rect x="8" y="4" width="10" height="6" rx="1"/>
+          <!-- Luneta/ocular -->
+          <line x1="18" y1="6" x2="22" y2="6"/>
+          <line x1="4" y1="7" x2="8" y2="7"/>
+          <!-- Coluna central -->
+          <line x1="13" y1="10" x2="13" y2="15"/>
+          <!-- Três pernas do tripé -->
+          <line x1="13" y1="15" x2="6" y2="24"/>
+          <line x1="13" y1="15" x2="13" y2="24"/>
+          <line x1="13" y1="15" x2="20" y2="24"/>
+          <!-- Base das pernas -->
+          <line x1="4" y1="24" x2="8" y2="24"/>
+          <line x1="11" y1="24" x2="15" y2="24"/>
+          <line x1="18" y1="24" x2="22" y2="24"/>
+        </svg>
+      </div>
+      <div class="service-title">Topografia</div>
+      <ul class="service-items">
+        <li>Aerolevantamento planialtimétrico</li>
+        <li>Georreferenciamento de imóveis rurais</li>
+        <li>Retificação e desmembramento de matrículas</li>
+        <li>Mapeamento com drone · modelos 3D</li>
+      </ul>
+    </div>
+
+    <!-- CONSULTORIA AMBIENTAL — folha com nervura e gota -->
+    <div class="service-card">
+      <div class="service-icon">
+        <svg viewBox="0 0 26 26" fill="none" stroke="#005849" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <!-- Folha -->
+          <path d="M13,22 C13,22 5,17 5,10 C5,6 8.5,3 13,3 C17.5,3 21,6 21,10 C21,17 13,22 13,22 Z"/>
+          <!-- Nervura central -->
+          <line x1="13" y1="22" x2="13" y2="7"/>
+          <!-- Nervuras laterais -->
+          <line x1="13" y1="12" x2="9" y2="9"/>
+          <line x1="13" y1="15" x2="9" y2="13"/>
+          <line x1="13" y1="12" x2="17" y2="9"/>
+          <line x1="13" y1="15" x2="17" y2="13"/>
+        </svg>
+      </div>
+      <div class="service-title">Consultoria Ambiental</div>
+      <ul class="service-items">
+        <li>Mapeamento de APPs</li>
+        <li>Caracterização de cursos hídricos</li>
+        <li>Licenciamento ambiental</li>
+        <li>Cadastro Ambiental Rural (CAR)</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<!-- MODELOS 3D -->
+<section class="modelos-section" id="modelos">
+  <div class="section-header">
+    <div class="section-tag">Portfólio</div>
+    <h2 class="section-title">Modelos 3D de projetos</h2>
+  </div>
+  <div class="modelos-grid">
+    <a href="#" class="modelo-card">
+      <div class="modelo-thumb">
+        <svg viewBox="0 0 60 45" xmlns="http://www.w3.org/2000/svg" style="width:60%;opacity:0.35">
+          <polyline points="5,35 15,20 25,25 35,10 45,18 55,8" fill="none" stroke="#005849" stroke-width="1.5"/>
+          <polyline points="5,40 15,28 25,33 35,18 45,26 55,16" fill="none" stroke="#005849" stroke-width="1"/>
+        </svg>
+        <span class="modelo-thumb-label">Topografia</span>
+      </div>
+      <div class="modelo-info">
+        <div class="modelo-nome">Fazenda Rio Negro</div>
+        <div class="modelo-meta">Aerolevantamento · 240 ha</div>
+      </div>
+    </a>
+    <a href="#" class="modelo-card">
+      <div class="modelo-thumb">
+        <svg viewBox="0 0 60 45" xmlns="http://www.w3.org/2000/svg" style="width:60%;opacity:0.35">
+          <rect x="10" y="15" width="12" height="20" fill="none" stroke="#005849" stroke-width="1.5"/>
+          <rect x="28" y="20" width="8" height="15" fill="none" stroke="#005849" stroke-width="1"/>
+          <rect x="42" y="10" width="10" height="25" fill="none" stroke="#005849" stroke-width="1.5"/>
+          <line x1="5" y1="35" x2="55" y2="35" stroke="#67C187" stroke-width="0.5"/>
+        </svg>
+        <span class="modelo-thumb-label">Loteamento</span>
+      </div>
+      <div class="modelo-info">
+        <div class="modelo-nome">Loteamento Urubici</div>
+        <div class="modelo-meta">Levantamento urbano · 15 ha</div>
+      </div>
+    </a>
+    <a href="#" class="modelo-card">
+      <div class="modelo-thumb">
+        <svg viewBox="0 0 60 45" xmlns="http://www.w3.org/2000/svg" style="width:60%;opacity:0.35">
+          <circle cx="30" cy="22" r="14" fill="none" stroke="#005849" stroke-width="1.5"/>
+          <circle cx="30" cy="22" r="9" fill="none" stroke="#005849" stroke-width="1"/>
+          <circle cx="30" cy="22" r="4" fill="none" stroke="#67C187" stroke-width="1"/>
+          <circle cx="30" cy="22" r="1.5" fill="#005849"/>
+        </svg>
+        <span class="modelo-thumb-label">Mineral</span>
+      </div>
+      <div class="modelo-info">
+        <div class="modelo-nome">Mineração Xanxerê</div>
+        <div class="modelo-meta">Lavra a céu aberto · mapeamento</div>
+      </div>
+    </a>
+    <div class="modelo-card modelo-placeholder">
+      <div class="modelo-thumb">
+        <svg viewBox="0 0 24 24" stroke="rgba(255,255,255,0.15)" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        <span>Adicionar modelo</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOBRE -->
+<section class="sobre-section" id="sobre">
+  <div class="sobre-content">
+    <div class="section-tag">Sobre nós</div>
+    <h2 class="section-title" style="margin-bottom:2rem">Precisão técnica a serviço do seu projeto</h2>
+    <p>A Geodinâmica é uma empresa especializada em geologia, topografia e consultoria ambiental, com sede em Urubici, no coração da Serra Catarinense.</p>
+    <p>Nosso objetivo é fornecer as informações técnicas essenciais para viabilizar projetos de forma eficiente e sustentável, por meio de tecnologias avançadas e metodologia rigorosa.</p>
+    <p>Criamos bases cartográficas detalhadas que fundamentam planejamentos estratégicos, análises geológicas precisas e consultoria ambiental para garantir conformidade com normas e boas práticas.</p>
+  </div>
+  <div class="sobre-details">
+    <div class="detail-item">
+      <div class="detail-icon">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div class="detail-text">
+        <strong>Arel Hadi Rey Antonio</strong>
+        <span>Responsável Técnico · Geólogo · CREA SC 187958-4</span>
+      </div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      </div>
+      <div class="detail-text">
+        <strong>Urubici · Santa Catarina</strong>
+        <span>Atuação na Serra Catarinense e região</span>
+      </div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#005849" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <!-- Corpo central do drone -->
+          <rect x="9" y="9" width="6" height="6" rx="1"/>
+          <!-- 4 braços diagonais -->
+          <line x1="9" y1="9" x2="5" y2="5"/>
+          <line x1="15" y1="9" x2="19" y2="5"/>
+          <line x1="9" y1="15" x2="5" y2="19"/>
+          <line x1="15" y1="15" x2="19" y2="19"/>
+          <!-- 4 hélices (elipses nos cantos) -->
+          <ellipse cx="4" cy="4" rx="3" ry="1.2" transform="rotate(-45 4 4)"/>
+          <ellipse cx="20" cy="4" rx="3" ry="1.2" transform="rotate(45 20 4)"/>
+          <ellipse cx="4" cy="20" rx="3" ry="1.2" transform="rotate(45 4 20)"/>
+          <ellipse cx="20" cy="20" rx="3" ry="1.2" transform="rotate(-45 20 20)"/>
+        </svg>
+      </div>
+      <div class="detail-text">
+        <strong>Tecnologia de ponta</strong>
+        <span>Drone especializado em mapeamentos e equipamentos topográficos modernos garantem precisão e qualidade</span>
+      </div>
+    </div>
+    <div class="detail-item">
+      <div class="detail-icon">
+        <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>
+      </div>
+      <div class="detail-text">
+        <strong>Experiência consolidada</strong>
+        <span>Desde 2017 entregando soluções técnicas com rigor e comprometimento na Serra Catarinense</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTATO -->
+<section class="contato-section" id="contato">
+  <div class="contato-info">
+    <div class="section-tag">Contato</div>
+    <h2>Vamos falar<br>sobre seu projeto</h2>
+    <p>Entre em contato para solicitar um orçamento ou tirar dúvidas sobre nossos serviços.</p>
+    <div class="contato-items">
+      <a href="https://wa.me/554991676406" class="contato-item">
+        <div class="contato-item-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+        </div>
+        (49) 9 9167-6406
+      </a>
+      <a href="mailto:geodinamica@hotmail.com" class="contato-item">
+        <div class="contato-item-icon">
+          <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        geodinamica@hotmail.com
+      </a>
+      <a href="https://geodinamicasa.com.br" class="contato-item">
+        <div class="contato-item-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        </div>
+        geodinamicasa.com.br
+      </a>
+      <div class="contato-item">
+        <div class="contato-item-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        Urubici · Santa Catarina · Brasil
+      </div>
+    </div>
+  </div>
+  <form class="contato-form" onsubmit="handleSubmit(event)">
+    <div class="form-row">
+      <div class="form-group"><label>Nome</label><input type="text" placeholder="Seu nome"></div>
+      <div class="form-group"><label>Email</label><input type="email" placeholder="seu@email.com"></div>
+    </div>
+    <div class="form-group"><label>Assunto</label><input type="text" placeholder="Tipo de serviço ou projeto"></div>
+    <div class="form-group"><label>Mensagem</label><textarea placeholder="Descreva seu projeto ou dúvida..."></textarea></div>
+    <button type="submit" class="btn-submit">Enviar mensagem →</button>
+  </form>
+</section>
+
+<footer>
+  <div class="footer-logo">
+    <span class="footer-logo-text">GEO<span>DINÂMICA</span></span>
+  </div>
+  <div class="footer-text">© 2017–2026 Geodinâmica · Geologia e Soluções Ambientais · Urubici, SC</div>
+  <div class="crea-badge">CREA SC 187958-4</div>
+</footer>
+
+<script>
+function handleSubmit(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('.btn-submit');
+  btn.textContent = 'Mensagem enviada ✓';
+  btn.style.background = '#67C187';
+  setTimeout(() => { btn.textContent = 'Enviar mensagem →'; btn.style.background = ''; e.target.reset(); }, 3000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) { entry.target.style.opacity = '1'; entry.target.style.transform = 'translateY(0)'; }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.service-card, .modelo-card, .detail-item').forEach(el => {
+    el.style.opacity = '0'; el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(el);
+  });
+});
+</script>
+</body>
+</html>
