@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modelos 3D – Geodinâmica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --verde: #005849;
+    --verde-claro: #67C187;
+    --pedra: #2C2C2A;
+    --branco: #ffffff;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--pedra); color: var(--branco); min-height: 100vh; }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 3rem;
+    background: rgba(44,44,42,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .nav-logo { display: flex; align-items: center; gap: 0.7rem; text-decoration: none; }
+  .nav-logo svg { width: 32px; height: 32px; }
+  .nav-logo-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; letter-spacing: 0.04em; color: #fff; }
+  .nav-logo-text span { color: var(--verde-claro); }
+  .nav-back {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.78rem; font-weight: 400; letter-spacing: 0.06em; text-transform: uppercase;
+    color: rgba(255,255,255,0.45); text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.1); padding: 0.45rem 1rem; border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .nav-back:hover { color: #fff; border-color: rgba(255,255,255,0.25); }
+  .nav-back svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; }
+
+  /* HEADER */
+  .page-header {
+    padding: 4rem 3rem 2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .page-tag {
+    font-size: 0.68rem; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--verde-claro); margin-bottom: 0.75rem;
+  }
+  .page-title {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: clamp(1.8rem, 3vw, 2.5rem); letter-spacing: -0.02em; line-height: 1.1;
+    margin-bottom: 0.75rem;
+  }
+  .page-sub {
+    font-size: 0.9rem; font-weight: 300; color: rgba(255,255,255,0.45); max-width: 500px;
+  }
+
+  /* GRID */
+  .modelos-container { padding: 3rem; }
+  .modelos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .modelo-card {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 4px; overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s;
+    text-decoration: none; display: block; color: inherit;
+  }
+  .modelo-card:hover { border-color: rgba(0,88,73,0.4); transform: translateY(-3px); }
+
+  .modelo-thumb {
+    aspect-ratio: 16/10;
+    background: linear-gradient(135deg, #0a1a14, #0f2d20);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .modelo-thumb svg { width: 55%; opacity: 0.3; }
+  .modelo-thumb-label {
+    position: absolute; bottom: 0.75rem; left: 0.75rem;
+    font-size: 0.62rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--verde-claro); background: rgba(0,40,30,0.85); padding: 0.25rem 0.6rem; border-radius: 2px;
+  }
+  .modelo-thumb-play {
+    position: absolute;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: rgba(0,88,73,0.7);
+    border: 1px solid rgba(103,193,135,0.3);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .modelo-thumb-play svg { width: 16px; height: 16px; fill: #fff; margin-left: 2px; }
+  .modelo-card:hover .modelo-thumb-play { opacity: 1; }
+
+  .modelo-info { padding: 1rem 1.25rem 1.25rem; }
+  .modelo-nome { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.35rem; }
+  .modelo-meta { font-size: 0.78rem; font-weight: 300; color: rgba(255,255,255,0.38); }
+
+  /* EMPTY CARD */
+  .modelo-card-empty {
+    border: 1px dashed rgba(255,255,255,0.08); background: transparent;
+    border-radius: 4px; aspect-ratio: unset; min-height: 180px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 0.75rem; cursor: default;
+  }
+  .modelo-card-empty svg { width: 28px; height: 28px; stroke: rgba(255,255,255,0.12); fill: none; stroke-width: 1.5; }
+  .modelo-card-empty span { font-size: 0.75rem; color: rgba(255,255,255,0.18); font-weight: 300; }
+
+  /* FOOTER */
+  footer {
+    margin-top: 4rem; padding: 2rem 3rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-text { font-size: 0.72rem; font-weight: 300; color: rgba(255,255,255,0.22); }
+  .crea-badge { font-size: 0.68rem; color: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.08); padding: 0.25rem 0.6rem; border-radius: 2px; }
+
+  @media (max-width: 768px) {
+    nav, .page-header, .modelos-container, footer { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .modelos-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4,28 A14,14 0 0,1 28,28 Z" fill="#67C187" opacity="0.2"/>
+      <polyline points="4,28 12,12 18,20 22,14 28,28" fill="none" stroke="#005849" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M4,26 Q10,24 16,26 Q22,28 28,26" fill="none" stroke="#005849" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+    <span class="nav-logo-text">GEO<span>DINÂMICA</span></span>
+  </a>
+  <a href="index.html" class="nav-back">
+    <svg viewBox="0 0 16 16"><path d="M10 4l-4 4 4 4"/></svg>
+    Voltar ao site
+  </a>
+</nav>
+
+<div class="page-header">
+  <div class="page-tag">Portfólio</div>
+  <h1 class="page-title">Modelos 3D</h1>
+  <p class="page-sub">Clique em qualquer modelo para abrir a visualização interativa.</p>
+</div>
+
+<div class="modelos-container">
+  <div class="modelos-grid" id="modelos-grid">
+
+    <!-- Modelo de exemplo — substitua a URL pelo GLB real -->
+    <a href="viewer.html?modelo=https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/modelo.glb&nome=Modelo+Teste" class="modelo-card">
+      <div class="modelo-thumb">
+        <svg viewBox="0 0 60 45" xmlns="http://www.w3.org/2000/svg">
+          <polyline points="5,35 15,20 25,25 35,10 45,18 55,8" fill="none" stroke="#005849" stroke-width="1.5"/>
+          <polyline points="5,40 15,28 25,33 35,18 45,26 55,16" fill="none" stroke="#003d33" stroke-width="1"/>
+        </svg>
+        <div class="modelo-thumb-play">
+          <svg viewBox="0 0 16 16"><polygon points="4,2 14,8 4,14"/></svg>
+        </div>
+        <span class="modelo-thumb-label">Topografia</span>
+      </div>
+      <div class="modelo-info">
+        <div class="modelo-nome">Modelo Teste</div>
+        <div class="modelo-meta">Aerolevantamento</div>
+      </div>
+    </a>
+
+    <!-- Card vazio — adicionar novos modelos -->
+    <div class="modelo-card-empty">
+      <svg viewBox="0 0 24 24" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      <span>Novos modelos em breve</span>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <div class="footer-text">© 2017–2026 Geodinâmica · Geologia e Soluções Ambientais</div>
+  <div class="crea-badge">CREA SC 187958-4</div>
+</footer>
+
+</body>
+</html>
