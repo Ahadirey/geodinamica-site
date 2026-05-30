@@ -473,8 +473,9 @@ function loadGLB(url) {
 
         scene.add(model);
 
-        // Set camera distance based on model size
-        spherical.radius = maxDim * scale * 2.5;
+        // Set camera distance based on model size — mais próximo para impacto
+        spherical.radius = maxDim * scale * 1.4;
+        spherical.phi = 1.0; // ângulo levemente acima
         updateCamera();
 
         // Move grid to model base
