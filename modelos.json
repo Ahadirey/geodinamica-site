@@ -8,5 +8,15 @@
     "tipo": "topografia",
     "publico": true,
     "data": "2026-05-28"
+  },
+  {
+    "id": "modelo_mozara",
+    "nome": "Mozara 3D",
+    "descricao": "Aerolevantamento",
+    "arquivo": "modelo_mozara.glb",
+    "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/modelo_mozara.glb",
+    "tipo": "topografia",
+    "publico": true,
+    "data": "2026-05-29"
   }
 ]
