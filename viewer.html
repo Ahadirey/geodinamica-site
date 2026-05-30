@@ -451,7 +451,13 @@ function loadGLB(url) {
   const script = document.createElement('script');
   script.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js';
   script.onload = () => {
-    const loader = new THREE.GLTFLoader();
+    const dracoScript = document.createElement('script');
+    dracoScript.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js';
+    dracoScript.onload = () => {
+      const dracoLoader = new THREE.DRACOLoader();
+      dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+      const loader = new THREE.GLTFLoader();
+      loader.setDRACOLoader(dracoLoader);
     const bar = document.getElementById('loading-bar');
 
     loader.load(
@@ -521,6 +527,8 @@ function loadGLB(url) {
         document.getElementById('error-detail').textContent = url;
       }
     );
+    };
+    document.head.appendChild(dracoScript);
   };
   document.head.appendChild(script);
 }
