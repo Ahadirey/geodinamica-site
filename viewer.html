@@ -287,7 +287,7 @@
 
 <div class="geo-badge">geodinamicasa.com.br</div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.152.0/build/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 // Pega o modelo da URL: ?modelo=URL_DO_GLB&nome=Nome+do+Projeto
 const params = new URLSearchParams(window.location.search);
@@ -306,7 +306,7 @@ const canvas = document.getElementById('viewer-canvas');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.0;
 renderer.shadowMap.enabled = false; // desativa sombras para economizar memória GPU
@@ -460,20 +460,9 @@ function loadGLB(url) {
   }
 
   async function initLoader(url) {
-    await loadScript('https://cdn.jsdelivr.net/npm/three@0.152.0/examples/js/loaders/GLTFLoader.js');
-    await loadScript('https://cdn.jsdelivr.net/npm/three@0.152.0/examples/js/loaders/DRACOLoader.js');
-    await loadScript('https://cdn.jsdelivr.net/npm/three@0.152.0/examples/js/loaders/KTX2Loader.js');
-
-    const ktx2Loader = new THREE.KTX2Loader();
-    ktx2Loader.setTranscoderPath('https://cdn.jsdelivr.net/npm/three@0.152.0/examples/jsm/libs/basis/');
-    ktx2Loader.detectSupport(renderer);
-
-    const dracoLoader = new THREE.DRACOLoader();
-    dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+    await loadScript('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js');
 
     const loader = new THREE.GLTFLoader();
-    loader.setKTX2Loader(ktx2Loader);
-    loader.setDRACOLoader(dracoLoader);
 
     const bar = document.getElementById('loading-bar');
 
