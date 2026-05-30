@@ -303,14 +303,23 @@ setTimeout(() => {
 
 // THREE.JS SETUP
 const canvas = document.getElementById('viewer-canvas');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.2;
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMappingExposure = 1.0;
+renderer.shadowMap.enabled = false; // desativa sombras para economizar memória GPU
+renderer.physicallyCorrectLights = true;
+
+// Aumenta limite de texturas para suportar 4096x4096
+const gl = renderer.getContext();
+const maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+console.log('Max texture size:', maxTextureSize);
+
+// Configura anisotropia máxima para texturas mais nítidas
+const maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
+renderer.capabilities.getMaxAnisotropy = () => maxAnisotropy;
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x0d1a15);
@@ -463,11 +472,23 @@ function loadGLB(url) {
         model.position.sub(center.multiplyScalar(scale));
         model.position.y -= (size.y * scale) / 2;
 
-        // Enable shadows
+        // Enable shadows e anisotropia máxima nas texturas
         model.traverse(node => {
           if (node.isMesh) {
-            node.castShadow = true;
-            node.receiveShadow = true;
+            node.castShadow = false;
+            node.receiveShadow = false;
+            // Aplica anisotropia máxima em todas as texturas para nitidez
+            if (node.material) {
+              const mats = Array.isArray(node.material) ? node.material : [node.material];
+              mats.forEach(mat => {
+                ['map','normalMap','roughnessMap','metalnessMap','aoMap','emissiveMap'].forEach(key => {
+                  if (mat[key]) {
+                    mat[key].anisotropy = maxAnisotropy;
+                    mat[key].needsUpdate = true;
+                  }
+                });
+              });
+            }
           }
         });
 
