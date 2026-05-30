@@ -288,6 +288,7 @@
 <div class="geo-badge">geodinamicasa.com.br</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meshoptimizer@0.18.1/meshopt_decoder.js"></script>
 <script>
 // Pega o modelo da URL: ?modelo=URL_DO_GLB&nome=Nome+do+Projeto
 const params = new URLSearchParams(window.location.search);
@@ -452,6 +453,7 @@ function loadGLB(url) {
   script.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js';
   script.onload = () => {
     const loader = new THREE.GLTFLoader();
+    loader.setMeshoptDecoder(MeshoptDecoder);
     const bar = document.getElementById('loading-bar');
 
     loader.load(
