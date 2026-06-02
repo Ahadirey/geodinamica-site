@@ -7,7 +7,9 @@
     "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/modelo.glb",
     "tipo": "topografia",
     "publico": true,
-    "data": "2026-05-28"
+    "data": "2026-05-28",
+    "lat": -28.021017,
+    "lon": -49.612710
   },
   {
     "id": "modelo-mozara",
@@ -17,7 +19,9 @@
     "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/modelo_mozara.glb",
     "tipo": "topografia",
     "publico": true,
-    "data": "2026-05-29"
+    "data": "2026-05-29",
+    "lat": -28.021017,
+    "lon": -49.612710
   },
   {
     "id": "modelo-mozara-2048",
@@ -27,6 +31,8 @@
     "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/modelo_mozara2048.glb",
     "tipo": "topografia",
     "publico": true,
-    "data": "2026-05-31"
+    "data": "2026-05-31",
+    "lat": -28.021017,
+    "lon": -49.612710
   }
 ]
