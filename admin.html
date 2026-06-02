@@ -330,12 +330,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 // ── CONFIGURAÇÃO ──────────────────────────────────────────────────────────────
-const ADMIN_PASSWORD  = "geo2026";           // ← altere aqui
-const GITHUB_TOKEN    = "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"; // ← cole o token GitHub aqui
-const GITHUB_USER     = "Ahadirey";
-const GITHUB_REPO     = "geodinamica-site";
-const GITHUB_FILE     = "modelos.json";
-const GITHUB_BRANCH   = "main";
+const ADMIN_PASSWORD  = "geo2026";  // ← altere aqui se quiser
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── LOGIN ─────────────────────────────────────────────────────────────────────
@@ -602,38 +597,33 @@ document.getElementById('btn-salvar').addEventListener('click', async () => {
   };
 
   try {
-    // Busca SHA atual do arquivo
-    const getResp = await fetch(
-      `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE}?ref=${GITHUB_BRANCH}`,
-      { headers: { Authorization: `token ${GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json' } }
-    );
-    const fileData = await getResp.json();
-    const sha = fileData.sha;
+    // Chama a API route do Vercel — token fica seguro no servidor
+    const modelo = modelosData[currentModelIndex];
+    const resp = await fetch('/api/save-vista', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        senha: ADMIN_PASSWORD,
+        modeloId: modelo.id,
+        vista: {
+          spherical: { ...editorSpherical },
+          panOffset: { ...editorPanOffset }
+        }
+      })
+    });
 
-    const novoConteudo = JSON.stringify(modelosData, null, 2);
-    const encoded = btoa(unescape(encodeURIComponent(novoConteudo)));
-
-    const putResp = await fetch(
-      `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`,
-      {
-        method: 'PUT',
-        headers: { Authorization: `token ${GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: `Vista: ${modelosData[currentModelIndex].nome}`,
-          content: encoded,
-          sha,
-          branch: GITHUB_BRANCH
-        })
-      }
-    );
-
-    if (putResp.ok) {
+    const result = await resp.json();
+    if (resp.ok) {
+      // Atualiza também o cache local
+      modelosData[currentModelIndex].vista = {
+        spherical: { ...editorSpherical },
+        panOffset: { ...editorPanOffset }
+      };
       status.className = 'save-status ok';
       status.textContent = '✓ Vista salva com sucesso!';
-      renderGrid(); // atualiza badge no card
+      renderGrid();
     } else {
-      const err = await putResp.json();
-      throw new Error(err.message);
+      throw new Error(result.error || 'Erro desconhecido');
     }
   } catch(e) {
     status.className = 'save-status err';
