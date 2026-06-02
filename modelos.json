@@ -37,6 +37,17 @@
     "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/PORTICO_SAO_JOAQUIM.glb",
     "tipo": "ambiental",
     "publico": true,
-    "data": "2026-06-02"
+    "data": "2026-06-02",
+    "vista": {
+      "spherical": {
+        "theta": -1.6649999999999994,
+        "phi": 1.0857963267948962,
+        "radius": 3.3
+      },
+      "panOffset": {
+        "x": 0.3840000000000006,
+        "y": -0.9359999999999997
+      }
+    }
   }
 ]
