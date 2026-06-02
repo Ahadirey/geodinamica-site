@@ -14,7 +14,7 @@
     --branco: #ffffff;
   }
   html { scroll-behavior: smooth; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--pedra); color: var(--branco); min-height: 100vh; }
+  body { font-family: 'DM Sans', sans-serif; background: #1a1f1d; color: var(--branco); min-height: 100vh; }
 
   /* NAV */
   nav {
@@ -66,7 +66,7 @@
   }
 
   .modelo-card {
-    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
     border-radius: 4px; overflow: hidden;
     transition: border-color 0.3s, transform 0.3s;
     text-decoration: none; display: block; color: inherit;
@@ -75,7 +75,7 @@
 
   .modelo-thumb {
     aspect-ratio: 16/10;
-    background: linear-gradient(135deg, #0a1a14, #0f2d20);
+    background: linear-gradient(135deg, #1a2e25, #243d30);
     display: flex; align-items: center; justify-content: center;
     position: relative; overflow: hidden;
   }
@@ -194,8 +194,9 @@ async function carregarModelos() {
       const icon = TIPO_ICONS[m.tipo] || TIPO_ICONS.topografia;
       const url = encodeURIComponent(m.url);
       const nome = encodeURIComponent(m.nome);
+      const coordParams = (m.lat && m.lon) ? `&lat=${m.lat}&lon=${m.lon}` : '';
       return `
-      <a href="viewer.html?modelo=${m.url}&nome=${m.nome.replace(/ /g,'+')}" class="modelo-card">
+      <a href="viewer.html?modelo=${m.url}&nome=${m.nome.replace(/ /g,'+')}${coordParams}" class="modelo-card">
         <div class="modelo-thumb">
           ${icon}
           <div class="modelo-thumb-play">

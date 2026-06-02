@@ -18,27 +18,5 @@
     "tipo": "topografia",
     "publico": true,
     "data": "2026-05-29"
-  },
-  {
-    "id": "modelo_mozara2048",
-    "nome": "Mozara 2048",
-    "descricao": "Aero",
-    "arquivo": "modelo_mozara2048.glb",
-    "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/modelo_mozara2048.glb",
-    "tipo": "topografia",
-    "publico": true,
-    "data": "2026-05-29"
-  },
-  {
-    "id": "modelo_mozara2048",
-    "nome": "Modelo Mozara Sol",
-    "descricao": "Aero",
-    "arquivo": "modelo_mozara2048.glb",
-    "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/modelo_mozara2048.glb",
-    "tipo": "topografia",
-    "publico": true,
-    "data": "2026-06-02",
-    "lat": -28.021017,
-    "lon": -49.61271
   }
 ]
