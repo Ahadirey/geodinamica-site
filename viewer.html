@@ -547,10 +547,10 @@ const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerH
 camera.position.set(0, 2, 5);
 
 // LIGHTS
-const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.4); // baixo para sombras visíveis
 scene.add(ambientLight);
 
-const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+const dirLight = new THREE.DirectionalLight(0xffffff, 2.0); // forte para sombras nítidas
 dirLight.position.set(5, 10, 7);
 dirLight.castShadow = true;
 dirLight.shadow.mapSize.width = 2048;
@@ -563,6 +563,7 @@ dirLight.shadow.camera.top = 30;
 dirLight.shadow.camera.bottom = -30;
 dirLight.shadow.bias = -0.001;
 scene.add(dirLight);
+scene.add(dirLight.target); // OBRIGATÓRIO para sombras direcionais seguirem a luz
 
 const fillLight = new THREE.DirectionalLight(0xffffff, 0.5);
 fillLight.position.set(-5, 5, -5);
@@ -821,19 +822,28 @@ function iniciarSolar() {
       document.getElementById('sun-status').style.color = '#67C187';
     }
 
-    // Move a luz direcional para posição do sol
+    // Move a luz direcional para posição do sol e atualiza sombras
     if (elevDeg > 0) {
       const elevRad = pos.altitude;
-      const azRad = pos.azimuth;
-      const dist = 50;
-      dirLight.position.set(
-        dist * Math.cos(elevRad) * Math.sin(azRad),
-        dist * Math.sin(elevRad),
-        dist * Math.cos(elevRad) * Math.cos(azRad)
-      );
+      // SunCalc retorna azimute em radianos a partir do Sul, sentido horário
+      // Convertemos para coordenadas Three.js (eixo Y para cima, Z para frente)
+      const azRad = pos.azimuth + Math.PI; // ajuste para Norte = 0
+      const dist = 100;
+
+      const x = dist * Math.cos(elevRad) * Math.sin(azRad);
+      const y = dist * Math.sin(elevRad);
+      const z = dist * Math.cos(elevRad) * Math.cos(azRad);
+
+      dirLight.position.set(x, y, z);
+      dirLight.target.position.set(0, 0, 0);
+      dirLight.target.updateMatrixWorld();
+
+      // CRÍTICO: forçar atualização da câmera de sombra após mover a luz
       dirLight.shadow.camera.updateProjectionMatrix();
-      dirLight.intensity = Math.max(0.3, Math.sin(elevRad) * 1.5);
-      ambientLight.intensity = Math.max(0.3, 0.4 + Math.sin(elevRad) * 0.8);
+      dirLight.shadow.needsUpdate = true;
+
+      dirLight.intensity = Math.max(0.2, Math.sin(elevRad) * 2.0);
+      ambientLight.intensity = Math.max(0.2, 0.3 + Math.sin(elevRad) * 0.7);
 
       // Cor quente no nascer/pôr do sol
       if (elevDeg < 15) {
@@ -844,9 +854,9 @@ function iniciarSolar() {
         ambientLight.color.setHex(0xffffff);
       }
     } else {
-      // Noite — luz ambiente mínima
+      // Noite — luz ambiente mínima azulada
       dirLight.intensity = 0;
-      ambientLight.intensity = 0.15;
+      ambientLight.intensity = 0.12;
       ambientLight.color.setHex(0x8899ff);
     }
   }
