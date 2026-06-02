@@ -147,7 +147,153 @@
     border-radius: 2px;
   }
 
-  /* CONTROLS HINT */
+  /* SOLAR CONTROL */
+  .solar-panel {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    z-index: 10;
+    background: rgba(20,28,24,0.85);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 4px;
+    padding: 1rem 1.25rem;
+    backdrop-filter: blur(10px);
+    min-width: 280px;
+    transition: opacity 0.3s;
+  }
+
+  .solar-panel.no-coords {
+    display: none;
+  }
+
+  .solar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.85rem;
+  }
+
+  .solar-title {
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .solar-title svg {
+    width: 14px; height: 14px;
+    stroke: #EF9F27;
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+  }
+
+  .solar-info {
+    font-size: 0.78rem;
+    font-weight: 400;
+    color: #EF9F27;
+  }
+
+  .solar-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .solar-row:last-child { margin-bottom: 0; }
+
+  .solar-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.4);
+    font-weight: 300;
+  }
+
+  .solar-label span:last-child {
+    color: rgba(255,255,255,0.7);
+    font-weight: 400;
+  }
+
+  .solar-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.1);
+    outline: none;
+    cursor: pointer;
+  }
+
+  .solar-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #EF9F27;
+    cursor: pointer;
+    border: 2px solid rgba(0,0,0,0.3);
+    transition: transform 0.1s;
+  }
+
+  .solar-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+  }
+
+  .solar-btn-now {
+    width: 100%;
+    margin-top: 0.75rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 0.4rem 1rem;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .solar-btn-now:hover {
+    color: #EF9F27;
+    border-color: rgba(239,159,39,0.3);
+    background: rgba(239,159,39,0.08);
+  }
+
+  .sun-position-indicator {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .sun-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .sun-stat-label {
+    font-size: 0.62rem;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .sun-stat-value {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: rgba(255,255,255,0.7);
+  }
   .controls-hint {
     position: absolute;
     bottom: 1.5rem;
@@ -285,16 +431,67 @@
   <div class="hint-item"><span class="hint-key">⇥</span> Botão direito para mover</div>
 </div>
 
+<div class="solar-panel" id="solar-panel">
+  <div class="solar-header">
+    <div class="solar-title">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      Posição Solar
+    </div>
+    <div class="solar-info" id="solar-time-display">12:00</div>
+  </div>
+
+  <div class="solar-row">
+    <div class="solar-label">
+      <span>Hora</span>
+      <span id="hora-label">12:00</span>
+    </div>
+    <input type="range" class="solar-slider" id="hora-slider" min="0" max="1440" value="720" step="10">
+  </div>
+
+  <div class="solar-row">
+    <div class="solar-label">
+      <span>Data</span>
+      <span id="data-label">Jun 15</span>
+    </div>
+    <input type="range" class="solar-slider" id="data-slider" min="1" max="365" value="166" step="1">
+  </div>
+
+  <div class="sun-position-indicator">
+    <div class="sun-stat">
+      <div class="sun-stat-label">Elevação</div>
+      <div class="sun-stat-value" id="sun-elevation">--°</div>
+    </div>
+    <div class="sun-stat">
+      <div class="sun-stat-label">Azimute</div>
+      <div class="sun-stat-value" id="sun-azimuth">--°</div>
+    </div>
+    <div class="sun-stat">
+      <div class="sun-stat-label">Status</div>
+      <div class="sun-stat-value" id="sun-status">--</div>
+    </div>
+  </div>
+
+  <button class="solar-btn-now" id="btn-agora">⟳ Usar hora atual</button>
+</div>
+
 <div class="geo-badge">geodinamicasa.com.br</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.js"></script>
 <script>
 // Pega o modelo da URL: ?modelo=URL_DO_GLB&nome=Nome+do+Projeto
 const params = new URLSearchParams(window.location.search);
 const modelUrl = params.get('modelo') || 'https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/modelo.glb';
 const modelName = params.get('nome') || 'Modelo 3D';
+const modelLat = parseFloat(params.get('lat')) || null;
+const modelLon = parseFloat(params.get('lon')) || null;
 
 document.getElementById('model-title').textContent = modelName;
+
+// Oculta painel solar se não tiver coordenadas
+if (!modelLat || !modelLon) {
+  document.getElementById('solar-panel').classList.add('no-coords');
+}
 
 // Fade hint after 5s
 setTimeout(() => {
@@ -534,6 +731,112 @@ function loadGLB(url) {
 
 loadGLB(modelUrl);
 updateCamera();
+
+// ─── CONTROLE SOLAR ──────────────────────────────────────────────────────────
+if (modelLat && modelLon) {
+  const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+  function dayOfYearToDate(doy) {
+    const d = new Date(new Date().getFullYear(), 0);
+    d.setDate(doy);
+    return d;
+  }
+
+  function formatHora(minutes) {
+    const h = Math.floor(minutes / 60).toString().padStart(2,'0');
+    const m = (minutes % 60).toString().padStart(2,'0');
+    return `${h}:${m}`;
+  }
+
+  function formatData(doy) {
+    const d = dayOfYearToDate(doy);
+    return `${MESES[d.getMonth()]} ${d.getDate()}`;
+  }
+
+  function updateSun(minutes, doy) {
+    const date = dayOfYearToDate(doy);
+    date.setHours(Math.floor(minutes/60), minutes%60, 0);
+
+    const pos = SunCalc.getPosition(date, modelLat, modelLon);
+    const elevDeg = pos.altitude * (180/Math.PI);
+    const azDeg = ((pos.azimuth * (180/Math.PI)) + 180) % 360;
+
+    // Atualiza UI
+    document.getElementById('hora-label').textContent = formatHora(minutes);
+    document.getElementById('data-label').textContent = formatData(doy);
+    document.getElementById('solar-time-display').textContent = formatHora(minutes);
+    document.getElementById('sun-elevation').textContent = elevDeg.toFixed(1) + '°';
+    document.getElementById('sun-azimuth').textContent = azDeg.toFixed(1) + '°';
+
+    if (elevDeg < 0) {
+      document.getElementById('sun-status').textContent = 'Noite';
+      document.getElementById('sun-status').style.color = 'rgba(255,255,255,0.3)';
+    } else if (elevDeg < 10) {
+      document.getElementById('sun-status').textContent = 'Amanhecer';
+      document.getElementById('sun-status').style.color = '#EF9F27';
+    } else {
+      document.getElementById('sun-status').textContent = 'Dia';
+      document.getElementById('sun-status').style.color = '#67C187';
+    }
+
+    // Move a luz direcional para posição do sol
+    if (elevDeg > 0) {
+      const elevRad = pos.altitude;
+      const azRad = pos.azimuth;
+      const dist = 50;
+      dirLight.position.set(
+        dist * Math.cos(elevRad) * Math.sin(azRad),
+        dist * Math.sin(elevRad),
+        dist * Math.cos(elevRad) * Math.cos(azRad)
+      );
+      dirLight.intensity = Math.max(0.3, Math.sin(elevRad) * 1.5);
+      ambientLight.intensity = Math.max(0.3, 0.4 + Math.sin(elevRad) * 0.8);
+
+      // Cor quente no nascer/pôr do sol
+      if (elevDeg < 15) {
+        dirLight.color.setHex(0xffaa44);
+        ambientLight.color.setHex(0xffcc88);
+      } else {
+        dirLight.color.setHex(0xffffff);
+        ambientLight.color.setHex(0xffffff);
+      }
+    } else {
+      // Noite — luz ambiente mínima
+      dirLight.intensity = 0;
+      ambientLight.intensity = 0.15;
+      ambientLight.color.setHex(0x8899ff);
+    }
+  }
+
+  // Inicializa com hora atual
+  const now = new Date();
+  const minutesNow = now.getHours() * 60 + now.getMinutes();
+  const doyNow = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
+
+  document.getElementById('hora-slider').value = minutesNow;
+  document.getElementById('data-slider').value = doyNow;
+  updateSun(minutesNow, doyNow);
+
+  // Eventos dos sliders
+  document.getElementById('hora-slider').addEventListener('input', function() {
+    updateSun(parseInt(this.value), parseInt(document.getElementById('data-slider').value));
+  });
+
+  document.getElementById('data-slider').addEventListener('input', function() {
+    updateSun(parseInt(document.getElementById('hora-slider').value), parseInt(this.value));
+  });
+
+  // Botão "agora"
+  document.getElementById('btn-agora').addEventListener('click', function() {
+    const n = new Date();
+    const m = n.getHours() * 60 + n.getMinutes();
+    const d = Math.floor((n - new Date(n.getFullYear(), 0, 0)) / 86400000);
+    document.getElementById('hora-slider').value = m;
+    document.getElementById('data-slider').value = d;
+    updateSun(m, d);
+  });
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 // RENDER LOOP
 function animate() {
