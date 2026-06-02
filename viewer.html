@@ -154,7 +154,24 @@ camera.position.set(0, 2, 5);
 const ambient = new THREE.AmbientLight(0xffffff, 1.0);
 scene.add(ambient);
 
-// ─── ORBIT CONTROLS ───────────────────────────────────────────────────────────
+// ─── VISTA SALVA ──────────────────────────────────────────────────────────────
+// Busca vista personalizada do modelos.json e aplica antes de mostrar o modelo
+async function carregarVista() {
+  try {
+    const r = await fetch('modelos.json?v=' + Date.now());
+    const modelos = await r.json();
+    const arquivo = modelUrl.split('/').pop();
+    const modelo = modelos.find(m => m.arquivo === arquivo || m.url === modelUrl);
+    if (modelo && modelo.vista) {
+      spherical.theta  = modelo.vista.spherical.theta;
+      spherical.phi    = modelo.vista.spherical.phi;
+      spherical.radius = modelo.vista.spherical.radius;
+      panOffset.set(modelo.vista.panOffset.x, modelo.vista.panOffset.y, 0);
+      updateCamera();
+    }
+  } catch(e) { /* sem vista salva — usa padrão */ }
+}
+carregarVista();
 let isDragging = false, isPanning = false;
 let prevMouse = { x: 0, y: 0 };
 let spherical = { theta: 0.3, phi: 1.0, radius: 5 };
@@ -276,7 +293,8 @@ function loadGLB(url) {
           });
 
           scene.add(model);
-          spherical.radius = maxDim * scale * 1.4;
+          // Só aplica radius padrão se não tiver vista salva
+          if (spherical.radius === 5) spherical.radius = maxDim * scale * 1.4;
           updateCamera();
 
           bar.style.width = '100%';

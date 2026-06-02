@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geodinâmica – Admin</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --verde: #005849;
+    --verde-claro: #67C187;
+    --bg: #1a1f1d;
+    --surface: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.09);
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: #fff; min-height: 100vh; }
+
+  /* ── LOGIN ── */
+  #login-screen {
+    position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: var(--bg); z-index: 100;
+  }
+  #login-screen.hidden { display: none; }
+  .login-box {
+    width: 340px; background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border); border-radius: 6px; padding: 2.5rem 2rem;
+  }
+  .login-logo { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 2rem; }
+  .login-logo-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; letter-spacing: 0.04em; }
+  .login-logo-text span { color: var(--verde-claro); }
+  .login-title { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.4rem; }
+  .login-sub { font-size: 0.78rem; color: rgba(255,255,255,0.35); margin-bottom: 1.75rem; font-weight: 300; }
+  .field { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
+  .field label { font-size: 0.72rem; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.08em; }
+  .field input {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    border-radius: 3px; padding: 0.6rem 0.85rem;
+    font-size: 0.9rem; color: #fff; font-family: inherit; outline: none;
+    transition: border-color 0.2s;
+  }
+  .field input:focus { border-color: rgba(103,193,135,0.4); }
+  .login-btn {
+    width: 100%; margin-top: 0.5rem; padding: 0.7rem;
+    background: var(--verde); border: none; border-radius: 3px;
+    font-family: inherit; font-size: 0.82rem; font-weight: 500;
+    letter-spacing: 0.08em; text-transform: uppercase; color: #fff;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .login-btn:hover { background: #007060; }
+  .login-error { font-size: 0.75rem; color: #ff6b6b; margin-top: 0.75rem; display: none; }
+  .login-error.visible { display: block; }
+
+  /* ── MAIN ── */
+  #main-screen { display: none; }
+  #main-screen.visible { display: block; }
+
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 2rem;
+    background: rgba(26,31,29,0.95); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-brand { display: flex; align-items: center; gap: 0.6rem; }
+  .nav-brand-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.95rem; letter-spacing: 0.04em; }
+  .nav-brand-text span { color: var(--verde-claro); }
+  .nav-badge {
+    font-size: 0.62rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--verde-claro); background: rgba(103,193,135,0.1);
+    border: 1px solid rgba(103,193,135,0.2); padding: 0.2rem 0.6rem; border-radius: 2px;
+  }
+  .nav-right { display: flex; align-items: center; gap: 1rem; }
+  .nav-link {
+    font-size: 0.75rem; color: rgba(255,255,255,0.4); text-decoration: none;
+    letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.2s;
+  }
+  .nav-link:hover { color: #fff; }
+  .logout-btn {
+    font-size: 0.72rem; color: rgba(255,255,255,0.35); background: none;
+    border: 1px solid var(--border); padding: 0.35rem 0.8rem; border-radius: 2px;
+    cursor: pointer; font-family: inherit; transition: all 0.2s;
+  }
+  .logout-btn:hover { color: #fff; border-color: rgba(255,255,255,0.2); }
+
+  .page-content { padding: 2.5rem 2rem; max-width: 1100px; margin: 0 auto; }
+  .page-tag { font-size: 0.68rem; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--verde-claro); margin-bottom: 0.5rem; }
+  .page-title { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 700; margin-bottom: 0.4rem; }
+  .page-sub { font-size: 0.85rem; color: rgba(255,255,255,0.4); font-weight: 300; margin-bottom: 2.5rem; }
+
+  /* ── GRID DE MODELOS ── */
+  .modelos-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem;
+  }
+  .modelo-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .modelo-card:hover { border-color: rgba(0,88,73,0.35); }
+  .modelo-card-header { padding: 1rem 1.25rem 0.75rem; border-bottom: 1px solid var(--border); }
+  .modelo-card-nome { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .modelo-card-meta { font-size: 0.73rem; color: rgba(255,255,255,0.35); font-weight: 300; }
+  .modelo-card-body { padding: 1rem 1.25rem; }
+
+  .vista-info {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.72rem; color: rgba(255,255,255,0.35); margin-bottom: 1rem;
+  }
+  .vista-info svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 1.8; flex-shrink: 0; }
+  .vista-salva { color: var(--verde-claro); }
+  .vista-salva svg { stroke: var(--verde-claro); }
+
+  .card-actions { display: flex; gap: 0.6rem; }
+  .btn-editar {
+    flex: 1; padding: 0.55rem 0; font-family: inherit; font-size: 0.75rem;
+    font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase;
+    background: rgba(0,88,73,0.2); border: 1px solid rgba(0,88,73,0.35);
+    color: var(--verde-claro); border-radius: 3px; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-editar:hover { background: rgba(0,88,73,0.35); }
+  .btn-ver {
+    padding: 0.55rem 0.9rem; font-family: inherit; font-size: 0.75rem;
+    font-weight: 400; letter-spacing: 0.06em; text-transform: uppercase;
+    background: none; border: 1px solid var(--border); color: rgba(255,255,255,0.4);
+    border-radius: 3px; cursor: pointer; transition: all 0.2s; text-decoration: none;
+    display: flex; align-items: center;
+  }
+  .btn-ver:hover { color: #fff; border-color: rgba(255,255,255,0.2); }
+
+  /* ── MODAL EDITOR ── */
+  #editor-modal {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+    display: none; align-items: stretch;
+  }
+  #editor-modal.visible { display: flex; }
+
+  .editor-sidebar {
+    width: 280px; flex-shrink: 0;
+    background: rgba(20,26,23,0.98); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; padding: 1.5rem;
+    overflow-y: auto;
+  }
+  .editor-title { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; }
+  .editor-sub { font-size: 0.73rem; color: rgba(255,255,255,0.35); font-weight: 300; margin-bottom: 1.5rem; line-height: 1.5; }
+
+  .editor-section { margin-bottom: 1.5rem; }
+  .editor-section-title {
+    font-size: 0.65rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
+    color: rgba(255,255,255,0.3); margin-bottom: 0.75rem;
+    padding-bottom: 0.4rem; border-bottom: 1px solid var(--border);
+  }
+
+  .vista-values { display: flex; flex-direction: column; gap: 0.5rem; }
+  .vista-val-row { display: flex; justify-content: space-between; align-items: center; }
+  .vista-val-label { font-size: 0.7rem; color: rgba(255,255,255,0.35); }
+  .vista-val { font-size: 0.78rem; font-weight: 500; color: rgba(255,255,255,0.7); font-family: monospace; }
+
+  .editor-actions { margin-top: auto; display: flex; flex-direction: column; gap: 0.6rem; }
+  .btn-salvar {
+    width: 100%; padding: 0.75rem; font-family: inherit; font-size: 0.8rem;
+    font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    background: var(--verde); border: none; color: #fff; border-radius: 3px;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .btn-salvar:hover { background: #007060; }
+  .btn-salvar:disabled { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.3); cursor: not-allowed; }
+  .btn-cancelar {
+    width: 100%; padding: 0.65rem; font-family: inherit; font-size: 0.75rem;
+    font-weight: 400; letter-spacing: 0.06em; text-transform: uppercase;
+    background: none; border: 1px solid var(--border); color: rgba(255,255,255,0.4);
+    border-radius: 3px; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-cancelar:hover { color: #fff; border-color: rgba(255,255,255,0.2); }
+
+  .save-status {
+    font-size: 0.72rem; text-align: center; padding: 0.4rem;
+    border-radius: 3px; display: none;
+  }
+  .save-status.ok { display: block; color: var(--verde-claro); background: rgba(103,193,135,0.1); border: 1px solid rgba(103,193,135,0.2); }
+  .save-status.err { display: block; color: #ff6b6b; background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.2); }
+  .save-status.loading { display: block; color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+
+  .editor-viewer { flex: 1; position: relative; overflow: hidden; }
+  #editor-canvas { width: 100%; height: 100%; display: block; }
+
+  .editor-hint {
+    position: absolute; top: 1rem; left: 50%; transform: translateX(-50%);
+    background: rgba(13,26,21,0.8); border: 1px solid var(--border);
+    border-radius: 3px; padding: 0.5rem 1rem;
+    font-size: 0.7rem; color: rgba(255,255,255,0.45);
+    backdrop-filter: blur(8px); white-space: nowrap;
+    pointer-events: none;
+  }
+
+  #editor-loading {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 1rem;
+    background: #1a1f1d; z-index: 10;
+  }
+  #editor-loading.hidden { display: none; }
+  #editor-loading svg { width: 36px; height: 36px; animation: spin 2s linear infinite; }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  #editor-loading span { font-size: 0.78rem; color: rgba(255,255,255,0.4); letter-spacing: 0.08em; text-transform: uppercase; }
+
+  .instrucoes {
+    background: rgba(103,193,135,0.06); border: 1px solid rgba(103,193,135,0.15);
+    border-radius: 3px; padding: 0.75rem; margin-bottom: 1.5rem;
+  }
+  .instrucoes p { font-size: 0.72rem; color: rgba(255,255,255,0.45); line-height: 1.6; font-weight: 300; }
+  .instrucoes p + p { margin-top: 0.3rem; }
+
+  @media (max-width: 768px) {
+    .editor-sidebar { width: 100%; max-height: 45vh; border-right: none; border-bottom: 1px solid var(--border); }
+    #editor-modal.visible { flex-direction: column; }
+  }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <svg viewBox="0 0 32 32" fill="none" width="28" height="28">
+        <path d="M4,28 A14,14 0 0,1 28,28 Z" fill="#67C187" opacity="0.2"/>
+        <polyline points="4,28 12,12 18,20 22,14 28,28" fill="none" stroke="#005849" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+        <path d="M4,26 Q10,24 16,26 Q22,28 28,26" fill="none" stroke="#005849" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      <span class="login-logo-text">GEO<span>DINÂMICA</span></span>
+    </div>
+    <div class="login-title">Área administrativa</div>
+    <div class="login-sub">Acesso restrito. Digite a senha para continuar.</div>
+    <div class="field">
+      <label>Senha</label>
+      <input type="password" id="senha-input" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="login-btn" id="login-btn">Entrar</button>
+    <div class="login-error" id="login-error">Senha incorreta.</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main-screen">
+  <nav>
+    <div class="nav-brand">
+      <svg viewBox="0 0 32 32" fill="none" width="26" height="26">
+        <path d="M4,28 A14,14 0 0,1 28,28 Z" fill="#67C187" opacity="0.2"/>
+        <polyline points="4,28 12,12 18,20 22,14 28,28" fill="none" stroke="#005849" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+        <path d="M4,26 Q10,24 16,26 Q22,28 28,26" fill="none" stroke="#005849" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      <span class="nav-brand-text">GEO<span>DINÂMICA</span></span>
+      <span class="nav-badge">Admin</span>
+    </div>
+    <div class="nav-right">
+      <a href="index.html" class="nav-link">Site</a>
+      <a href="modelos.html" class="nav-link">Portfólio</a>
+      <button class="logout-btn" id="logout-btn">Sair</button>
+    </div>
+  </nav>
+
+  <div class="page-content">
+    <div class="page-tag">Administração</div>
+    <h1 class="page-title">Editar vistas dos modelos</h1>
+    <p class="page-sub">Defina o ângulo e zoom inicial de cada modelo 3D. Clique em "Editar vista" para ajustar interativamente.</p>
+    <div class="modelos-grid" id="modelos-grid">
+      <div style="color:rgba(255,255,255,0.3);font-size:0.8rem;">Carregando modelos...</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITOR -->
+<div id="editor-modal">
+  <div class="editor-sidebar">
+    <div class="editor-title" id="editor-model-name">Modelo</div>
+    <div class="editor-sub">Arraste e gire o modelo até encontrar a vista ideal. Os valores são atualizados em tempo real.</div>
+
+    <div class="instrucoes">
+      <p>🖱 <strong>Arrastar</strong> — rotacionar</p>
+      <p>🖱 <strong>Scroll</strong> — zoom</p>
+      <p>🖱 <strong>Botão direito</strong> — mover</p>
+    </div>
+
+    <div class="editor-section">
+      <div class="editor-section-title">Vista atual</div>
+      <div class="vista-values">
+        <div class="vista-val-row">
+          <span class="vista-val-label">Rotação H</span>
+          <span class="vista-val" id="val-theta">0.30</span>
+        </div>
+        <div class="vista-val-row">
+          <span class="vista-val-label">Rotação V</span>
+          <span class="vista-val" id="val-phi">1.00</span>
+        </div>
+        <div class="vista-val-row">
+          <span class="vista-val-label">Zoom</span>
+          <span class="vista-val" id="val-radius">5.00</span>
+        </div>
+        <div class="vista-val-row">
+          <span class="vista-val-label">Pan X</span>
+          <span class="vista-val" id="val-panx">0.00</span>
+        </div>
+        <div class="vista-val-row">
+          <span class="vista-val-label">Pan Y</span>
+          <span class="vista-val" id="val-pany">0.00</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="editor-actions">
+      <div class="save-status" id="save-status"></div>
+      <button class="btn-salvar" id="btn-salvar">💾 Salvar vista</button>
+      <button class="btn-cancelar" id="btn-cancelar">Cancelar</button>
+    </div>
+  </div>
+
+  <div class="editor-viewer">
+    <div id="editor-loading">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#005849" stroke-width="2" stroke-linecap="round">
+        <circle cx="24" cy="24" r="20" stroke="rgba(0,88,73,0.15)"/>
+        <path d="M24 4 A20 20 0 0 1 44 24"/>
+      </svg>
+      <span>Carregando modelo...</span>
+    </div>
+    <canvas id="editor-canvas"></canvas>
+    <div class="editor-hint">Ajuste a vista e clique em "Salvar vista"</div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ── CONFIGURAÇÃO ──────────────────────────────────────────────────────────────
+const ADMIN_PASSWORD  = "geo2026";           // ← altere aqui
+const GITHUB_TOKEN    = "COLE_SEU_TOKEN_AQUI"; // ← cole o token GitHub aqui
+const GITHUB_USER     = "Ahadirey";
+const GITHUB_REPO     = "geodinamica-site";
+const GITHUB_FILE     = "modelos.json";
+const GITHUB_BRANCH   = "main";
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── LOGIN ─────────────────────────────────────────────────────────────────────
+function checkLogin() {
+  return sessionStorage.getItem('geo_admin') === ADMIN_PASSWORD;
+}
+
+document.getElementById('senha-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') tentarLogin();
+});
+document.getElementById('login-btn').addEventListener('click', tentarLogin);
+
+function tentarLogin() {
+  const val = document.getElementById('senha-input').value;
+  if (val === ADMIN_PASSWORD) {
+    sessionStorage.setItem('geo_admin', val);
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('main-screen').classList.add('visible');
+    carregarModelos();
+  } else {
+    document.getElementById('login-error').classList.add('visible');
+    document.getElementById('senha-input').value = '';
+    document.getElementById('senha-input').focus();
+  }
+}
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+  sessionStorage.removeItem('geo_admin');
+  location.reload();
+});
+
+if (checkLogin()) {
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('main-screen').classList.add('visible');
+  carregarModelos();
+}
+
+// ── CARREGAR MODELOS ──────────────────────────────────────────────────────────
+let modelosData = [];
+
+async function carregarModelos() {
+  const grid = document.getElementById('modelos-grid');
+  try {
+    const r = await fetch('modelos.json?v=' + Date.now());
+    modelosData = await r.json();
+    renderGrid();
+  } catch(e) {
+    grid.innerHTML = '<div style="color:#ff6b6b;font-size:0.8rem;">Erro ao carregar modelos.json</div>';
+  }
+}
+
+function renderGrid() {
+  const grid = document.getElementById('modelos-grid');
+  if (!modelosData.length) { grid.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:0.8rem;">Nenhum modelo encontrado.</div>'; return; }
+
+  grid.innerHTML = modelosData.map((m, i) => {
+    const temVista = m.vista != null;
+    return `
+    <div class="modelo-card">
+      <div class="modelo-card-header">
+        <div class="modelo-card-nome">${m.nome}</div>
+        <div class="modelo-card-meta">${m.descricao} · ${m.data}</div>
+      </div>
+      <div class="modelo-card-body">
+        <div class="vista-info ${temVista ? 'vista-salva' : ''}">
+          <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          ${temVista ? 'Vista personalizada salva' : 'Usando vista padrão'}
+        </div>
+        <div class="card-actions">
+          <button class="btn-editar" onclick="abrirEditor(${i})">✏ Editar vista</button>
+          <a class="btn-ver" href="viewer.html?modelo=${encodeURIComponent(m.url)}&nome=${encodeURIComponent(m.nome)}" target="_blank">↗</a>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── EDITOR THREE.JS ───────────────────────────────────────────────────────────
+let editorRenderer, editorScene, editorCamera, editorAnimId;
+let editorSpherical = { theta: 0.3, phi: 1.0, radius: 5 };
+let editorPanOffset = { x: 0, y: 0 };
+let editorTarget = { x: 0, y: 0, z: 0 };
+let isDragging = false, isPanning = false;
+let prevMouse = { x: 0, y: 0 };
+let currentModelIndex = null;
+
+function abrirEditor(idx) {
+  currentModelIndex = idx;
+  const modelo = modelosData[idx];
+
+  document.getElementById('editor-model-name').textContent = modelo.nome;
+  document.getElementById('save-status').className = 'save-status';
+  document.getElementById('editor-loading').classList.remove('hidden');
+  document.getElementById('editor-modal').classList.add('visible');
+
+  // Restaura vista salva se existir
+  if (modelo.vista) {
+    editorSpherical = { ...modelo.vista.spherical };
+    editorPanOffset = { ...modelo.vista.panOffset };
+  } else {
+    editorSpherical = { theta: 0.3, phi: 1.0, radius: 5 };
+    editorPanOffset = { x: 0, y: 0 };
+  }
+  editorTarget = { x: 0, y: 0, z: 0 };
+
+  iniciarEditorRenderer();
+  carregarModeloEditor(modelo.url);
+}
+
+function fecharEditor() {
+  document.getElementById('editor-modal').classList.remove('visible');
+  if (editorAnimId) cancelAnimationFrame(editorAnimId);
+  if (editorRenderer) { editorRenderer.dispose(); editorRenderer = null; }
+  if (editorScene) { editorScene = null; }
+  currentModelIndex = null;
+}
+
+document.getElementById('btn-cancelar').addEventListener('click', fecharEditor);
+document.getElementById('editor-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('editor-modal')) fecharEditor();
+});
+
+function iniciarEditorRenderer() {
+  const canvas = document.getElementById('editor-canvas');
+  if (editorRenderer) editorRenderer.dispose();
+
+  editorRenderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  editorRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  editorRenderer.outputEncoding = THREE.sRGBEncoding;
+  editorRenderer.toneMapping = THREE.NoToneMapping;
+
+  const w = canvas.parentElement.clientWidth;
+  const h = canvas.parentElement.clientHeight;
+  editorRenderer.setSize(w, h);
+
+  editorScene = new THREE.Scene();
+  editorScene.background = new THREE.Color(0x1a1f1d);
+
+  editorCamera = new THREE.PerspectiveCamera(45, w / h, 0.01, 1000);
+  editorUpdateCamera();
+
+  // Controles
+  canvas.addEventListener('mousedown', editorMouseDown);
+  canvas.addEventListener('mousemove', editorMouseMove);
+  canvas.addEventListener('mouseup', editorMouseUp);
+  canvas.addEventListener('mouseleave', editorMouseUp);
+  canvas.addEventListener('contextmenu', e => e.preventDefault());
+  canvas.addEventListener('wheel', editorWheel, { passive: true });
+
+  function editorLoop() {
+    editorAnimId = requestAnimationFrame(editorLoop);
+    if (editorRenderer && editorScene && editorCamera) editorRenderer.render(editorScene, editorCamera);
+  }
+  editorLoop();
+}
+
+function editorUpdateCamera() {
+  if (!editorCamera) return;
+  const s = editorSpherical;
+  const x = s.radius * Math.sin(s.phi) * Math.sin(s.theta);
+  const y = s.radius * Math.cos(s.phi);
+  const z = s.radius * Math.sin(s.phi) * Math.cos(s.theta);
+  editorCamera.position.set(
+    editorTarget.x + x + editorPanOffset.x,
+    editorTarget.y + y + editorPanOffset.y,
+    editorTarget.z + z
+  );
+  editorCamera.lookAt(editorTarget.x + editorPanOffset.x, editorTarget.y + editorPanOffset.y, editorTarget.z);
+  updateValDisplay();
+}
+
+function updateValDisplay() {
+  document.getElementById('val-theta').textContent  = editorSpherical.theta.toFixed(3);
+  document.getElementById('val-phi').textContent    = editorSpherical.phi.toFixed(3);
+  document.getElementById('val-radius').textContent = editorSpherical.radius.toFixed(3);
+  document.getElementById('val-panx').textContent   = editorPanOffset.x.toFixed(3);
+  document.getElementById('val-pany').textContent   = editorPanOffset.y.toFixed(3);
+}
+
+function editorMouseDown(e) {
+  if (e.button === 2) isPanning = true; else isDragging = true;
+  prevMouse = { x: e.clientX, y: e.clientY };
+}
+function editorMouseMove(e) {
+  const dx = e.clientX - prevMouse.x, dy = e.clientY - prevMouse.y;
+  if (isDragging) {
+    editorSpherical.theta -= dx * 0.005;
+    editorSpherical.phi = Math.max(0.08, Math.min(Math.PI / 2, editorSpherical.phi - dy * 0.005));
+  }
+  if (isPanning) { editorPanOffset.x -= dx * 0.003; editorPanOffset.y += dy * 0.003; }
+  prevMouse = { x: e.clientX, y: e.clientY };
+  editorUpdateCamera();
+}
+function editorMouseUp() { isDragging = false; isPanning = false; }
+function editorWheel(e) {
+  editorSpherical.radius = Math.max(0.3, Math.min(50, editorSpherical.radius + e.deltaY * 0.003));
+  editorUpdateCamera();
+}
+
+function carregarModeloEditor(url) {
+  const s1 = document.createElement('script');
+  s1.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js';
+  s1.onload = () => {
+    const s2 = document.createElement('script');
+    s2.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js';
+    s2.onload = () => {
+      const dracoLoader = new THREE.DRACOLoader();
+      dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+      const loader = new THREE.GLTFLoader();
+      loader.setDRACOLoader(dracoLoader);
+
+      loader.load(url, (gltf) => {
+        const model = gltf.scene;
+        const box = new THREE.Box3().setFromObject(model);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const scale = 3 / maxDim;
+
+        model.scale.setScalar(scale);
+        model.position.sub(center.multiplyScalar(scale));
+        model.position.y -= (size.y * scale) / 2;
+
+        const maxAniso = editorRenderer.capabilities.getMaxAnisotropy();
+        model.traverse(node => {
+          if (!node.isMesh) return;
+          const mats = Array.isArray(node.material) ? node.material : [node.material];
+          mats.forEach((mat, idx) => {
+            if (mat.map) { mat.map.encoding = THREE.sRGBEncoding; mat.map.anisotropy = maxAniso; mat.map.needsUpdate = true; }
+            const basic = new THREE.MeshBasicMaterial({ map: mat.map, side: THREE.DoubleSide });
+            if (Array.isArray(node.material)) node.material[idx] = basic; else node.material = basic;
+          });
+        });
+
+        editorScene.add(model);
+
+        // Se não tem vista salva, ajusta radius ao tamanho do modelo
+        if (!modelosData[currentModelIndex].vista) {
+          editorSpherical.radius = maxDim * scale * 1.4;
+        }
+        editorUpdateCamera();
+        document.getElementById('editor-loading').classList.add('hidden');
+      },
+      null,
+      (err) => { console.error(err); document.getElementById('editor-loading').classList.add('hidden'); });
+    };
+    document.head.appendChild(s2);
+  };
+  document.head.appendChild(s1);
+}
+
+// ── SALVAR VIA GITHUB API ─────────────────────────────────────────────────────
+document.getElementById('btn-salvar').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-salvar');
+  const status = document.getElementById('save-status');
+  btn.disabled = true;
+  status.className = 'save-status loading';
+  status.textContent = 'Salvando...';
+
+  // Salva a vista no modelo atual
+  modelosData[currentModelIndex].vista = {
+    spherical: { ...editorSpherical },
+    panOffset: { ...editorPanOffset }
+  };
+
+  try {
+    // Busca SHA atual do arquivo
+    const getResp = await fetch(
+      `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE}?ref=${GITHUB_BRANCH}`,
+      { headers: { Authorization: `token ${GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json' } }
+    );
+    const fileData = await getResp.json();
+    const sha = fileData.sha;
+
+    const novoConteudo = JSON.stringify(modelosData, null, 2);
+    const encoded = btoa(unescape(encodeURIComponent(novoConteudo)));
+
+    const putResp = await fetch(
+      `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`,
+      {
+        method: 'PUT',
+        headers: { Authorization: `token ${GITHUB_TOKEN}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: `Vista: ${modelosData[currentModelIndex].nome}`,
+          content: encoded,
+          sha,
+          branch: GITHUB_BRANCH
+        })
+      }
+    );
+
+    if (putResp.ok) {
+      status.className = 'save-status ok';
+      status.textContent = '✓ Vista salva com sucesso!';
+      renderGrid(); // atualiza badge no card
+    } else {
+      const err = await putResp.json();
+      throw new Error(err.message);
+    }
+  } catch(e) {
+    status.className = 'save-status err';
+    status.textContent = '✗ Erro: ' + e.message;
+  }
+
+  btn.disabled = false;
+});
+</script>
+</body>
+</html>
