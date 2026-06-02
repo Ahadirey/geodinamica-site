@@ -154,29 +154,36 @@ camera.position.set(0, 2, 5);
 const ambient = new THREE.AmbientLight(0xffffff, 1.0);
 scene.add(ambient);
 
-// ─── VISTA SALVA ──────────────────────────────────────────────────────────────
-// Busca vista personalizada do modelos.json e aplica antes de mostrar o modelo
-async function carregarVista() {
-  try {
-    const r = await fetch('modelos.json?v=' + Date.now());
-    const modelos = await r.json();
-    const arquivo = modelUrl.split('/').pop();
-    const modelo = modelos.find(m => m.arquivo === arquivo || m.url === modelUrl);
-    if (modelo && modelo.vista) {
-      spherical.theta  = modelo.vista.spherical.theta;
-      spherical.phi    = modelo.vista.spherical.phi;
-      spherical.radius = modelo.vista.spherical.radius;
-      panOffset.set(modelo.vista.panOffset.x, modelo.vista.panOffset.y, 0);
-      updateCamera();
-    }
-  } catch(e) { /* sem vista salva — usa padrão */ }
-}
-carregarVista();
+// ─── ORBIT CONTROLS ───────────────────────────────────────────────────────────
 let isDragging = false, isPanning = false;
 let prevMouse = { x: 0, y: 0 };
 let spherical = { theta: 0.3, phi: 1.0, radius: 5 };
 let target = new THREE.Vector3();
 let panOffset = new THREE.Vector3();
+let vistaCarregada = false; // flag para não sobrescrever vista com radius padrão
+
+// Busca e armazena a vista — aplicada após o modelo carregar
+let vistaSalva = null;
+async function buscarVista() {
+  try {
+    const r = await fetch('modelos.json?v=' + Date.now());
+    const modelos = await r.json();
+    const arquivo = modelUrl.split('/').pop();
+    const modelo = modelos.find(m => m.arquivo === arquivo || m.url === modelUrl);
+    if (modelo && modelo.vista) vistaSalva = modelo.vista;
+  } catch(e) { /* sem vista */ }
+}
+buscarVista();
+
+function aplicarVista() {
+  if (!vistaSalva) return;
+  spherical.theta  = vistaSalva.spherical.theta;
+  spherical.phi    = vistaSalva.spherical.phi;
+  spherical.radius = vistaSalva.spherical.radius;
+  panOffset.set(vistaSalva.panOffset.x, vistaSalva.panOffset.y, 0);
+  vistaCarregada = true;
+  updateCamera();
+}
 
 function updateCamera() {
   const x = spherical.radius * Math.sin(spherical.phi) * Math.sin(spherical.theta);
@@ -293,9 +300,13 @@ function loadGLB(url) {
           });
 
           scene.add(model);
-          // Só aplica radius padrão se não tiver vista salva
-          if (spherical.radius === 5) spherical.radius = maxDim * scale * 1.4;
-          updateCamera();
+          // Aplica vista salva se existir, senão usa radius padrão
+          if (vistaSalva) {
+            aplicarVista();
+          } else {
+            spherical.radius = maxDim * scale * 1.4;
+            updateCamera();
+          }
 
           bar.style.width = '100%';
           setTimeout(() => document.getElementById('loading').classList.add('hidden'), 400);

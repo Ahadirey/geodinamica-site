@@ -434,7 +434,7 @@ document.getElementById('btn-cancelar-editor').addEventListener('click', fecharE
 function iniciarEditorRenderer() {
   const canvas = document.getElementById('editor-canvas');
   if (editorRenderer) editorRenderer.dispose();
-  editorRenderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  editorRenderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
   editorRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   editorRenderer.outputEncoding = THREE.sRGBEncoding;
   editorRenderer.toneMapping = THREE.NoToneMapping;
@@ -527,7 +527,10 @@ document.getElementById('btn-salvar-vista').addEventListener('click', async () =
   status.className = 'save-status loading';
   status.textContent = 'Capturando thumbnail...';
 
-  // Captura o canvas atual como imagem
+  // Força render de um frame e aguarda antes de capturar
+  editorRenderer.render(editorScene, editorCamera);
+  await new Promise(r => setTimeout(r, 100));
+
   const canvas = document.getElementById('editor-canvas');
   const thumbBase64 = canvas.toDataURL('image/jpeg', 0.88);
 
