@@ -483,15 +483,36 @@
 const params = new URLSearchParams(window.location.search);
 const modelUrl = params.get('modelo') || 'https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/modelo.glb';
 const modelName = params.get('nome') || 'Modelo 3D';
-const modelLat = parseFloat(params.get('lat')) || null;
-const modelLon = parseFloat(params.get('lon')) || null;
+let modelLat = parseFloat(params.get('lat')) || null;
+let modelLon = parseFloat(params.get('lon')) || null;
 
 document.getElementById('model-title').textContent = modelName;
 
-// Oculta painel solar se não tiver coordenadas
-if (!modelLat || !modelLon) {
-  document.getElementById('solar-panel').classList.add('no-coords');
+// Painel solar oculto por padrão até confirmar coords
+document.getElementById('solar-panel').classList.add('no-coords');
+
+// Busca coordenadas no modelos.json se não vieram na URL
+async function carregarCoordenadas() {
+  if (modelLat && modelLon) {
+    iniciarSolar();
+    return;
+  }
+  try {
+    const resp = await fetch('modelos.json?v=' + Date.now());
+    const modelos = await resp.json();
+    const arquivo = modelUrl.split('/').pop();
+    const modelo = modelos.find(m => m.arquivo === arquivo || m.url === modelUrl);
+    if (modelo && modelo.lat && modelo.lon) {
+      modelLat = modelo.lat;
+      modelLon = modelo.lon;
+      iniciarSolar();
+    }
+  } catch(e) {
+    console.log('Coordenadas não encontradas');
+  }
 }
+
+carregarCoordenadas();
 
 // Fade hint after 5s
 setTimeout(() => {
@@ -506,7 +527,8 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.3;
-renderer.shadowMap.enabled = false; // desativa sombras para economizar memória GPU
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.physicallyCorrectLights = true;
 
 // Aumenta limite de texturas para suportar 4096x4096
@@ -530,6 +552,16 @@ scene.add(ambientLight);
 
 const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
 dirLight.position.set(5, 10, 7);
+dirLight.castShadow = true;
+dirLight.shadow.mapSize.width = 2048;
+dirLight.shadow.mapSize.height = 2048;
+dirLight.shadow.camera.near = 0.1;
+dirLight.shadow.camera.far = 200;
+dirLight.shadow.camera.left = -30;
+dirLight.shadow.camera.right = 30;
+dirLight.shadow.camera.top = 30;
+dirLight.shadow.camera.bottom = -30;
+dirLight.shadow.bias = -0.001;
 scene.add(dirLight);
 
 const fillLight = new THREE.DirectionalLight(0xffffff, 0.5);
@@ -673,11 +705,11 @@ function loadGLB(url) {
         model.position.sub(center.multiplyScalar(scale));
         model.position.y -= (size.y * scale) / 2;
 
-        // Enable shadows e anisotropia máxima nas texturas
+        // Ativa sombras e anisotropia máxima nas texturas
         model.traverse(node => {
           if (node.isMesh) {
-            node.castShadow = false;
-            node.receiveShadow = false;
+            node.castShadow = true;
+            node.receiveShadow = true;
             // Aplica anisotropia máxima em todas as texturas para nitidez
             if (node.material) {
               const mats = Array.isArray(node.material) ? node.material : [node.material];
@@ -694,6 +726,15 @@ function loadGLB(url) {
         });
 
         scene.add(model);
+
+        // Ajusta câmera de sombra ao tamanho do modelo
+        const shadowSize = maxDim * scale * 1.5;
+        dirLight.shadow.camera.left = -shadowSize;
+        dirLight.shadow.camera.right = shadowSize;
+        dirLight.shadow.camera.top = shadowSize;
+        dirLight.shadow.camera.bottom = -shadowSize;
+        dirLight.shadow.camera.far = shadowSize * 10;
+        dirLight.shadow.camera.updateProjectionMatrix();
 
         // Set camera distance based on model size — mais próximo para impacto
         spherical.radius = maxDim * scale * 1.4;
@@ -733,7 +774,8 @@ loadGLB(modelUrl);
 updateCamera();
 
 // ─── CONTROLE SOLAR ──────────────────────────────────────────────────────────
-if (modelLat && modelLon) {
+function iniciarSolar() {
+  document.getElementById('solar-panel').classList.remove('no-coords');
   const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 
   function dayOfYearToDate(doy) {
@@ -789,6 +831,7 @@ if (modelLat && modelLon) {
         dist * Math.sin(elevRad),
         dist * Math.cos(elevRad) * Math.cos(azRad)
       );
+      dirLight.shadow.camera.updateProjectionMatrix();
       dirLight.intensity = Math.max(0.3, Math.sin(elevRad) * 1.5);
       ambientLight.intensity = Math.max(0.3, 0.4 + Math.sin(elevRad) * 0.8);
 
