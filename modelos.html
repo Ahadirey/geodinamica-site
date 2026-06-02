@@ -80,6 +80,10 @@
     position: relative; overflow: hidden;
   }
   .modelo-thumb svg { width: 55%; opacity: 0.3; }
+  .modelo-thumb img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; display: block;
+  }
   .modelo-thumb-label {
     position: absolute; bottom: 0.75rem; left: 0.75rem;
     font-size: 0.62rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
@@ -194,11 +198,13 @@ async function carregarModelos() {
       const icon = TIPO_ICONS[m.tipo] || TIPO_ICONS.topografia;
       const url = encodeURIComponent(m.url);
       const nome = encodeURIComponent(m.nome);
-      const coordParams = (m.lat && m.lon) ? `&lat=${m.lat}&lon=${m.lon}` : '';
+      const thumbHtml = m.thumb
+        ? `<img src="${m.thumb}?v=${Date.now()}" alt="${m.nome}" loading="lazy">`
+        : icon;
       return `
-      <a href="viewer.html?modelo=${m.url}&nome=${m.nome.replace(/ /g,'+')}${coordParams}" class="modelo-card">
+      <a href="viewer.html?modelo=${m.url}&nome=${m.nome.replace(/ /g,'+')}` + `" class="modelo-card">
         <div class="modelo-thumb">
-          ${icon}
+          ${thumbHtml}
           <div class="modelo-thumb-play">
             <svg viewBox="0 0 16 16"><polygon points="4,2 14,8 4,14" fill="#fff"/></svg>
           </div>

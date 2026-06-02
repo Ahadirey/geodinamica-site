@@ -525,12 +525,37 @@ document.getElementById('btn-salvar-vista').addEventListener('click', async () =
   const status = document.getElementById('save-status');
   btn.disabled = true;
   status.className = 'save-status loading';
-  status.textContent = 'Salvando...';
-  modelosData[currentIdx].vista = { spherical: { ...editorSph }, panOffset: { ...editorPan } };
+  status.textContent = 'Capturando thumbnail...';
+
+  // Captura o canvas atual como imagem
+  const canvas = document.getElementById('editor-canvas');
+  const thumbBase64 = canvas.toDataURL('image/jpeg', 0.88);
+
+  status.textContent = 'Enviando thumbnail...';
+
   try {
+    // 1. Upload da thumbnail no R2
+    const thumbResp = await fetch('/api/upload-thumb', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        senha: ADMIN_PASSWORD,
+        modeloId: modelosData[currentIdx].id,
+        imagem: thumbBase64
+      })
+    });
+    const thumbResult = await thumbResp.json();
+    if (!thumbResp.ok) throw new Error('Thumb: ' + (thumbResult.error || 'erro'));
+
+    // 2. Salva vista + URL da thumb no modelos.json
+    modelosData[currentIdx].vista = { spherical: { ...editorSph }, panOffset: { ...editorPan } };
+    modelosData[currentIdx].thumb = thumbResult.url;
+
+    status.textContent = 'Salvando vista...';
     await salvarModelos(`Vista: ${modelosData[currentIdx].nome}`);
+
     status.className = 'save-status ok';
-    status.textContent = '✓ Vista salva!';
+    status.textContent = '✓ Vista e thumbnail salvas!';
     renderGrid();
   } catch(e) {
     status.className = 'save-status err';
