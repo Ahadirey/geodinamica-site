@@ -7,7 +7,18 @@
     "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/modelo.glb",
     "tipo": "topografia",
     "publico": true,
-    "data": "2026-05-28"
+    "data": "2026-05-28",
+    "vista": {
+      "spherical": {
+        "theta": 0.16999999999999987,
+        "phi": 0.6099999999999997,
+        "radius": 3
+      },
+      "panOffset": {
+        "x": -0.17999999999999983,
+        "y": -0.501
+      }
+    }
   },
   {
     "id": "modelo-mozara",
