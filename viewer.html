@@ -6,355 +6,69 @@
 <title>Geodinâmica – Visualizador 3D</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: #1e2422;
-    color: #fff;
-    font-family: 'DM Sans', sans-serif;
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
+  body { background: #1e2422; color: #fff; font-family: 'DM Sans', sans-serif; height: 100vh; overflow: hidden; }
 
   .topbar {
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
     padding: 1rem 1.5rem;
     background: linear-gradient(to bottom, rgba(13,26,21,0.95) 0%, transparent 100%);
   }
-
-  .topbar-brand {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    text-decoration: none;
-  }
-
-  .brand-icon svg { width: 28px; height: 28px; }
-
-  .brand-text {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 0.95rem;
-    letter-spacing: 0.04em;
-    color: #fff;
-  }
+  .topbar-brand { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+  .brand-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.95rem; letter-spacing: 0.04em; color: #fff; }
   .brand-text span { color: #67C187; }
-
   .topbar-info { text-align: right; }
-
-  .model-name {
-    font-family: 'Syne', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #fff;
-    margin-bottom: 0.1rem;
-  }
-
-  .model-meta {
-    font-size: 0.72rem;
-    font-weight: 300;
-    color: rgba(255,255,255,0.4);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-
+  .model-name { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 600; color: #fff; margin-bottom: 0.1rem; }
+  .model-meta { font-size: 0.72rem; font-weight: 300; color: rgba(255,255,255,0.4); letter-spacing: 0.06em; text-transform: uppercase; }
   .back-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.78rem;
-    font-weight: 400;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.45);
-    text-decoration: none;
-    border: 1px solid rgba(255,255,255,0.1);
-    padding: 0.45rem 1rem;
-    border-radius: 2px;
-    transition: all 0.2s;
+    display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.78rem; font-weight: 400; letter-spacing: 0.06em; text-transform: uppercase;
+    color: rgba(255,255,255,0.45); text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.1); padding: 0.45rem 1rem; border-radius: 2px; transition: all 0.2s;
   }
   .back-btn:hover { color: #fff; border-color: rgba(255,255,255,0.25); }
   .back-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; }
 
-  #viewer-canvas {
-    width: 100%;
-    height: 100vh;
-    display: block;
-  }
+  #viewer-canvas { width: 100%; height: 100vh; display: block; }
 
   #loading {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: #1e2422;
-    z-index: 20;
-    gap: 1.5rem;
-    transition: opacity 0.6s ease;
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: #1e2422; z-index: 20; gap: 1.5rem; transition: opacity 0.6s ease;
   }
-
-  #loading.hidden {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .loading-icon svg {
-    width: 48px; height: 48px;
-    animation: spin 2s linear infinite;
-  }
-
-  @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-
-  .loading-text {
-    font-family: 'Syne', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.5);
-  }
-
-  .loading-bar-wrap {
-    width: 160px;
-    height: 2px;
-    background: rgba(255,255,255,0.08);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-
-  .loading-bar {
-    height: 100%;
-    background: #005849;
-    width: 0%;
-    transition: width 0.3s ease;
-    border-radius: 2px;
-  }
-
-  .solar-panel {
-    position: absolute;
-    bottom: 1.5rem;
-    left: 1.5rem;
-    z-index: 10;
-    background: rgba(20,28,24,0.85);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 4px;
-    padding: 1rem 1.25rem;
-    backdrop-filter: blur(10px);
-    min-width: 280px;
-    transition: opacity 0.3s;
-  }
-
-  .solar-panel.no-coords { display: none; }
-
-  .solar-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 0.85rem;
-  }
-
-  .solar-title {
-    font-size: 0.72rem;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.5);
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-
-  .solar-title svg {
-    width: 14px; height: 14px;
-    stroke: #EF9F27;
-    fill: none;
-    stroke-width: 1.8;
-    stroke-linecap: round;
-  }
-
-  .solar-info {
-    font-size: 0.78rem;
-    font-weight: 400;
-    color: #EF9F27;
-  }
-
-  .solar-row {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .solar-row:last-child { margin-bottom: 0; }
-
-  .solar-label {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.7rem;
-    color: rgba(255,255,255,0.4);
-    font-weight: 300;
-  }
-
-  .solar-label span:last-child {
-    color: rgba(255,255,255,0.7);
-    font-weight: 400;
-  }
-
-  .solar-slider {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 3px;
-    border-radius: 2px;
-    background: rgba(255,255,255,0.1);
-    outline: none;
-    cursor: pointer;
-  }
-
-  .solar-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 14px; height: 14px;
-    border-radius: 50%;
-    background: #EF9F27;
-    cursor: pointer;
-    border: 2px solid rgba(0,0,0,0.3);
-    transition: transform 0.1s;
-  }
-
-  .solar-slider::-webkit-slider-thumb:hover { transform: scale(1.2); }
-
-  .solar-btn-now {
-    width: 100%;
-    margin-top: 0.75rem;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.7rem;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.5);
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    padding: 0.4rem 1rem;
-    border-radius: 2px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .solar-btn-now:hover {
-    color: #EF9F27;
-    border-color: rgba(239,159,39,0.3);
-    background: rgba(239,159,39,0.08);
-  }
-
-  .sun-position-indicator {
-    display: flex;
-    gap: 1rem;
-    margin-top: 0.6rem;
-    padding-top: 0.6rem;
-    border-top: 1px solid rgba(255,255,255,0.06);
-  }
-
-  .sun-stat {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-  }
-
-  .sun-stat-label {
-    font-size: 0.62rem;
-    color: rgba(255,255,255,0.3);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-
-  .sun-stat-value {
-    font-size: 0.78rem;
-    font-weight: 500;
-    color: rgba(255,255,255,0.7);
-  }
+  #loading.hidden { opacity: 0; pointer-events: none; }
+  .loading-icon svg { width: 48px; height: 48px; animation: spin 2s linear infinite; }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .loading-text { font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+  .loading-bar-wrap { width: 160px; height: 2px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+  .loading-bar { height: 100%; background: #005849; width: 0%; transition: width 0.3s ease; border-radius: 2px; }
 
   .controls-hint {
-    position: absolute;
-    bottom: 1.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 1.5rem;
-    background: rgba(13,26,21,0.7);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 3px;
-    padding: 0.6rem 1.25rem;
-    backdrop-filter: blur(8px);
-    opacity: 1;
-    transition: opacity 1s ease;
+    position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 1.5rem;
+    background: rgba(13,26,21,0.7); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 3px; padding: 0.6rem 1.25rem; backdrop-filter: blur(8px);
+    opacity: 1; transition: opacity 1s ease;
   }
-
   .controls-hint.fade { opacity: 0; }
-
-  .hint-item {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.72rem;
-    font-weight: 300;
-    color: rgba(255,255,255,0.4);
-    letter-spacing: 0.04em;
-  }
-
-  .hint-key {
-    font-size: 0.65rem;
-    color: #67C187;
-    border: 1px solid rgba(103,193,135,0.3);
-    padding: 0.1rem 0.4rem;
-    border-radius: 2px;
-  }
+  .hint-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; font-weight: 300; color: rgba(255,255,255,0.4); }
+  .hint-key { font-size: 0.65rem; color: #67C187; border: 1px solid rgba(103,193,135,0.3); padding: 0.1rem 0.4rem; border-radius: 2px; }
 
   .geo-badge {
-    position: absolute;
-    bottom: 1.5rem;
-    right: 1.5rem;
-    font-size: 0.65rem;
-    font-weight: 400;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.2);
-    border: 1px solid rgba(255,255,255,0.08);
-    padding: 0.25rem 0.6rem;
-    border-radius: 2px;
+    position: absolute; bottom: 1.5rem; right: 1.5rem;
+    font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.08);
+    padding: 0.25rem 0.6rem; border-radius: 2px;
   }
 
   #error-msg {
-    display: none;
-    position: absolute;
-    inset: 0;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    background: #1e2422;
-    z-index: 25;
-    color: rgba(255,255,255,0.5);
-    font-size: 0.9rem;
-    font-weight: 300;
+    display: none; position: absolute; inset: 0;
+    flex-direction: column; align-items: center; justify-content: center;
+    gap: 1rem; background: #1e2422; z-index: 25;
+    color: rgba(255,255,255,0.5); font-size: 0.9rem; font-weight: 300;
   }
-
   #error-msg.visible { display: flex; }
-
-  #error-msg svg {
-    width: 40px; height: 40px;
-    stroke: rgba(255,255,255,0.2);
-  }
+  #error-msg svg { width: 40px; height: 40px; stroke: rgba(255,255,255,0.2); }
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
 </head>
@@ -362,13 +76,11 @@
 
 <div class="topbar">
   <a href="modelos.html" class="topbar-brand">
-    <div class="brand-icon">
-      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M4,28 A14,14 0 0,1 28,28 Z" fill="#67C187" opacity="0.2"/>
-        <polyline points="4,28 12,12 18,20 22,14 28,28" fill="none" stroke="#005849" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
-        <path d="M4,26 Q10,24 16,26 Q22,28 28,26" fill="none" stroke="#005849" stroke-width="1.2" stroke-linecap="round"/>
-      </svg>
-    </div>
+    <svg viewBox="0 0 32 32" fill="none" width="28" height="28">
+      <path d="M4,28 A14,14 0 0,1 28,28 Z" fill="#67C187" opacity="0.2"/>
+      <polyline points="4,28 12,12 18,20 22,14 28,28" fill="none" stroke="#005849" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M4,26 Q10,24 16,26 Q22,28 28,26" fill="none" stroke="#005849" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
     <span class="brand-text">GEO<span>DINÂMICA</span></span>
   </a>
   <div class="topbar-info">
@@ -389,16 +101,12 @@
     </svg>
   </div>
   <div class="loading-text">Carregando modelo</div>
-  <div class="loading-bar-wrap">
-    <div class="loading-bar" id="loading-bar"></div>
-  </div>
+  <div class="loading-bar-wrap"><div class="loading-bar" id="loading-bar"></div></div>
 </div>
 
 <div id="error-msg">
   <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round">
-    <circle cx="12" cy="12" r="10"/>
-    <line x1="12" y1="8" x2="12" y2="12"/>
-    <line x1="12" y1="16" x2="12.01" y2="16"/>
+    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
   </svg>
   Não foi possível carregar o modelo.
   <span style="font-size:0.75rem;color:rgba(255,255,255,0.3)" id="error-detail"></span>
@@ -412,102 +120,27 @@
   <div class="hint-item"><span class="hint-key">⇥</span> Botão direito para mover</div>
 </div>
 
-<div class="solar-panel" id="solar-panel">
-  <div class="solar-header">
-    <div class="solar-title">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-      Posição Solar
-    </div>
-    <div class="solar-info" id="solar-time-display">12:00</div>
-  </div>
-
-  <div class="solar-row">
-    <div class="solar-label">
-      <span>Hora</span>
-      <span id="hora-label">12:00</span>
-    </div>
-    <input type="range" class="solar-slider" id="hora-slider" min="0" max="1440" value="720" step="10">
-  </div>
-
-  <div class="solar-row">
-    <div class="solar-label">
-      <span>Data</span>
-      <span id="data-label">Jun 15</span>
-    </div>
-    <input type="range" class="solar-slider" id="data-slider" min="1" max="365" value="166" step="1">
-  </div>
-
-  <div class="sun-position-indicator">
-    <div class="sun-stat">
-      <div class="sun-stat-label">Elevação</div>
-      <div class="sun-stat-value" id="sun-elevation">--°</div>
-    </div>
-    <div class="sun-stat">
-      <div class="sun-stat-label">Azimute</div>
-      <div class="sun-stat-value" id="sun-azimuth">--°</div>
-    </div>
-    <div class="sun-stat">
-      <div class="sun-stat-label">Status</div>
-      <div class="sun-stat-value" id="sun-status">--</div>
-    </div>
-  </div>
-
-  <button class="solar-btn-now" id="btn-agora">⟳ Usar hora atual</button>
-</div>
-
 <div class="geo-badge">geodinamicasa.com.br</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.js"></script>
 <script>
 const params = new URLSearchParams(window.location.search);
 const modelUrl = params.get('modelo') || 'https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/modelo.glb';
 const modelName = params.get('nome') || 'Modelo 3D';
-let modelLat = parseFloat(params.get('lat')) || null;
-let modelLon = parseFloat(params.get('lon')) || null;
 
 document.getElementById('model-title').textContent = modelName;
-document.getElementById('solar-panel').classList.add('no-coords');
 
-// Flag: só inicia solar depois que o modelo carregar
-let modeloCarregado = false;
-let coordsOk = false;
+setTimeout(() => document.getElementById('controls-hint').classList.add('fade'), 5000);
 
-async function carregarCoordenadas() {
-  if (modelLat && modelLon) {
-    coordsOk = true;
-    if (modeloCarregado) iniciarSolar();
-    return;
-  }
-  try {
-    const resp = await fetch('modelos.json?v=' + Date.now());
-    const modelos = await resp.json();
-    const arquivo = modelUrl.split('/').pop();
-    const modelo = modelos.find(m => m.arquivo === arquivo || m.url === modelUrl);
-    if (modelo && modelo.lat && modelo.lon) {
-      modelLat = modelo.lat;
-      modelLon = modelo.lon;
-      coordsOk = true;
-      if (modeloCarregado) iniciarSolar();
-    }
-  } catch(e) { console.log('Coordenadas não encontradas'); }
-}
-
-carregarCoordenadas();
-
-setTimeout(() => {
-  document.getElementById('controls-hint').classList.add('fade');
-}, 5000);
-
-// ─── THREE.JS SETUP ───────────────────────────────────────────────────────────
+// ─── RENDERER ─────────────────────────────────────────────────────────────────
 const canvas = document.getElementById('viewer-canvas');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
+
+// Configurações para fidelidade máxima à textura original
 renderer.outputEncoding = THREE.sRGBEncoding;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.0;
-// Sombras desativadas — usamos shader próprio para overlay de sombra
+renderer.toneMapping = THREE.NoToneMapping;   // sem tone mapping — preserva cores originais
 renderer.shadowMap.enabled = false;
 
 const scene = new THREE.Scene();
@@ -516,131 +149,43 @@ scene.background = new THREE.Color(0x1e2422);
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
 camera.position.set(0, 2, 5);
 
-// Direção do sol — atualizada pelo controle solar
-// vec3 em coordenadas Three.js (Y = cima)
-const sunDir = new THREE.Vector3(0, 1, 0).normalize();
-
-// ─── SHADER MATERIAL SOLAR ────────────────────────────────────────────────────
-// Este shader mantém a textura fotográfica original e aplica sombreamento
-// baseado no ângulo entre a normal da face e a direção do sol (dot product).
-// O resultado é misturado com a textura: áreas de face para o sol ficam claras,
-// áreas voltadas para longe do sol ficam escuras = sombras visíveis.
-
-const solarShaderChunk = {
-  uniforms: {
-    sunDirection: { value: sunDir },
-    sunIntensity: { value: 1.0 },
-    shadowStrength: { value: 0.7 },
-    sunColor: { value: new THREE.Color(1.0, 1.0, 1.0) },
-    isNight: { value: 0.0 }
-  },
-  vertexShader: `
-    varying vec2 vUv;
-    varying vec3 vWorldNormal;
-    void main() {
-      vUv = uv;
-      // Normal em world space — essencial para sombra seguir o sol
-      vWorldNormal = normalize(mat3(modelMatrix) * normal);
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }
-  `,
-  fragmentShader: `
-    uniform sampler2D map;
-    uniform vec3 sunDirection;
-    uniform float sunIntensity;
-    uniform float shadowStrength;  // 0 = sem efeito, 1 = sombra total
-    uniform vec3 sunColor;
-    uniform float isNight;
-    varying vec2 vUv;
-    varying vec3 vWorldNormal;
-
-    void main() {
-      vec4 texColor = texture2D(map, vUv);
-
-      // ── Dot product normal × sol ──────────────────────────────────────────
-      // +1.0 = face direto pro sol (iluminada)
-      //  0.0 = face tangente ao sol (neutro)
-      // -1.0 = face de costas pro sol (sombra)
-      float NdotL = dot(normalize(vWorldNormal), normalize(sunDirection));
-
-      // ── Overlay de sombra/luz sobre textura baked ─────────────────────────
-      // A ideia: criar um multiplicador que vai de (1 - shadowStrength) até (1 + highlight)
-      // Faces em sombra: multiplicador < 1.0 → escurece a textura
-      // Faces ao sol:    multiplicador > 1.0 → clareia a textura
-      // Resultado: contraste relativo entre faces, não escurecimento geral
-
-      // Mapeia NdotL (-1..1) para fator de escurecimento/clareamento
-      // sombra: NdotL negativo → escurece até (1 - shadowStrength)
-      // luz:    NdotL positivo → clareia levemente + cor do sol
-      float shadowFactor = 1.0 - shadowStrength * max(0.0, -NdotL + 0.1);
-      float lightFactor  = 1.0 + (shadowStrength * 0.4) * max(0.0, NdotL);
-
-      float overlay = shadowFactor * lightFactor;
-      overlay = clamp(overlay, 0.05, 1.6);
-
-      // Cor do sol misturada nas faces iluminadas
-      float sunMix = max(0.0, NdotL) * shadowStrength * 0.25;
-      vec3 litColor = mix(texColor.rgb, texColor.rgb * sunColor, sunMix);
-
-      vec3 finalColor = litColor * overlay;
-
-      // ── Noite ─────────────────────────────────────────────────────────────
-      vec3 nightColor = texColor.rgb * 0.07 * vec3(0.55, 0.65, 1.0);
-      finalColor = mix(finalColor, nightColor, isNight);
-
-      gl_FragColor = vec4(finalColor, texColor.a);
-    }
-  `
-};
-
-// Mapa global para materiais solares (para atualizar uniforms depois)
-const solarMaterials = [];
+// Luz ambiente neutra — apenas para que o MeshStandardMaterial não fique preto
+// A textura já tem iluminação baked do Metashape, então a luz deve ser neutra e uniforme
+const ambient = new THREE.AmbientLight(0xffffff, 1.0);
+scene.add(ambient);
 
 // ─── ORBIT CONTROLS ───────────────────────────────────────────────────────────
-let isDragging = false;
-let isPanning = false;
+let isDragging = false, isPanning = false;
 let prevMouse = { x: 0, y: 0 };
-let spherical = { theta: 0.3, phi: 1.1, radius: 5 };
-let target = new THREE.Vector3(0, 0, 0);
+let spherical = { theta: 0.3, phi: 1.0, radius: 5 };
+let target = new THREE.Vector3();
 let panOffset = new THREE.Vector3();
 
 function updateCamera() {
   const x = spherical.radius * Math.sin(spherical.phi) * Math.sin(spherical.theta);
   const y = spherical.radius * Math.cos(spherical.phi);
   const z = spherical.radius * Math.sin(spherical.phi) * Math.cos(spherical.theta);
-  camera.position.set(
-    target.x + x + panOffset.x,
-    target.y + y + panOffset.y,
-    target.z + z + panOffset.z
-  );
+  camera.position.set(target.x + x + panOffset.x, target.y + y + panOffset.y, target.z + z + panOffset.z);
   camera.lookAt(target.x + panOffset.x, target.y + panOffset.y, target.z + panOffset.z);
 }
 
 canvas.addEventListener('mousedown', e => {
-  if (e.button === 2) isPanning = true;
-  else isDragging = true;
+  if (e.button === 2) isPanning = true; else isDragging = true;
   prevMouse = { x: e.clientX, y: e.clientY };
 });
-
 canvas.addEventListener('mousemove', e => {
-  const dx = e.clientX - prevMouse.x;
-  const dy = e.clientY - prevMouse.y;
+  const dx = e.clientX - prevMouse.x, dy = e.clientY - prevMouse.y;
   if (isDragging) {
     spherical.theta -= dx * 0.005;
     spherical.phi = Math.max(0.08, Math.min(Math.PI / 2, spherical.phi - dy * 0.005));
   }
-  if (isPanning) {
-    panOffset.x -= dx * 0.003;
-    panOffset.y += dy * 0.003;
-  }
+  if (isPanning) { panOffset.x -= dx * 0.003; panOffset.y += dy * 0.003; }
   prevMouse = { x: e.clientX, y: e.clientY };
   updateCamera();
 });
-
 canvas.addEventListener('mouseup', () => { isDragging = false; isPanning = false; });
 canvas.addEventListener('mouseleave', () => { isDragging = false; isPanning = false; });
 canvas.addEventListener('contextmenu', e => e.preventDefault());
-
 canvas.addEventListener('wheel', e => {
   spherical.radius = Math.max(0.5, Math.min(50, spherical.radius + e.deltaY * 0.003));
   updateCamera();
@@ -648,38 +193,23 @@ canvas.addEventListener('wheel', e => {
 
 let lastTouchDist = 0;
 canvas.addEventListener('touchstart', e => {
-  if (e.touches.length === 1) {
-    isDragging = true;
-    prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-  }
-  if (e.touches.length === 2) {
-    lastTouchDist = Math.hypot(
-      e.touches[0].clientX - e.touches[1].clientX,
-      e.touches[0].clientY - e.touches[1].clientY
-    );
-  }
+  if (e.touches.length === 1) { isDragging = true; prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }
+  if (e.touches.length === 2) lastTouchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
 }, { passive: true });
-
 canvas.addEventListener('touchmove', e => {
   if (e.touches.length === 1 && isDragging) {
-    const dx = e.touches[0].clientX - prevMouse.x;
-    const dy = e.touches[0].clientY - prevMouse.y;
+    const dx = e.touches[0].clientX - prevMouse.x, dy = e.touches[0].clientY - prevMouse.y;
     spherical.theta -= dx * 0.005;
     spherical.phi = Math.max(0.08, Math.min(Math.PI / 2, spherical.phi - dy * 0.005));
     prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
     updateCamera();
   }
   if (e.touches.length === 2) {
-    const dist = Math.hypot(
-      e.touches[0].clientX - e.touches[1].clientX,
-      e.touches[0].clientY - e.touches[1].clientY
-    );
+    const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
     spherical.radius = Math.max(0.5, Math.min(50, spherical.radius - (dist - lastTouchDist) * 0.02));
-    lastTouchDist = dist;
-    updateCamera();
+    lastTouchDist = dist; updateCamera();
   }
 }, { passive: true });
-
 canvas.addEventListener('touchend', () => { isDragging = false; });
 
 window.addEventListener('resize', () => {
@@ -690,20 +220,19 @@ window.addEventListener('resize', () => {
 
 // ─── GLB LOADER ───────────────────────────────────────────────────────────────
 function loadGLB(url) {
-  const script = document.createElement('script');
-  script.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js';
-  script.onload = () => {
-    const dracoScript = document.createElement('script');
-    dracoScript.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js';
-    dracoScript.onload = () => {
+  const s1 = document.createElement('script');
+  s1.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js';
+  s1.onload = () => {
+    const s2 = document.createElement('script');
+    s2.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js';
+    s2.onload = () => {
       const dracoLoader = new THREE.DRACOLoader();
       dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
       const loader = new THREE.GLTFLoader();
       loader.setDRACOLoader(dracoLoader);
       const bar = document.getElementById('loading-bar');
 
-      loader.load(
-        url,
+      loader.load(url,
         (gltf) => {
           const model = gltf.scene;
           const box = new THREE.Box3().setFromObject(model);
@@ -716,200 +245,61 @@ function loadGLB(url) {
           model.position.sub(center.multiplyScalar(scale));
           model.position.y -= (size.y * scale) / 2;
 
-          const maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
+          const maxAniso = renderer.capabilities.getMaxAnisotropy();
 
-          // Substitui materiais pelo shader solar
           model.traverse(node => {
-            if (node.isMesh && node.material) {
-              const mats = Array.isArray(node.material) ? node.material : [node.material];
-              const newMats = mats.map(mat => {
-                // Pega a textura existente do material original
-                const tex = mat.map;
-                if (tex) {
-                  tex.anisotropy = maxAnisotropy;
-                  tex.needsUpdate = true;
-                  tex.encoding = THREE.sRGBEncoding;
-                }
-
-                // Cria ShaderMaterial com a textura + uniforms solares
-                const shaderMat = new THREE.ShaderMaterial({
-                  uniforms: {
-                    map: { value: tex },
-                    sunDirection: { value: new THREE.Vector3(0, 1, 0) },
-                    sunIntensity: { value: 1.0 },
-                    shadowStrength: { value: 0.0 },  // começa neutro, solar atualiza
-                    sunColor: { value: new THREE.Color(1.0, 1.0, 1.0) },
-                    isNight: { value: 0.0 }
-                  },
-                  vertexShader: solarShaderChunk.vertexShader,
-                  fragmentShader: solarShaderChunk.fragmentShader,
-                  side: THREE.DoubleSide
-                });
-
-                solarMaterials.push(shaderMat);
-                return shaderMat;
+            if (!node.isMesh) return;
+            const mats = Array.isArray(node.material) ? node.material : [node.material];
+            mats.forEach(mat => {
+              // Garante que a textura use sRGB correto e anisotropia máxima
+              if (mat.map) {
+                mat.map.encoding = THREE.sRGBEncoding;
+                mat.map.anisotropy = maxAniso;
+                mat.map.needsUpdate = true;
+              }
+              // MeshBasicMaterial ignora luzes completamente —
+              // exibe a textura exatamente como foi exportada pelo Metashape
+              const basic = new THREE.MeshBasicMaterial({
+                map: mat.map,
+                side: THREE.DoubleSide,
+                transparent: mat.transparent || false,
+                alphaTest: mat.alphaTest || 0,
               });
-
-              node.material = newMats.length === 1 ? newMats[0] : newMats;
-            }
+              // Substitui o material no node
+              if (Array.isArray(node.material)) {
+                const idx = node.material.indexOf(mat);
+                node.material[idx] = basic;
+              } else {
+                node.material = basic;
+              }
+            });
           });
 
           scene.add(model);
-
           spherical.radius = maxDim * scale * 1.4;
-          spherical.phi = 1.0;
           updateCamera();
 
           bar.style.width = '100%';
-          setTimeout(() => {
-            document.getElementById('loading').classList.add('hidden');
-            // Modelo pronto — inicia solar se coordenadas já chegaram
-            modeloCarregado = true;
-            if (coordsOk) iniciarSolar();
-          }, 400);
+          setTimeout(() => document.getElementById('loading').classList.add('hidden'), 400);
         },
-        (progress) => {
-          if (progress.total > 0) {
-            bar.style.width = (progress.loaded / progress.total * 100) + '%';
-          }
-        },
+        (progress) => { if (progress.total > 0) bar.style.width = (progress.loaded / progress.total * 100) + '%'; },
         (error) => {
           console.error(error);
           document.getElementById('loading').classList.add('hidden');
-          const errEl = document.getElementById('error-msg');
-          errEl.classList.add('visible');
+          document.getElementById('error-msg').classList.add('visible');
           document.getElementById('error-detail').textContent = url;
         }
       );
     };
-    document.head.appendChild(dracoScript);
+    document.head.appendChild(s2);
   };
-  document.head.appendChild(script);
+  document.head.appendChild(s1);
 }
 
 loadGLB(modelUrl);
 updateCamera();
 
-// ─── CONTROLE SOLAR ───────────────────────────────────────────────────────────
-function iniciarSolar() {
-  document.getElementById('solar-panel').classList.remove('no-coords');
-  const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-
-  function dayOfYearToDate(doy) {
-    const d = new Date(new Date().getFullYear(), 0);
-    d.setDate(doy);
-    return d;
-  }
-
-  function formatHora(minutes) {
-    const h = Math.floor(minutes / 60).toString().padStart(2,'0');
-    const m = (minutes % 60).toString().padStart(2,'0');
-    return `${h}:${m}`;
-  }
-
-  function formatData(doy) {
-    const d = dayOfYearToDate(doy);
-    return `${MESES[d.getMonth()]} ${d.getDate()}`;
-  }
-
-  function updateSun(minutes, doy) {
-    const date = dayOfYearToDate(doy);
-    date.setHours(Math.floor(minutes/60), minutes%60, 0);
-
-    const pos = SunCalc.getPosition(date, modelLat, modelLon);
-    const elevDeg = pos.altitude * (180/Math.PI);
-    // SunCalc azimuth: 0 = Sul, Pi = Norte, sentido horário
-    const azDeg = ((pos.azimuth * (180/Math.PI)) + 180) % 360;
-
-    document.getElementById('hora-label').textContent = formatHora(minutes);
-    document.getElementById('data-label').textContent = formatData(doy);
-    document.getElementById('solar-time-display').textContent = formatHora(minutes);
-    document.getElementById('sun-elevation').textContent = elevDeg.toFixed(1) + '°';
-    document.getElementById('sun-azimuth').textContent = azDeg.toFixed(1) + '°';
-
-    if (elevDeg < 0) {
-      document.getElementById('sun-status').textContent = 'Noite';
-      document.getElementById('sun-status').style.color = 'rgba(255,255,255,0.3)';
-    } else if (elevDeg < 10) {
-      document.getElementById('sun-status').textContent = 'Amanhecer';
-      document.getElementById('sun-status').style.color = '#EF9F27';
-    } else {
-      document.getElementById('sun-status').textContent = 'Dia';
-      document.getElementById('sun-status').style.color = '#67C187';
-    }
-
-    if (elevDeg > 0) {
-      const elevRad = pos.altitude;
-      const azRad = pos.azimuth;
-
-      // Converte azimute+elevação em vetor 3D (Three.js: Y=cima, SunCalc: 0=Sul)
-      const sx = -Math.cos(elevRad) * Math.sin(azRad);
-      const sy =  Math.sin(elevRad);
-      const sz = -Math.cos(elevRad) * Math.cos(azRad);
-      sunDir.set(sx, sy, sz).normalize();
-
-      // shadowStrength: quanta sombra aplicar
-      // Ao meio-dia (elevação alta) → sombras fortes e nítidas
-      // Ao amanhecer/anoitecer (elevação baixa) → sombras suaves
-      const intensity = Math.pow(Math.sin(elevRad), 0.5);
-      const shadow = 0.5 + intensity * 0.45; // 0.50 amanhecer → 0.95 meio-dia
-
-      // Cor do sol: laranja ao horizonte, branco ao meio-dia
-      const r = 1.0;
-      const g = 0.7 + intensity * 0.3;
-      const b = 0.4 + intensity * 0.6;
-
-      solarMaterials.forEach(mat => {
-        mat.uniforms.sunDirection.value.copy(sunDir);
-        mat.uniforms.sunIntensity.value = intensity;
-        mat.uniforms.shadowStrength.value = shadow;
-        mat.uniforms.sunColor.value.setRGB(r, g, b);
-        mat.uniforms.isNight.value = 0.0;
-      });
-
-    } else {
-      // Noite
-      sunDir.set(0, -1, 0);
-      solarMaterials.forEach(mat => {
-        mat.uniforms.sunDirection.value.copy(sunDir);
-        mat.uniforms.sunIntensity.value = 0.0;
-        mat.uniforms.shadowStrength.value = 0.0;
-        mat.uniforms.isNight.value = 1.0;
-      });
-    }
-  }
-
-  const now = new Date();
-  const minutesNow = now.getHours() * 60 + now.getMinutes();
-  const doyNow = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
-
-  document.getElementById('hora-slider').value = minutesNow;
-  document.getElementById('data-slider').value = doyNow;
-  updateSun(minutesNow, doyNow);
-
-  document.getElementById('hora-slider').addEventListener('input', function() {
-    updateSun(parseInt(this.value), parseInt(document.getElementById('data-slider').value));
-  });
-
-  document.getElementById('data-slider').addEventListener('input', function() {
-    updateSun(parseInt(document.getElementById('hora-slider').value), parseInt(this.value));
-  });
-
-  document.getElementById('btn-agora').addEventListener('click', function() {
-    const n = new Date();
-    const m = n.getHours() * 60 + n.getMinutes();
-    const d = Math.floor((n - new Date(n.getFullYear(), 0, 0)) / 86400000);
-    document.getElementById('hora-slider').value = m;
-    document.getElementById('data-slider').value = d;
-    updateSun(m, d);
-  });
-}
-
-// ─── RENDER LOOP ──────────────────────────────────────────────────────────────
-function animate() {
-  requestAnimationFrame(animate);
-  renderer.render(scene, camera);
-}
+function animate() { requestAnimationFrame(animate); renderer.render(scene, camera); }
 animate();
 </script>
 </body>
