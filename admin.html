@@ -7,24 +7,16 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --verde: #005849;
-    --verde-claro: #67C187;
-    --bg: #1a1f1d;
-    --surface: rgba(255,255,255,0.05);
-    --border: rgba(255,255,255,0.09);
+    --verde: #005849; --verde-claro: #67C187;
+    --bg: #1a1f1d; --surface: rgba(255,255,255,0.05); --border: rgba(255,255,255,0.09);
+    --danger: #e05555; --warning: #EF9F27;
   }
   body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: #fff; min-height: 100vh; }
 
   /* ── LOGIN ── */
-  #login-screen {
-    position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
-    background: var(--bg); z-index: 100;
-  }
+  #login-screen { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: var(--bg); z-index: 100; }
   #login-screen.hidden { display: none; }
-  .login-box {
-    width: 340px; background: rgba(255,255,255,0.04);
-    border: 1px solid var(--border); border-radius: 6px; padding: 2.5rem 2rem;
-  }
+  .login-box { width: 340px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 6px; padding: 2.5rem 2rem; }
   .login-logo { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 2rem; }
   .login-logo-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; letter-spacing: 0.04em; }
   .login-logo-text span { color: var(--verde-claro); }
@@ -32,20 +24,14 @@
   .login-sub { font-size: 0.78rem; color: rgba(255,255,255,0.35); margin-bottom: 1.75rem; font-weight: 300; }
   .field { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
   .field label { font-size: 0.72rem; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.08em; }
-  .field input {
-    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-    border-radius: 3px; padding: 0.6rem 0.85rem;
-    font-size: 0.9rem; color: #fff; font-family: inherit; outline: none;
-    transition: border-color 0.2s;
+  .field input, .field select, .field textarea {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 3px;
+    padding: 0.6rem 0.85rem; font-size: 0.9rem; color: #fff; font-family: inherit; outline: none; transition: border-color 0.2s;
   }
-  .field input:focus { border-color: rgba(103,193,135,0.4); }
-  .login-btn {
-    width: 100%; margin-top: 0.5rem; padding: 0.7rem;
-    background: var(--verde); border: none; border-radius: 3px;
-    font-family: inherit; font-size: 0.82rem; font-weight: 500;
-    letter-spacing: 0.08em; text-transform: uppercase; color: #fff;
-    cursor: pointer; transition: background 0.2s;
-  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: rgba(103,193,135,0.4); }
+  .field select option { background: #1a1f1d; }
+  .field textarea { resize: vertical; min-height: 70px; }
+  .login-btn { width: 100%; margin-top: 0.5rem; padding: 0.7rem; background: var(--verde); border: none; border-radius: 3px; font-family: inherit; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #fff; cursor: pointer; transition: background 0.2s; }
   .login-btn:hover { background: #007060; }
   .login-error { font-size: 0.75rem; color: #ff6b6b; margin-top: 0.75rem; display: none; }
   .login-error.visible { display: block; }
@@ -54,164 +40,128 @@
   #main-screen { display: none; }
   #main-screen.visible { display: block; }
 
-  nav {
-    position: sticky; top: 0; z-index: 50;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 1rem 2rem;
-    background: rgba(26,31,29,0.95); backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-  }
+  nav { position: sticky; top: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; background: rgba(26,31,29,0.97); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
   .nav-brand { display: flex; align-items: center; gap: 0.6rem; }
   .nav-brand-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.95rem; letter-spacing: 0.04em; }
   .nav-brand-text span { color: var(--verde-claro); }
-  .nav-badge {
-    font-size: 0.62rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--verde-claro); background: rgba(103,193,135,0.1);
-    border: 1px solid rgba(103,193,135,0.2); padding: 0.2rem 0.6rem; border-radius: 2px;
-  }
+  .nav-badge { font-size: 0.62rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--verde-claro); background: rgba(103,193,135,0.1); border: 1px solid rgba(103,193,135,0.2); padding: 0.2rem 0.6rem; border-radius: 2px; }
   .nav-right { display: flex; align-items: center; gap: 1rem; }
-  .nav-link {
-    font-size: 0.75rem; color: rgba(255,255,255,0.4); text-decoration: none;
-    letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.2s;
-  }
+  .nav-link { font-size: 0.75rem; color: rgba(255,255,255,0.4); text-decoration: none; letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.2s; }
   .nav-link:hover { color: #fff; }
-  .logout-btn {
-    font-size: 0.72rem; color: rgba(255,255,255,0.35); background: none;
-    border: 1px solid var(--border); padding: 0.35rem 0.8rem; border-radius: 2px;
-    cursor: pointer; font-family: inherit; transition: all 0.2s;
-  }
+  .logout-btn { font-size: 0.72rem; color: rgba(255,255,255,0.35); background: none; border: 1px solid var(--border); padding: 0.35rem 0.8rem; border-radius: 2px; cursor: pointer; font-family: inherit; transition: all 0.2s; }
   .logout-btn:hover { color: #fff; border-color: rgba(255,255,255,0.2); }
 
-  .page-content { padding: 2.5rem 2rem; max-width: 1100px; margin: 0 auto; }
-  .page-tag { font-size: 0.68rem; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--verde-claro); margin-bottom: 0.5rem; }
-  .page-title { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 700; margin-bottom: 0.4rem; }
-  .page-sub { font-size: 0.85rem; color: rgba(255,255,255,0.4); font-weight: 300; margin-bottom: 2.5rem; }
+  .page-content { padding: 2.5rem 2rem; max-width: 1200px; margin: 0 auto; }
+  .page-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+  .page-tag { font-size: 0.68rem; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--verde-claro); margin-bottom: 0.4rem; }
+  .page-title { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 700; }
+  .btn-add { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.2rem; background: var(--verde); border: none; border-radius: 3px; font-family: inherit; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: #fff; cursor: pointer; transition: background 0.2s; }
+  .btn-add:hover { background: #007060; }
 
-  /* ── GRID DE MODELOS ── */
-  .modelos-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem;
-  }
-  .modelo-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden;
-    transition: border-color 0.2s;
-  }
+  /* ── GRID ── */
+  .modelos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.25rem; }
+  .modelo-card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; transition: border-color 0.2s; }
   .modelo-card:hover { border-color: rgba(0,88,73,0.35); }
-  .modelo-card-header { padding: 1rem 1.25rem 0.75rem; border-bottom: 1px solid var(--border); }
-  .modelo-card-nome { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem; }
-  .modelo-card-meta { font-size: 0.73rem; color: rgba(255,255,255,0.35); font-weight: 300; }
-  .modelo-card-body { padding: 1rem 1.25rem; }
-
-  .vista-info {
-    display: flex; align-items: center; gap: 0.5rem;
-    font-size: 0.72rem; color: rgba(255,255,255,0.35); margin-bottom: 1rem;
-  }
-  .vista-info svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 1.8; flex-shrink: 0; }
+  .modelo-card-header { padding: 1rem 1.25rem 0.75rem; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; }
+  .modelo-card-info { flex: 1; min-width: 0; }
+  .modelo-card-nome { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .modelo-card-meta { font-size: 0.72rem; color: rgba(255,255,255,0.35); font-weight: 300; }
+  .publico-badge { font-size: 0.6rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.2rem 0.5rem; border-radius: 2px; white-space: nowrap; flex-shrink: 0; }
+  .publico-badge.sim { color: var(--verde-claro); background: rgba(103,193,135,0.1); border: 1px solid rgba(103,193,135,0.2); }
+  .publico-badge.nao { color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  .modelo-card-body { padding: 0.85rem 1.25rem; }
+  .vista-info { display: flex; align-items: center; gap: 0.4rem; font-size: 0.71rem; color: rgba(255,255,255,0.3); margin-bottom: 0.85rem; }
+  .vista-info svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 1.8; flex-shrink: 0; }
   .vista-salva { color: var(--verde-claro); }
   .vista-salva svg { stroke: var(--verde-claro); }
-
-  .card-actions { display: flex; gap: 0.6rem; }
-  .btn-editar {
-    flex: 1; padding: 0.55rem 0; font-family: inherit; font-size: 0.75rem;
-    font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase;
-    background: rgba(0,88,73,0.2); border: 1px solid rgba(0,88,73,0.35);
-    color: var(--verde-claro); border-radius: 3px; cursor: pointer; transition: all 0.2s;
-  }
-  .btn-editar:hover { background: rgba(0,88,73,0.35); }
-  .btn-ver {
-    padding: 0.55rem 0.9rem; font-family: inherit; font-size: 0.75rem;
-    font-weight: 400; letter-spacing: 0.06em; text-transform: uppercase;
-    background: none; border: 1px solid var(--border); color: rgba(255,255,255,0.4);
-    border-radius: 3px; cursor: pointer; transition: all 0.2s; text-decoration: none;
-    display: flex; align-items: center;
-  }
+  .card-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .btn-card { padding: 0.48rem 0.7rem; font-family: inherit; font-size: 0.7rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; border-radius: 3px; cursor: pointer; transition: all 0.2s; border: 1px solid; }
+  .btn-vista { flex: 1; background: rgba(0,88,73,0.15); border-color: rgba(0,88,73,0.3); color: var(--verde-claro); }
+  .btn-vista:hover { background: rgba(0,88,73,0.3); }
+  .btn-editar-dados { background: rgba(255,255,255,0.05); border-color: var(--border); color: rgba(255,255,255,0.5); }
+  .btn-editar-dados:hover { color: #fff; border-color: rgba(255,255,255,0.2); }
+  .btn-toggle { background: rgba(255,255,255,0.05); border-color: var(--border); color: rgba(255,255,255,0.5); }
+  .btn-toggle:hover { color: var(--warning); border-color: rgba(239,159,39,0.3); }
+  .btn-ver { background: none; border-color: var(--border); color: rgba(255,255,255,0.35); text-decoration: none; display: inline-flex; align-items: center; }
   .btn-ver:hover { color: #fff; border-color: rgba(255,255,255,0.2); }
+  .btn-deletar { background: rgba(224,85,85,0.08); border-color: rgba(224,85,85,0.2); color: rgba(224,85,85,0.6); }
+  .btn-deletar:hover { background: rgba(224,85,85,0.18); border-color: rgba(224,85,85,0.4); color: var(--danger); }
 
-  /* ── MODAL EDITOR ── */
-  #editor-modal {
-    position: fixed; inset: 0; z-index: 200;
-    background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
-    display: none; align-items: stretch;
-  }
+  /* ── MODAIS ── */
+  .modal-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; }
+  .modal-overlay.visible { display: flex; }
+
+  /* Editor de vista */
+  #editor-modal { align-items: stretch; }
   #editor-modal.visible { display: flex; }
-
-  .editor-sidebar {
-    width: 280px; flex-shrink: 0;
-    background: rgba(20,26,23,0.98); border-right: 1px solid var(--border);
-    display: flex; flex-direction: column; padding: 1.5rem;
-    overflow-y: auto;
-  }
-  .editor-title { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; }
-  .editor-sub { font-size: 0.73rem; color: rgba(255,255,255,0.35); font-weight: 300; margin-bottom: 1.5rem; line-height: 1.5; }
-
-  .editor-section { margin-bottom: 1.5rem; }
-  .editor-section-title {
-    font-size: 0.65rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
-    color: rgba(255,255,255,0.3); margin-bottom: 0.75rem;
-    padding-bottom: 0.4rem; border-bottom: 1px solid var(--border);
-  }
-
-  .vista-values { display: flex; flex-direction: column; gap: 0.5rem; }
-  .vista-val-row { display: flex; justify-content: space-between; align-items: center; }
-  .vista-val-label { font-size: 0.7rem; color: rgba(255,255,255,0.35); }
-  .vista-val { font-size: 0.78rem; font-weight: 500; color: rgba(255,255,255,0.7); font-family: monospace; }
-
-  .editor-actions { margin-top: auto; display: flex; flex-direction: column; gap: 0.6rem; }
-  .btn-salvar {
-    width: 100%; padding: 0.75rem; font-family: inherit; font-size: 0.8rem;
-    font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
-    background: var(--verde); border: none; color: #fff; border-radius: 3px;
-    cursor: pointer; transition: background 0.2s;
-  }
+  .editor-sidebar { width: 260px; flex-shrink: 0; background: rgba(18,24,21,0.99); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 1.25rem; overflow-y: auto; }
+  .editor-title { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; margin-bottom: 0.2rem; }
+  .editor-sub { font-size: 0.7rem; color: rgba(255,255,255,0.3); font-weight: 300; margin-bottom: 1.25rem; line-height: 1.5; }
+  .instrucoes { background: rgba(103,193,135,0.05); border: 1px solid rgba(103,193,135,0.12); border-radius: 3px; padding: 0.65rem; margin-bottom: 1.25rem; }
+  .instrucoes p { font-size: 0.7rem; color: rgba(255,255,255,0.4); line-height: 1.7; }
+  .editor-section-title { font-size: 0.62rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.25); margin-bottom: 0.65rem; padding-bottom: 0.35rem; border-bottom: 1px solid var(--border); }
+  .vista-values { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.25rem; }
+  .vista-val-row { display: flex; justify-content: space-between; }
+  .vista-val-label { font-size: 0.68rem; color: rgba(255,255,255,0.3); }
+  .vista-val { font-size: 0.75rem; font-weight: 500; color: rgba(255,255,255,0.65); font-family: monospace; }
+  .editor-actions { margin-top: auto; display: flex; flex-direction: column; gap: 0.5rem; }
+  .save-status { font-size: 0.7rem; text-align: center; padding: 0.4rem; border-radius: 3px; display: none; }
+  .save-status.ok { display: block; color: var(--verde-claro); background: rgba(103,193,135,0.08); border: 1px solid rgba(103,193,135,0.18); }
+  .save-status.err { display: block; color: #ff6b6b; background: rgba(255,107,107,0.06); border: 1px solid rgba(255,107,107,0.18); }
+  .save-status.loading { display: block; color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  .btn-salvar { width: 100%; padding: 0.7rem; font-family: inherit; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; background: var(--verde); border: none; color: #fff; border-radius: 3px; cursor: pointer; transition: background 0.2s; }
   .btn-salvar:hover { background: #007060; }
-  .btn-salvar:disabled { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.3); cursor: not-allowed; }
-  .btn-cancelar {
-    width: 100%; padding: 0.65rem; font-family: inherit; font-size: 0.75rem;
-    font-weight: 400; letter-spacing: 0.06em; text-transform: uppercase;
-    background: none; border: 1px solid var(--border); color: rgba(255,255,255,0.4);
-    border-radius: 3px; cursor: pointer; transition: all 0.2s;
-  }
-  .btn-cancelar:hover { color: #fff; border-color: rgba(255,255,255,0.2); }
-
-  .save-status {
-    font-size: 0.72rem; text-align: center; padding: 0.4rem;
-    border-radius: 3px; display: none;
-  }
-  .save-status.ok { display: block; color: var(--verde-claro); background: rgba(103,193,135,0.1); border: 1px solid rgba(103,193,135,0.2); }
-  .save-status.err { display: block; color: #ff6b6b; background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.2); }
-  .save-status.loading { display: block; color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
-
+  .btn-salvar:disabled { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.25); cursor: not-allowed; }
+  .btn-cancelar-editor { width: 100%; padding: 0.6rem; font-family: inherit; font-size: 0.72rem; font-weight: 400; letter-spacing: 0.06em; text-transform: uppercase; background: none; border: 1px solid var(--border); color: rgba(255,255,255,0.35); border-radius: 3px; cursor: pointer; transition: all 0.2s; }
+  .btn-cancelar-editor:hover { color: #fff; border-color: rgba(255,255,255,0.2); }
   .editor-viewer { flex: 1; position: relative; overflow: hidden; }
   #editor-canvas { width: 100%; height: 100%; display: block; }
-
-  .editor-hint {
-    position: absolute; top: 1rem; left: 50%; transform: translateX(-50%);
-    background: rgba(13,26,21,0.8); border: 1px solid var(--border);
-    border-radius: 3px; padding: 0.5rem 1rem;
-    font-size: 0.7rem; color: rgba(255,255,255,0.45);
-    backdrop-filter: blur(8px); white-space: nowrap;
-    pointer-events: none;
-  }
-
-  #editor-loading {
-    position: absolute; inset: 0; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 1rem;
-    background: #1a1f1d; z-index: 10;
-  }
+  .editor-hint { position: absolute; top: 1rem; left: 50%; transform: translateX(-50%); background: rgba(13,26,21,0.8); border: 1px solid var(--border); border-radius: 3px; padding: 0.45rem 1rem; font-size: 0.68rem; color: rgba(255,255,255,0.4); backdrop-filter: blur(8px); white-space: nowrap; pointer-events: none; }
+  #editor-loading { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; background: #1a1f1d; z-index: 10; }
   #editor-loading.hidden { display: none; }
   #editor-loading svg { width: 36px; height: 36px; animation: spin 2s linear infinite; }
+  #editor-loading span { font-size: 0.75rem; color: rgba(255,255,255,0.35); letter-spacing: 0.08em; text-transform: uppercase; }
   @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-  #editor-loading span { font-size: 0.78rem; color: rgba(255,255,255,0.4); letter-spacing: 0.08em; text-transform: uppercase; }
 
-  .instrucoes {
-    background: rgba(103,193,135,0.06); border: 1px solid rgba(103,193,135,0.15);
-    border-radius: 3px; padding: 0.75rem; margin-bottom: 1.5rem;
-  }
-  .instrucoes p { font-size: 0.72rem; color: rgba(255,255,255,0.45); line-height: 1.6; font-weight: 300; }
-  .instrucoes p + p { margin-top: 0.3rem; }
+  /* Modal dados / adicionar */
+  .modal-box { background: rgba(22,28,25,0.99); border: 1px solid var(--border); border-radius: 6px; padding: 2rem; width: 480px; max-width: 95vw; max-height: 90vh; overflow-y: auto; }
+  .modal-title { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.3rem; }
+  .modal-sub { font-size: 0.75rem; color: rgba(255,255,255,0.35); margin-bottom: 1.5rem; font-weight: 300; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .modal-actions { display: flex; gap: 0.6rem; margin-top: 1.5rem; }
+  .btn-modal-primary { flex: 1; padding: 0.7rem; font-family: inherit; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; background: var(--verde); border: none; color: #fff; border-radius: 3px; cursor: pointer; transition: background 0.2s; }
+  .btn-modal-primary:hover { background: #007060; }
+  .btn-modal-primary:disabled { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.25); cursor: not-allowed; }
+  .btn-modal-cancel { padding: 0.7rem 1.2rem; font-family: inherit; font-size: 0.75rem; background: none; border: 1px solid var(--border); color: rgba(255,255,255,0.4); border-radius: 3px; cursor: pointer; transition: all 0.2s; }
+  .btn-modal-cancel:hover { color: #fff; border-color: rgba(255,255,255,0.2); }
+  .modal-status { font-size: 0.72rem; text-align: center; padding: 0.5rem; border-radius: 3px; margin-top: 0.75rem; display: none; }
+  .modal-status.ok { display: block; color: var(--verde-claro); background: rgba(103,193,135,0.08); border: 1px solid rgba(103,193,135,0.18); }
+  .modal-status.err { display: block; color: #ff6b6b; background: rgba(255,107,107,0.06); border: 1px solid rgba(255,107,107,0.18); }
+  .modal-status.loading { display: block; color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+
+  /* Modal confirmar delete */
+  .confirm-box { background: rgba(22,28,25,0.99); border: 1px solid rgba(224,85,85,0.2); border-radius: 6px; padding: 2rem; width: 380px; max-width: 95vw; }
+  .confirm-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--danger); }
+  .confirm-text { font-size: 0.8rem; color: rgba(255,255,255,0.5); line-height: 1.6; margin-bottom: 1.5rem; font-weight: 300; }
+  .confirm-nome { color: #fff; font-weight: 500; }
+  .confirm-actions { display: flex; gap: 0.6rem; }
+  .btn-confirm-delete { flex: 1; padding: 0.7rem; font-family: inherit; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; background: var(--danger); border: none; color: #fff; border-radius: 3px; cursor: pointer; transition: background 0.2s; }
+  .btn-confirm-delete:hover { background: #c04444; }
+  .btn-confirm-delete:disabled { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.25); cursor: not-allowed; }
+
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0; }
+  .toggle-label { font-size: 0.8rem; color: rgba(255,255,255,0.7); }
+  .toggle-switch { position: relative; width: 40px; height: 22px; cursor: pointer; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-track { position: absolute; inset: 0; background: rgba(255,255,255,0.1); border-radius: 11px; transition: background 0.2s; border: 1px solid var(--border); }
+  .toggle-switch input:checked + .toggle-track { background: var(--verde); border-color: var(--verde); }
+  .toggle-knob { position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; background: rgba(255,255,255,0.5); border-radius: 50%; transition: transform 0.2s, background 0.2s; }
+  .toggle-switch input:checked ~ .toggle-knob { transform: translateX(18px); background: #fff; }
 
   @media (max-width: 768px) {
-    .editor-sidebar { width: 100%; max-height: 45vh; border-right: none; border-bottom: 1px solid var(--border); }
+    .editor-sidebar { width: 100%; max-height: 40vh; border-right: none; border-bottom: 1px solid var(--border); }
     #editor-modal.visible { flex-direction: column; }
+    .form-row { grid-template-columns: 1fr; }
   }
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -222,7 +172,7 @@
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">
-      <svg viewBox="0 0 32 32" fill="none" width="28" height="28">
+      <svg viewBox="0 0 32 32" fill="none" width="26" height="26">
         <path d="M4,28 A14,14 0 0,1 28,28 Z" fill="#67C187" opacity="0.2"/>
         <polyline points="4,28 12,12 18,20 22,14 28,28" fill="none" stroke="#005849" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
         <path d="M4,26 Q10,24 16,26 Q22,28 28,26" fill="none" stroke="#005849" stroke-width="1.2" stroke-linecap="round"/>
@@ -230,7 +180,7 @@
       <span class="login-logo-text">GEO<span>DINÂMICA</span></span>
     </div>
     <div class="login-title">Área administrativa</div>
-    <div class="login-sub">Acesso restrito. Digite a senha para continuar.</div>
+    <div class="login-sub">Acesso restrito.</div>
     <div class="field">
       <label>Senha</label>
       <input type="password" id="senha-input" placeholder="••••••••" autocomplete="current-password">
@@ -244,7 +194,7 @@
 <div id="main-screen">
   <nav>
     <div class="nav-brand">
-      <svg viewBox="0 0 32 32" fill="none" width="26" height="26">
+      <svg viewBox="0 0 32 32" fill="none" width="24" height="24">
         <path d="M4,28 A14,14 0 0,1 28,28 Z" fill="#67C187" opacity="0.2"/>
         <polyline points="4,28 12,12 18,20 22,14 28,28" fill="none" stroke="#005849" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
         <path d="M4,26 Q10,24 16,26 Q22,28 28,26" fill="none" stroke="#005849" stroke-width="1.2" stroke-linecap="round"/>
@@ -254,66 +204,52 @@
     </div>
     <div class="nav-right">
       <a href="index.html" class="nav-link">Site</a>
-      <a href="modelos.html" class="nav-link">Portfólio</a>
+      <a href="modelos.html" class="nav-link" target="_blank">Portfólio</a>
       <button class="logout-btn" id="logout-btn">Sair</button>
     </div>
   </nav>
 
   <div class="page-content">
-    <div class="page-tag">Administração</div>
-    <h1 class="page-title">Editar vistas dos modelos</h1>
-    <p class="page-sub">Defina o ângulo e zoom inicial de cada modelo 3D. Clique em "Editar vista" para ajustar interativamente.</p>
+    <div class="page-header">
+      <div>
+        <div class="page-tag">Administração</div>
+        <h1 class="page-title">Modelos 3D</h1>
+      </div>
+      <button class="btn-add" id="btn-novo-modelo">
+        <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
+        Adicionar modelo
+      </button>
+    </div>
     <div class="modelos-grid" id="modelos-grid">
-      <div style="color:rgba(255,255,255,0.3);font-size:0.8rem;">Carregando modelos...</div>
+      <div style="color:rgba(255,255,255,0.3);font-size:0.8rem;grid-column:1/-1;">Carregando...</div>
     </div>
   </div>
 </div>
 
-<!-- MODAL EDITOR -->
-<div id="editor-modal">
+<!-- MODAL EDITOR VISTA -->
+<div class="modal-overlay" id="editor-modal">
   <div class="editor-sidebar">
     <div class="editor-title" id="editor-model-name">Modelo</div>
-    <div class="editor-sub">Arraste e gire o modelo até encontrar a vista ideal. Os valores são atualizados em tempo real.</div>
-
+    <div class="editor-sub">Ajuste a vista e clique em salvar.</div>
     <div class="instrucoes">
       <p>🖱 <strong>Arrastar</strong> — rotacionar</p>
       <p>🖱 <strong>Scroll</strong> — zoom</p>
-      <p>🖱 <strong>Botão direito</strong> — mover</p>
+      <p>🖱 <strong>Btn direito</strong> — mover</p>
     </div>
-
-    <div class="editor-section">
-      <div class="editor-section-title">Vista atual</div>
-      <div class="vista-values">
-        <div class="vista-val-row">
-          <span class="vista-val-label">Rotação H</span>
-          <span class="vista-val" id="val-theta">0.30</span>
-        </div>
-        <div class="vista-val-row">
-          <span class="vista-val-label">Rotação V</span>
-          <span class="vista-val" id="val-phi">1.00</span>
-        </div>
-        <div class="vista-val-row">
-          <span class="vista-val-label">Zoom</span>
-          <span class="vista-val" id="val-radius">5.00</span>
-        </div>
-        <div class="vista-val-row">
-          <span class="vista-val-label">Pan X</span>
-          <span class="vista-val" id="val-panx">0.00</span>
-        </div>
-        <div class="vista-val-row">
-          <span class="vista-val-label">Pan Y</span>
-          <span class="vista-val" id="val-pany">0.00</span>
-        </div>
-      </div>
+    <div class="editor-section-title">Vista atual</div>
+    <div class="vista-values">
+      <div class="vista-val-row"><span class="vista-val-label">Rotação H</span><span class="vista-val" id="val-theta">0.300</span></div>
+      <div class="vista-val-row"><span class="vista-val-label">Rotação V</span><span class="vista-val" id="val-phi">1.000</span></div>
+      <div class="vista-val-row"><span class="vista-val-label">Zoom</span><span class="vista-val" id="val-radius">5.000</span></div>
+      <div class="vista-val-row"><span class="vista-val-label">Pan X</span><span class="vista-val" id="val-panx">0.000</span></div>
+      <div class="vista-val-row"><span class="vista-val-label">Pan Y</span><span class="vista-val" id="val-pany">0.000</span></div>
     </div>
-
     <div class="editor-actions">
       <div class="save-status" id="save-status"></div>
-      <button class="btn-salvar" id="btn-salvar">💾 Salvar vista</button>
-      <button class="btn-cancelar" id="btn-cancelar">Cancelar</button>
+      <button class="btn-salvar" id="btn-salvar-vista">💾 Salvar vista</button>
+      <button class="btn-cancelar-editor" id="btn-cancelar-editor">Cancelar</button>
     </div>
   </div>
-
   <div class="editor-viewer">
     <div id="editor-loading">
       <svg viewBox="0 0 48 48" fill="none" stroke="#005849" stroke-width="2" stroke-linecap="round">
@@ -327,310 +263,428 @@
   </div>
 </div>
 
+<!-- MODAL DADOS (adicionar / editar) -->
+<div class="modal-overlay" id="dados-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="dados-modal-title">Adicionar modelo</div>
+    <div class="modal-sub" id="dados-modal-sub">Preencha os dados do novo modelo.</div>
+
+    <div class="field">
+      <label>Nome do projeto</label>
+      <input type="text" id="campo-nome" placeholder="Ex: Fazenda Rio Negro">
+    </div>
+    <div class="field">
+      <label>Descrição</label>
+      <textarea id="campo-descricao" placeholder="Ex: Aerolevantamento · 240 ha"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label>Tipo</label>
+        <select id="campo-tipo">
+          <option value="topografia">Topografia</option>
+          <option value="geologia">Geologia</option>
+          <option value="ambiental">Ambiental</option>
+          <option value="mineracao">Mineração</option>
+          <option value="rural">Rural</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Arquivo no R2 (.glb)</label>
+        <input type="text" id="campo-arquivo" placeholder="nome-do-arquivo.glb">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label>Latitude</label>
+        <input type="number" id="campo-lat" placeholder="-28.021017" step="any">
+      </div>
+      <div class="field">
+        <label>Longitude</label>
+        <input type="number" id="campo-lon" placeholder="-49.612710" step="any">
+      </div>
+    </div>
+    <div class="toggle-row">
+      <span class="toggle-label">Visível no portfólio público</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="campo-publico" checked>
+        <div class="toggle-track"></div>
+        <div class="toggle-knob"></div>
+      </label>
+    </div>
+
+    <div class="modal-status" id="dados-status"></div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" id="btn-cancelar-dados">Cancelar</button>
+      <button class="btn-modal-primary" id="btn-salvar-dados">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR DELETE -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="confirm-box">
+    <div class="confirm-title">Deletar modelo</div>
+    <div class="confirm-text">Tem certeza que deseja deletar <span class="confirm-nome" id="delete-nome"></span>? Esta ação não pode ser desfeita.</div>
+    <div class="modal-status" id="delete-status"></div>
+    <div class="confirm-actions">
+      <button class="btn-modal-cancel" id="btn-cancelar-delete">Cancelar</button>
+      <button class="btn-confirm-delete" id="btn-confirmar-delete">Deletar</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-// ── CONFIGURAÇÃO ──────────────────────────────────────────────────────────────
-const ADMIN_PASSWORD  = "geo2026";  // ← altere aqui se quiser
-// ─────────────────────────────────────────────────────────────────────────────
+const ADMIN_PASSWORD = "geo2026";
+const R2_BASE = "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev";
 
 // ── LOGIN ─────────────────────────────────────────────────────────────────────
-function checkLogin() {
-  return sessionStorage.getItem('geo_admin') === ADMIN_PASSWORD;
-}
-
-document.getElementById('senha-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') tentarLogin();
-});
+document.getElementById('senha-input').addEventListener('keydown', e => { if (e.key === 'Enter') tentarLogin(); });
 document.getElementById('login-btn').addEventListener('click', tentarLogin);
-
 function tentarLogin() {
-  const val = document.getElementById('senha-input').value;
-  if (val === ADMIN_PASSWORD) {
-    sessionStorage.setItem('geo_admin', val);
+  if (document.getElementById('senha-input').value === ADMIN_PASSWORD) {
+    sessionStorage.setItem('geo_admin', ADMIN_PASSWORD);
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('main-screen').classList.add('visible');
     carregarModelos();
   } else {
     document.getElementById('login-error').classList.add('visible');
     document.getElementById('senha-input').value = '';
-    document.getElementById('senha-input').focus();
   }
 }
-
-document.getElementById('logout-btn').addEventListener('click', () => {
-  sessionStorage.removeItem('geo_admin');
-  location.reload();
-});
-
-if (checkLogin()) {
+document.getElementById('logout-btn').addEventListener('click', () => { sessionStorage.removeItem('geo_admin'); location.reload(); });
+if (sessionStorage.getItem('geo_admin') === ADMIN_PASSWORD) {
   document.getElementById('login-screen').classList.add('hidden');
   document.getElementById('main-screen').classList.add('visible');
   carregarModelos();
 }
 
-// ── CARREGAR MODELOS ──────────────────────────────────────────────────────────
+// ── DADOS ─────────────────────────────────────────────────────────────────────
 let modelosData = [];
 
 async function carregarModelos() {
-  const grid = document.getElementById('modelos-grid');
   try {
     const r = await fetch('modelos.json?v=' + Date.now());
     modelosData = await r.json();
     renderGrid();
   } catch(e) {
-    grid.innerHTML = '<div style="color:#ff6b6b;font-size:0.8rem;">Erro ao carregar modelos.json</div>';
+    document.getElementById('modelos-grid').innerHTML = '<div style="color:#ff6b6b;font-size:0.8rem;">Erro ao carregar modelos.json</div>';
   }
 }
 
 function renderGrid() {
   const grid = document.getElementById('modelos-grid');
-  if (!modelosData.length) { grid.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:0.8rem;">Nenhum modelo encontrado.</div>'; return; }
-
-  grid.innerHTML = modelosData.map((m, i) => {
-    const temVista = m.vista != null;
-    return `
+  if (!modelosData.length) { grid.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:0.8rem;grid-column:1/-1;">Nenhum modelo.</div>'; return; }
+  grid.innerHTML = modelosData.map((m, i) => `
     <div class="modelo-card">
       <div class="modelo-card-header">
-        <div class="modelo-card-nome">${m.nome}</div>
-        <div class="modelo-card-meta">${m.descricao} · ${m.data}</div>
+        <div class="modelo-card-info">
+          <div class="modelo-card-nome">${m.nome}</div>
+          <div class="modelo-card-meta">${m.tipo} · ${m.data}</div>
+        </div>
+        <span class="publico-badge ${m.publico ? 'sim' : 'nao'}">${m.publico ? 'Público' : 'Oculto'}</span>
       </div>
       <div class="modelo-card-body">
-        <div class="vista-info ${temVista ? 'vista-salva' : ''}">
+        <div class="vista-info ${m.vista ? 'vista-salva' : ''}">
           <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          ${temVista ? 'Vista personalizada salva' : 'Usando vista padrão'}
+          ${m.vista ? 'Vista personalizada salva' : 'Vista padrão'}
         </div>
         <div class="card-actions">
-          <button class="btn-editar" onclick="abrirEditor(${i})">✏ Editar vista</button>
-          <a class="btn-ver" href="viewer.html?modelo=${encodeURIComponent(m.url)}&nome=${encodeURIComponent(m.nome)}" target="_blank">↗</a>
+          <button class="btn-card btn-vista" onclick="abrirEditorVista(${i})">✏ Vista</button>
+          <button class="btn-card btn-editar-dados" onclick="abrirEditarDados(${i})">Editar</button>
+          <button class="btn-card btn-toggle" onclick="togglePublico(${i})">${m.publico ? 'Ocultar' : 'Publicar'}</button>
+          <a class="btn-card btn-ver" href="viewer.html?modelo=${encodeURIComponent(m.url)}&nome=${encodeURIComponent(m.nome)}" target="_blank">↗</a>
+          <button class="btn-card btn-deletar" onclick="abrirDelete(${i})">🗑</button>
         </div>
       </div>
-    </div>`;
-  }).join('');
+    </div>`).join('');
 }
 
-// ── EDITOR THREE.JS ───────────────────────────────────────────────────────────
+// ── API CALL HELPER ───────────────────────────────────────────────────────────
+async function salvarModelos(mensagem) {
+  const resp = await fetch('/api/save-vista', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ senha: ADMIN_PASSWORD, modelos: modelosData, mensagem })
+  });
+  const result = await resp.json();
+  if (!resp.ok) throw new Error(result.error || 'Erro desconhecido');
+  return result;
+}
+
+// ── EDITOR DE VISTA ───────────────────────────────────────────────────────────
 let editorRenderer, editorScene, editorCamera, editorAnimId;
-let editorSpherical = { theta: 0.3, phi: 1.0, radius: 5 };
-let editorPanOffset = { x: 0, y: 0 };
-let editorTarget = { x: 0, y: 0, z: 0 };
-let isDragging = false, isPanning = false;
-let prevMouse = { x: 0, y: 0 };
-let currentModelIndex = null;
+let editorSph = { theta: 0.3, phi: 1.0, radius: 5 };
+let editorPan = { x: 0, y: 0 };
+let isDragging = false, isPanning = false, prevMouse = { x: 0, y: 0 };
+let currentIdx = null;
 
-function abrirEditor(idx) {
-  currentModelIndex = idx;
-  const modelo = modelosData[idx];
-
-  document.getElementById('editor-model-name').textContent = modelo.nome;
+function abrirEditorVista(idx) {
+  currentIdx = idx;
+  const m = modelosData[idx];
+  document.getElementById('editor-model-name').textContent = m.nome;
   document.getElementById('save-status').className = 'save-status';
   document.getElementById('editor-loading').classList.remove('hidden');
   document.getElementById('editor-modal').classList.add('visible');
-
-  // Restaura vista salva se existir
-  if (modelo.vista) {
-    editorSpherical = { ...modelo.vista.spherical };
-    editorPanOffset = { ...modelo.vista.panOffset };
-  } else {
-    editorSpherical = { theta: 0.3, phi: 1.0, radius: 5 };
-    editorPanOffset = { x: 0, y: 0 };
-  }
-  editorTarget = { x: 0, y: 0, z: 0 };
-
+  if (m.vista) { editorSph = { ...m.vista.spherical }; editorPan = { ...m.vista.panOffset }; }
+  else { editorSph = { theta: 0.3, phi: 1.0, radius: 5 }; editorPan = { x: 0, y: 0 }; }
   iniciarEditorRenderer();
-  carregarModeloEditor(modelo.url);
+  carregarModeloEditor(m.url);
 }
 
 function fecharEditor() {
   document.getElementById('editor-modal').classList.remove('visible');
   if (editorAnimId) cancelAnimationFrame(editorAnimId);
   if (editorRenderer) { editorRenderer.dispose(); editorRenderer = null; }
-  if (editorScene) { editorScene = null; }
-  currentModelIndex = null;
+  editorScene = null; currentIdx = null;
 }
 
-document.getElementById('btn-cancelar').addEventListener('click', fecharEditor);
-document.getElementById('editor-modal').addEventListener('click', e => {
-  if (e.target === document.getElementById('editor-modal')) fecharEditor();
-});
+document.getElementById('btn-cancelar-editor').addEventListener('click', fecharEditor);
 
 function iniciarEditorRenderer() {
   const canvas = document.getElementById('editor-canvas');
   if (editorRenderer) editorRenderer.dispose();
-
   editorRenderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   editorRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   editorRenderer.outputEncoding = THREE.sRGBEncoding;
   editorRenderer.toneMapping = THREE.NoToneMapping;
-
-  const w = canvas.parentElement.clientWidth;
-  const h = canvas.parentElement.clientHeight;
+  const w = canvas.parentElement.clientWidth, h = canvas.parentElement.clientHeight;
   editorRenderer.setSize(w, h);
-
   editorScene = new THREE.Scene();
   editorScene.background = new THREE.Color(0x1a1f1d);
-
   editorCamera = new THREE.PerspectiveCamera(45, w / h, 0.01, 1000);
-  editorUpdateCamera();
-
-  // Controles
-  canvas.addEventListener('mousedown', editorMouseDown);
-  canvas.addEventListener('mousemove', editorMouseMove);
-  canvas.addEventListener('mouseup', editorMouseUp);
-  canvas.addEventListener('mouseleave', editorMouseUp);
-  canvas.addEventListener('contextmenu', e => e.preventDefault());
-  canvas.addEventListener('wheel', editorWheel, { passive: true });
-
-  function editorLoop() {
-    editorAnimId = requestAnimationFrame(editorLoop);
-    if (editorRenderer && editorScene && editorCamera) editorRenderer.render(editorScene, editorCamera);
-  }
-  editorLoop();
+  editorUpdateCam();
+  canvas.onmousedown = e => { if (e.button === 2) isPanning = true; else isDragging = true; prevMouse = { x: e.clientX, y: e.clientY }; };
+  canvas.onmousemove = e => {
+    const dx = e.clientX - prevMouse.x, dy = e.clientY - prevMouse.y;
+    if (isDragging) { editorSph.theta -= dx * 0.005; editorSph.phi = Math.max(0.08, Math.min(Math.PI/2, editorSph.phi - dy * 0.005)); }
+    if (isPanning) { editorPan.x -= dx * 0.003; editorPan.y += dy * 0.003; }
+    prevMouse = { x: e.clientX, y: e.clientY };
+    editorUpdateCam();
+  };
+  canvas.onmouseup = canvas.onmouseleave = () => { isDragging = false; isPanning = false; };
+  canvas.oncontextmenu = e => e.preventDefault();
+  canvas.onwheel = e => { editorSph.radius = Math.max(0.3, Math.min(50, editorSph.radius + e.deltaY * 0.003)); editorUpdateCam(); };
+  (function loop() { editorAnimId = requestAnimationFrame(loop); if (editorRenderer && editorScene && editorCamera) editorRenderer.render(editorScene, editorCamera); })();
 }
 
-function editorUpdateCamera() {
+function editorUpdateCam() {
   if (!editorCamera) return;
-  const s = editorSpherical;
-  const x = s.radius * Math.sin(s.phi) * Math.sin(s.theta);
-  const y = s.radius * Math.cos(s.phi);
-  const z = s.radius * Math.sin(s.phi) * Math.cos(s.theta);
-  editorCamera.position.set(
-    editorTarget.x + x + editorPanOffset.x,
-    editorTarget.y + y + editorPanOffset.y,
-    editorTarget.z + z
-  );
-  editorCamera.lookAt(editorTarget.x + editorPanOffset.x, editorTarget.y + editorPanOffset.y, editorTarget.z);
-  updateValDisplay();
-}
-
-function updateValDisplay() {
-  document.getElementById('val-theta').textContent  = editorSpherical.theta.toFixed(3);
-  document.getElementById('val-phi').textContent    = editorSpherical.phi.toFixed(3);
-  document.getElementById('val-radius').textContent = editorSpherical.radius.toFixed(3);
-  document.getElementById('val-panx').textContent   = editorPanOffset.x.toFixed(3);
-  document.getElementById('val-pany').textContent   = editorPanOffset.y.toFixed(3);
-}
-
-function editorMouseDown(e) {
-  if (e.button === 2) isPanning = true; else isDragging = true;
-  prevMouse = { x: e.clientX, y: e.clientY };
-}
-function editorMouseMove(e) {
-  const dx = e.clientX - prevMouse.x, dy = e.clientY - prevMouse.y;
-  if (isDragging) {
-    editorSpherical.theta -= dx * 0.005;
-    editorSpherical.phi = Math.max(0.08, Math.min(Math.PI / 2, editorSpherical.phi - dy * 0.005));
-  }
-  if (isPanning) { editorPanOffset.x -= dx * 0.003; editorPanOffset.y += dy * 0.003; }
-  prevMouse = { x: e.clientX, y: e.clientY };
-  editorUpdateCamera();
-}
-function editorMouseUp() { isDragging = false; isPanning = false; }
-function editorWheel(e) {
-  editorSpherical.radius = Math.max(0.3, Math.min(50, editorSpherical.radius + e.deltaY * 0.003));
-  editorUpdateCamera();
+  const { theta, phi, radius } = editorSph;
+  editorCamera.position.set(radius * Math.sin(phi) * Math.sin(theta) + editorPan.x, radius * Math.cos(phi) + editorPan.y, radius * Math.sin(phi) * Math.cos(theta));
+  editorCamera.lookAt(editorPan.x, editorPan.y, 0);
+  document.getElementById('val-theta').textContent = theta.toFixed(3);
+  document.getElementById('val-phi').textContent = phi.toFixed(3);
+  document.getElementById('val-radius').textContent = radius.toFixed(3);
+  document.getElementById('val-panx').textContent = editorPan.x.toFixed(3);
+  document.getElementById('val-pany').textContent = editorPan.y.toFixed(3);
 }
 
 function carregarModeloEditor(url) {
-  const s1 = document.createElement('script');
-  s1.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js';
-  s1.onload = () => {
-    const s2 = document.createElement('script');
-    s2.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js';
-    s2.onload = () => {
-      const dracoLoader = new THREE.DRACOLoader();
-      dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
-      const loader = new THREE.GLTFLoader();
-      loader.setDRACOLoader(dracoLoader);
-
-      loader.load(url, (gltf) => {
-        const model = gltf.scene;
-        const box = new THREE.Box3().setFromObject(model);
-        const center = box.getCenter(new THREE.Vector3());
-        const size = box.getSize(new THREE.Vector3());
-        const maxDim = Math.max(size.x, size.y, size.z);
-        const scale = 3 / maxDim;
-
-        model.scale.setScalar(scale);
-        model.position.sub(center.multiplyScalar(scale));
-        model.position.y -= (size.y * scale) / 2;
-
-        const maxAniso = editorRenderer.capabilities.getMaxAnisotropy();
-        model.traverse(node => {
-          if (!node.isMesh) return;
-          const mats = Array.isArray(node.material) ? node.material : [node.material];
-          mats.forEach((mat, idx) => {
-            if (mat.map) { mat.map.encoding = THREE.sRGBEncoding; mat.map.anisotropy = maxAniso; mat.map.needsUpdate = true; }
-            const basic = new THREE.MeshBasicMaterial({ map: mat.map, side: THREE.DoubleSide });
-            if (Array.isArray(node.material)) node.material[idx] = basic; else node.material = basic;
-          });
-        });
-
-        editorScene.add(model);
-
-        // Se não tem vista salva, ajusta radius ao tamanho do modelo
-        if (!modelosData[currentModelIndex].vista) {
-          editorSpherical.radius = maxDim * scale * 1.4;
-        }
-        editorUpdateCamera();
-        document.getElementById('editor-loading').classList.add('hidden');
-      },
-      null,
-      (err) => { console.error(err); document.getElementById('editor-loading').classList.add('hidden'); });
+  const loadScripts = (cbs) => {
+    const s1 = document.createElement('script');
+    s1.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js';
+    s1.onload = () => {
+      const s2 = document.createElement('script');
+      s2.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js';
+      s2.onload = cbs;
+      document.head.appendChild(s2);
     };
-    document.head.appendChild(s2);
+    document.head.appendChild(s1);
   };
-  document.head.appendChild(s1);
+  const doLoad = () => {
+    const dl = new THREE.DRACOLoader();
+    dl.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+    const loader = new THREE.GLTFLoader();
+    loader.setDRACOLoader(dl);
+    loader.load(url, (gltf) => {
+      const model = gltf.scene;
+      const box = new THREE.Box3().setFromObject(model);
+      const center = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3());
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const scale = 3 / maxDim;
+      model.scale.setScalar(scale);
+      model.position.sub(center.multiplyScalar(scale));
+      model.position.y -= size.y * scale / 2;
+      model.traverse(node => {
+        if (!node.isMesh) return;
+        const mats = Array.isArray(node.material) ? node.material : [node.material];
+        mats.forEach((mat, i) => {
+          if (mat.map) { mat.map.encoding = THREE.sRGBEncoding; mat.map.anisotropy = editorRenderer.capabilities.getMaxAnisotropy(); mat.map.needsUpdate = true; }
+          const b = new THREE.MeshBasicMaterial({ map: mat.map, side: THREE.DoubleSide });
+          if (Array.isArray(node.material)) node.material[i] = b; else node.material = b;
+        });
+      });
+      editorScene.add(model);
+      if (!modelosData[currentIdx]?.vista) editorSph.radius = maxDim * scale * 1.4;
+      editorUpdateCam();
+      document.getElementById('editor-loading').classList.add('hidden');
+    }, null, err => { console.error(err); document.getElementById('editor-loading').classList.add('hidden'); });
+  };
+  if (typeof THREE.GLTFLoader === 'undefined') loadScripts(doLoad); else doLoad();
 }
 
-// ── SALVAR VIA GITHUB API ─────────────────────────────────────────────────────
-document.getElementById('btn-salvar').addEventListener('click', async () => {
-  const btn = document.getElementById('btn-salvar');
+document.getElementById('btn-salvar-vista').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-salvar-vista');
   const status = document.getElementById('save-status');
   btn.disabled = true;
   status.className = 'save-status loading';
   status.textContent = 'Salvando...';
-
-  // Salva a vista no modelo atual
-  modelosData[currentModelIndex].vista = {
-    spherical: { ...editorSpherical },
-    panOffset: { ...editorPanOffset }
-  };
-
+  modelosData[currentIdx].vista = { spherical: { ...editorSph }, panOffset: { ...editorPan } };
   try {
-    // Chama a API route do Vercel — token fica seguro no servidor
-    const modelo = modelosData[currentModelIndex];
-    const resp = await fetch('/api/save-vista', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        senha: ADMIN_PASSWORD,
-        modeloId: modelo.id,
-        vista: {
-          spherical: { ...editorSpherical },
-          panOffset: { ...editorPanOffset }
-        }
-      })
-    });
-
-    const result = await resp.json();
-    if (resp.ok) {
-      // Atualiza também o cache local
-      modelosData[currentModelIndex].vista = {
-        spherical: { ...editorSpherical },
-        panOffset: { ...editorPanOffset }
-      };
-      status.className = 'save-status ok';
-      status.textContent = '✓ Vista salva com sucesso!';
-      renderGrid();
-    } else {
-      throw new Error(result.error || 'Erro desconhecido');
-    }
+    await salvarModelos(`Vista: ${modelosData[currentIdx].nome}`);
+    status.className = 'save-status ok';
+    status.textContent = '✓ Vista salva!';
+    renderGrid();
   } catch(e) {
     status.className = 'save-status err';
-    status.textContent = '✗ Erro: ' + e.message;
+    status.textContent = '✗ ' + e.message;
+  }
+  btn.disabled = false;
+});
+
+// ── EDITAR / ADICIONAR DADOS ──────────────────────────────────────────────────
+let editandoIdx = null;
+
+document.getElementById('btn-novo-modelo').addEventListener('click', () => abrirDadosModal(null));
+document.getElementById('btn-cancelar-dados').addEventListener('click', () => document.getElementById('dados-modal').classList.remove('visible'));
+
+function abrirDadosModal(idx) {
+  editandoIdx = idx;
+  const isNovo = idx === null;
+  document.getElementById('dados-modal-title').textContent = isNovo ? 'Adicionar modelo' : 'Editar modelo';
+  document.getElementById('dados-modal-sub').textContent = isNovo ? 'Preencha os dados. O arquivo .glb já deve estar no R2.' : 'Edite os dados do modelo.';
+  document.getElementById('dados-status').className = 'modal-status';
+  document.getElementById('btn-salvar-dados').disabled = false;
+
+  const m = isNovo ? {} : modelosData[idx];
+  document.getElementById('campo-nome').value = m.nome || '';
+  document.getElementById('campo-descricao').value = m.descricao || '';
+  document.getElementById('campo-tipo').value = m.tipo || 'topografia';
+  document.getElementById('campo-arquivo').value = m.arquivo || '';
+  document.getElementById('campo-lat').value = m.lat || '';
+  document.getElementById('campo-lon').value = m.lon || '';
+  document.getElementById('campo-publico').checked = isNovo ? true : !!m.publico;
+  document.getElementById('campo-arquivo').disabled = !isNovo; // arquivo não pode mudar ao editar
+
+  document.getElementById('dados-modal').classList.add('visible');
+}
+
+function abrirEditarDados(idx) { abrirDadosModal(idx); }
+
+document.getElementById('btn-salvar-dados').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-salvar-dados');
+  const status = document.getElementById('dados-status');
+  const isNovo = editandoIdx === null;
+
+  const nome = document.getElementById('campo-nome').value.trim();
+  const arquivo = document.getElementById('campo-arquivo').value.trim();
+  if (!nome) { status.className = 'modal-status err'; status.textContent = 'Nome é obrigatório.'; return; }
+  if (isNovo && !arquivo) { status.className = 'modal-status err'; status.textContent = 'Arquivo é obrigatório.'; return; }
+
+  btn.disabled = true;
+  status.className = 'modal-status loading';
+  status.textContent = 'Salvando...';
+
+  const lat = parseFloat(document.getElementById('campo-lat').value) || null;
+  const lon = parseFloat(document.getElementById('campo-lon').value) || null;
+  const hoje = new Date().toISOString().split('T')[0];
+
+  if (isNovo) {
+    const novoModelo = {
+      id: arquivo.replace('.glb','').replace(/[^a-z0-9]/gi,'-').toLowerCase(),
+      nome,
+      descricao: document.getElementById('campo-descricao').value.trim(),
+      arquivo,
+      url: `${R2_BASE}/${arquivo}`,
+      tipo: document.getElementById('campo-tipo').value,
+      publico: document.getElementById('campo-publico').checked,
+      data: hoje
+    };
+    if (lat && lon) { novoModelo.lat = lat; novoModelo.lon = lon; }
+    modelosData.push(novoModelo);
+  } else {
+    const m = modelosData[editandoIdx];
+    m.nome = nome;
+    m.descricao = document.getElementById('campo-descricao').value.trim();
+    m.tipo = document.getElementById('campo-tipo').value;
+    m.publico = document.getElementById('campo-publico').checked;
+    if (lat && lon) { m.lat = lat; m.lon = lon; } else { delete m.lat; delete m.lon; }
   }
 
+  try {
+    await salvarModelos(isNovo ? `Adiciona: ${nome}` : `Edita: ${nome}`);
+    status.className = 'modal-status ok';
+    status.textContent = '✓ Salvo com sucesso!';
+    renderGrid();
+    setTimeout(() => document.getElementById('dados-modal').classList.remove('visible'), 1000);
+  } catch(e) {
+    status.className = 'modal-status err';
+    status.textContent = '✗ ' + e.message;
+    // Reverte se novo
+    if (isNovo) modelosData.pop();
+  }
   btn.disabled = false;
+});
+
+// ── TOGGLE PÚBLICO ────────────────────────────────────────────────────────────
+async function togglePublico(idx) {
+  modelosData[idx].publico = !modelosData[idx].publico;
+  renderGrid();
+  try {
+    await salvarModelos(`Visibilidade: ${modelosData[idx].nome}`);
+  } catch(e) {
+    modelosData[idx].publico = !modelosData[idx].publico; // reverte
+    renderGrid();
+    alert('Erro ao salvar: ' + e.message);
+  }
+}
+
+// ── DELETE ────────────────────────────────────────────────────────────────────
+let deleteIdx = null;
+
+function abrirDelete(idx) {
+  deleteIdx = idx;
+  document.getElementById('delete-nome').textContent = `"${modelosData[idx].nome}"`;
+  document.getElementById('delete-status').className = 'modal-status';
+  document.getElementById('btn-confirmar-delete').disabled = false;
+  document.getElementById('delete-modal').classList.add('visible');
+}
+
+document.getElementById('btn-cancelar-delete').addEventListener('click', () => document.getElementById('delete-modal').classList.remove('visible'));
+
+document.getElementById('btn-confirmar-delete').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-confirmar-delete');
+  const status = document.getElementById('delete-status');
+  btn.disabled = true;
+  status.className = 'modal-status loading';
+  status.textContent = 'Deletando...';
+
+  const nome = modelosData[deleteIdx].nome;
+  const backup = [...modelosData];
+  modelosData.splice(deleteIdx, 1);
+
+  try {
+    await salvarModelos(`Remove: ${nome}`);
+    status.className = 'modal-status ok';
+    status.textContent = '✓ Deletado!';
+    renderGrid();
+    setTimeout(() => document.getElementById('delete-modal').classList.remove('visible'), 800);
+  } catch(e) {
+    modelosData = backup;
+    renderGrid();
+    status.className = 'modal-status err';
+    status.textContent = '✗ ' + e.message;
+    btn.disabled = false;
+  }
+});
+
+// Fecha modais clicando fora
+['dados-modal','delete-modal'].forEach(id => {
+  document.getElementById(id).addEventListener('click', e => {
+    if (e.target === document.getElementById(id)) document.getElementById(id).classList.remove('visible');
+  });
 });
 </script>
 </body>
