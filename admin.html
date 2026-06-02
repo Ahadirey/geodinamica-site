@@ -232,9 +232,9 @@
     <div class="editor-title" id="editor-model-name">Modelo</div>
     <div class="editor-sub">Ajuste a vista e clique em salvar.</div>
     <div class="instrucoes">
-      <p>🖱 <strong>Arrastar</strong> — rotacionar</p>
-      <p>🖱 <strong>Scroll</strong> — zoom</p>
+      <p>🖱 <strong>Btn esquerdo / scroll</strong> — rotacionar</p>
       <p>🖱 <strong>Btn direito</strong> — mover</p>
+      <p>🖱 <strong>Wheel</strong> — zoom</p>
     </div>
     <div class="editor-section-title">Vista atual</div>
     <div class="vista-values">
@@ -444,7 +444,12 @@ function iniciarEditorRenderer() {
   editorScene.background = new THREE.Color(0x1a1f1d);
   editorCamera = new THREE.PerspectiveCamera(45, w / h, 0.01, 1000);
   editorUpdateCam();
-  canvas.onmousedown = e => { if (e.button === 2) isPanning = true; else isDragging = true; prevMouse = { x: e.clientX, y: e.clientY }; };
+  canvas.onmousedown = e => {
+    if (e.button === 0) { isDragging = true; }                       // esquerdo = rotacionar
+    if (e.button === 1) { isDragging = true; e.preventDefault(); }  // scroll = rotacionar
+    if (e.button === 2) { isPanning = true; }                        // direito = pan
+    prevMouse = { x: e.clientX, y: e.clientY };
+  };
   canvas.onmousemove = e => {
     const dx = e.clientX - prevMouse.x, dy = e.clientY - prevMouse.y;
     if (isDragging) { editorSph.theta -= dx * 0.005; editorSph.phi = Math.max(0.08, Math.min(Math.PI/2, editorSph.phi - dy * 0.005)); }
