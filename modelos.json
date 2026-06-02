@@ -38,7 +38,19 @@
     "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/modelo_mozara2048.glb",
     "tipo": "topografia",
     "publico": true,
-    "data": "2026-05-31"
+    "data": "2026-05-31",
+    "vista": {
+      "spherical": {
+        "theta": 1.7799999999999994,
+        "phi": 0.8499999999999999,
+        "radius": 3.5999999999999996
+      },
+      "panOffset": {
+        "x": 0.042000000000000065,
+        "y": -0.8790000000000006
+      }
+    },
+    "thumb": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/thumb_modelo-mozara-2048.jpg"
   },
   {
     "id": "portico-sao-joaquim",
