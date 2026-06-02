@@ -28,5 +28,15 @@
     "tipo": "topografia",
     "publico": true,
     "data": "2026-05-31"
+  },
+  {
+    "id": "portico-sao-joaquim",
+    "nome": "Pórtico SJ",
+    "descricao": "Fotogrametria",
+    "arquivo": "PORTICO_SAO_JOAQUIM.glb",
+    "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/PORTICO_SAO_JOAQUIM.glb",
+    "tipo": "ambiental",
+    "publico": true,
+    "data": "2026-06-02"
   }
 ]
