@@ -469,8 +469,16 @@ let modelLon = parseFloat(params.get('lon')) || null;
 document.getElementById('model-title').textContent = modelName;
 document.getElementById('solar-panel').classList.add('no-coords');
 
+// Flag: só inicia solar depois que o modelo carregar
+let modeloCarregado = false;
+let coordsOk = false;
+
 async function carregarCoordenadas() {
-  if (modelLat && modelLon) { iniciarSolar(); return; }
+  if (modelLat && modelLon) {
+    coordsOk = true;
+    if (modeloCarregado) iniciarSolar();
+    return;
+  }
   try {
     const resp = await fetch('modelos.json?v=' + Date.now());
     const modelos = await resp.json();
@@ -479,7 +487,8 @@ async function carregarCoordenadas() {
     if (modelo && modelo.lat && modelo.lon) {
       modelLat = modelo.lat;
       modelLon = modelo.lon;
-      iniciarSolar();
+      coordsOk = true;
+      if (modeloCarregado) iniciarSolar();
     }
   } catch(e) { console.log('Coordenadas não encontradas'); }
 }
@@ -718,7 +727,7 @@ function loadGLB(url) {
                     map: { value: tex },
                     sunDirection: { value: sunDir },
                     sunIntensity: { value: 1.0 },
-                    ambientStrength: { value: 0.35 },
+                    ambientStrength: { value: 0.65 },
                     sunriseColor: { value: new THREE.Color(1.0, 0.65, 0.25) },
                     isNight: { value: 0.0 }
                   },
@@ -744,6 +753,9 @@ function loadGLB(url) {
           bar.style.width = '100%';
           setTimeout(() => {
             document.getElementById('loading').classList.add('hidden');
+            // Modelo pronto — inicia solar se coordenadas já chegaram
+            modeloCarregado = true;
+            if (coordsOk) iniciarSolar();
           }, 400);
         },
         (progress) => {
@@ -828,16 +840,13 @@ function iniciarSolar() {
       ).normalize();
 
       // Intensidade: cresce com a elevação, pico ao meio-dia
-      const intensity = Math.pow(Math.sin(elevRad), 0.6); // curva suave
-
-      // Cor: laranja no horizonte, branco ao meio-dia
-      const isRiseSet = elevDeg < 20 ? (20 - elevDeg) / 20 : 0;
+      const intensity = Math.pow(Math.sin(elevRad), 0.5); // curva suave
 
       // Atualiza todos os materiais solares
       solarMaterials.forEach(mat => {
         mat.uniforms.sunDirection.value.copy(sunDir);
         mat.uniforms.sunIntensity.value = intensity;
-        mat.uniforms.ambientStrength.value = 0.25 + intensity * 0.15; // 0.25 noite → 0.40 meio-dia
+        mat.uniforms.ambientStrength.value = 0.55 + intensity * 0.25; // 0.55 mínimo → 0.80 meio-dia
         mat.uniforms.sunriseColor.value.setRGB(1.0, 0.55 + intensity * 0.45, 0.2 + intensity * 0.8);
         mat.uniforms.isNight.value = 0.0;
       });
