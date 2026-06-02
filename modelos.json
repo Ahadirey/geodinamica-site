@@ -29,7 +29,7 @@
     "arquivo": "modelo_mozara.glb",
     "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/modelo_mozara.glb",
     "tipo": "topografia",
-    "publico": true,
+    "publico": false,
     "data": "2026-05-29",
     "lat": -28.021017,
     "lon": -49.61271
