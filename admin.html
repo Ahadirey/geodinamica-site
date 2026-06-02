@@ -293,16 +293,6 @@
         <input type="text" id="campo-arquivo" placeholder="nome-do-arquivo.glb">
       </div>
     </div>
-    <div class="form-row">
-      <div class="field">
-        <label>Latitude</label>
-        <input type="number" id="campo-lat" placeholder="-28.021017" step="any">
-      </div>
-      <div class="field">
-        <label>Longitude</label>
-        <input type="number" id="campo-lon" placeholder="-49.612710" step="any">
-      </div>
-    </div>
     <div class="toggle-row">
       <span class="toggle-label">Visível no portfólio público</span>
       <label class="toggle-switch">
@@ -563,8 +553,6 @@ function abrirDadosModal(idx) {
   document.getElementById('campo-descricao').value = m.descricao || '';
   document.getElementById('campo-tipo').value = m.tipo || 'topografia';
   document.getElementById('campo-arquivo').value = m.arquivo || '';
-  document.getElementById('campo-lat').value = m.lat || '';
-  document.getElementById('campo-lon').value = m.lon || '';
   document.getElementById('campo-publico').checked = isNovo ? true : !!m.publico;
   document.getElementById('campo-arquivo').disabled = !isNovo; // arquivo não pode mudar ao editar
 
@@ -587,11 +575,9 @@ document.getElementById('btn-salvar-dados').addEventListener('click', async () =
   status.className = 'modal-status loading';
   status.textContent = 'Salvando...';
 
-  const lat = parseFloat(document.getElementById('campo-lat').value) || null;
-  const lon = parseFloat(document.getElementById('campo-lon').value) || null;
   const hoje = new Date().toISOString().split('T')[0];
 
-  if (isNovo) {
+    if (isNovo) {
     const novoModelo = {
       id: arquivo.replace('.glb','').replace(/[^a-z0-9]/gi,'-').toLowerCase(),
       nome,
@@ -602,7 +588,6 @@ document.getElementById('btn-salvar-dados').addEventListener('click', async () =
       publico: document.getElementById('campo-publico').checked,
       data: hoje
     };
-    if (lat && lon) { novoModelo.lat = lat; novoModelo.lon = lon; }
     modelosData.push(novoModelo);
   } else {
     const m = modelosData[editandoIdx];
@@ -610,7 +595,6 @@ document.getElementById('btn-salvar-dados').addEventListener('click', async () =
     m.descricao = document.getElementById('campo-descricao').value.trim();
     m.tipo = document.getElementById('campo-tipo').value;
     m.publico = document.getElementById('campo-publico').checked;
-    if (lat && lon) { m.lat = lat; m.lon = lon; } else { delete m.lat; delete m.lon; }
   }
 
   try {
