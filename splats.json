@@ -1,0 +1,13 @@
+[
+  {
+    "id": "modelo",
+    "nome": "testesplat",
+    "descricao": "aero",
+    "arquivo": "modelo.splat",
+    "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/modelo.splat",
+    "formato": "splat",
+    "tipo": "ambiental",
+    "publico": true,
+    "data": "2026-06-08"
+  }
+]
