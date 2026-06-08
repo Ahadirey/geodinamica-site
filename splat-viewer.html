@@ -53,6 +53,15 @@
   .hint-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; font-weight: 300; color: rgba(255,255,255,0.4); }
   .hint-key { font-size: 0.65rem; color: #67C187; border: 1px solid rgba(103,193,135,0.3); padding: 0.1rem 0.4rem; border-radius: 2px; }
 
+  /* Canvas criado pelo viewer precisa preencher o viewport como fundo */
+  canvas {
+    position: fixed !important;
+    top: 0 !important; left: 0 !important;
+    width: 100vw !important; height: 100vh !important;
+    z-index: 0 !important;
+    display: block !important;
+  }
+
   .geo-badge {
     position: absolute; bottom: 1.5rem; right: 1.5rem; z-index: 5;
     font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase;
@@ -137,8 +146,6 @@ if (!splatUrl) {
   throw new Error('URL ausente');
 }
 
-// ─── IMPORTA BIBLIOTECA ────────────────────────────────────────────────────────
-// gaussian-splats-3d gerencia seu próprio renderer WebGL e canvas
 let GaussianSplats3D;
 try {
   GaussianSplats3D = await import('https://esm.sh/@mkkellogg/gaussian-splats-3d@0.4.7');
@@ -150,32 +157,27 @@ try {
   throw e;
 }
 
-// ─── VIEWER ───────────────────────────────────────────────────────────────────
 const bar   = document.getElementById('loading-bar');
 const stage = document.getElementById('loading-stage');
 
-// Detecta formato pelo sufixo da URL; usa SceneFormat se disponível
 const ext = splatUrl.split('?')[0].split('.').pop().toLowerCase();
 const SF  = GaussianSplats3D.SceneFormat || {};
 const fmtMap = { ply: SF.Ply ?? 1, ksplat: SF.KSplat ?? 2 };
 const sceneFormat = fmtMap[ext] ?? (SF.Splat ?? 0);
 
-// Monta opções do Viewer defensivamente (enums podem variar por versão)
 const viewerOpts = {
   sharedMemoryForWorkers: false,
   gpuAcceleratedSort: false,
   selfDrivenMode: true,
   antialiased: true,
-  cameraUp: [0, 0, 1],
-  initialCameraPosition: [-20, -40, 20],
-  initialCameraLookAt:   [1.6, -4.5, -2],
+  initialCameraPosition: [0, -10, 5],
+  initialCameraLookAt:   [0,  0,  0],
 };
 if (GaussianSplats3D.SceneRevealMode?.Gradual !== undefined)
   viewerOpts.sceneRevealMode = GaussianSplats3D.SceneRevealMode.Gradual;
 
 const viewer = new GaussianSplats3D.Viewer(viewerOpts);
 
-// ─── CARREGA O ARQUIVO ────────────────────────────────────────────────────────
 viewer.addSplatScene(splatUrl, {
   showLoadingUI: false,
   format: sceneFormat,
