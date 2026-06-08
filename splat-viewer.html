@@ -122,6 +122,14 @@
 <div class="splat-badge">Gaussian Splatting</div>
 <div class="geo-badge">geodinamicasa.com.br</div>
 
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.168.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.168.0/examples/jsm/"
+  }
+}
+</script>
 <script type="module">
 const params    = new URLSearchParams(window.location.search);
 const splatUrl  = params.get('splat') || '';
