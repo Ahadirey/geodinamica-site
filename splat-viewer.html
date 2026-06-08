@@ -154,35 +154,36 @@ try {
 const bar   = document.getElementById('loading-bar');
 const stage = document.getElementById('loading-stage');
 
-const viewer = new GaussianSplats3D.Viewer({
-  sharedMemoryForWorkers: false,   // necessário sem headers COOP/COEP (Vercel padrão)
+// Detecta formato pelo sufixo da URL; usa SceneFormat se disponível
+const ext = splatUrl.split('?')[0].split('.').pop().toLowerCase();
+const SF  = GaussianSplats3D.SceneFormat || {};
+const fmtMap = { ply: SF.Ply ?? 1, ksplat: SF.KSplat ?? 2 };
+const sceneFormat = fmtMap[ext] ?? (SF.Splat ?? 0);
+
+// Monta opções do Viewer defensivamente (enums podem variar por versão)
+const viewerOpts = {
+  sharedMemoryForWorkers: false,
   gpuAcceleratedSort: true,
   selfDrivenMode: true,
   antialiased: true,
-  sceneRevealMode: GaussianSplats3D.SceneRevealMode.Gradual,
   cameraUp: [0, 1, 0],
   initialCameraPosition: [0, 2, 5],
   initialCameraLookAt:   [0, 0, 0],
-});
+};
+if (GaussianSplats3D.SceneRevealMode?.Gradual !== undefined)
+  viewerOpts.sceneRevealMode = GaussianSplats3D.SceneRevealMode.Gradual;
+
+const viewer = new GaussianSplats3D.Viewer(viewerOpts);
 
 // ─── CARREGA O ARQUIVO ────────────────────────────────────────────────────────
-// Detecta formato pelo sufixo da URL; padrão = splat
-const ext = splatUrl.split('?')[0].split('.').pop().toLowerCase();
-const fmtMap = { ply: GaussianSplats3D.SceneFormat.Ply, ksplat: GaussianSplats3D.SceneFormat.KSplat };
-const sceneFormat = fmtMap[ext] ?? GaussianSplats3D.SceneFormat.Splat;
-
 viewer.addSplatScene(splatUrl, {
   showLoadingUI: false,
   format: sceneFormat,
   splatAlphaRemovalThreshold: 5,
-  onProgress: (progress, progressMsg, loadStage) => {
-    if (loadStage === GaussianSplats3D.LoaderStatus.Downloading) {
-      stage.textContent = 'Baixando modelo...';
-      bar.style.width = Math.round(progress) + '%';
-    } else if (loadStage === GaussianSplats3D.LoaderStatus.Processing) {
-      stage.textContent = 'Processando splats...';
-      bar.style.width = '85%';
-    }
+  onProgress: (progress) => {
+    const pct = Math.min(Math.round(progress), 95);
+    bar.style.width = pct + '%';
+    stage.textContent = pct < 60 ? 'Baixando modelo...' : 'Processando splats...';
   }
 })
 .then(() => {
