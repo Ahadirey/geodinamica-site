@@ -9,16 +9,5 @@
     "tipo": "ambiental",
     "publico": true,
     "data": "2026-06-08"
-  },
-  {
-    "id": "testsplat",
-    "nome": "splats",
-    "descricao": "splat",
-    "arquivo": "testsplat",
-    "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/testsplat",
-    "formato": "splat",
-    "tipo": "rural",
-    "publico": true,
-    "data": "2026-06-08"
   }
 ]
