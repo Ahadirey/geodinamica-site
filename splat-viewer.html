@@ -163,10 +163,12 @@ const sceneFormat = fmtMap[ext] ?? (SF.Splat ?? 0);
 // Monta opções do Viewer defensivamente (enums podem variar por versão)
 const viewerOpts = {
   sharedMemoryForWorkers: false,
-  gpuAcceleratedSort: true,
+  gpuAcceleratedSort: false,
   selfDrivenMode: true,
   antialiased: true,
-  autoFitToScene: true,
+  cameraUp: [0, 0, 1],
+  initialCameraPosition: [-20, -40, 20],
+  initialCameraLookAt:   [1.6, -4.5, -2],
 };
 if (GaussianSplats3D.SceneRevealMode?.Gradual !== undefined)
   viewerOpts.sceneRevealMode = GaussianSplats3D.SceneRevealMode.Gradual;
