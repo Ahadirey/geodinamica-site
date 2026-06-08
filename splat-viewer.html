@@ -166,8 +166,14 @@ const viewer = new GaussianSplats3D.Viewer({
 });
 
 // ─── CARREGA O ARQUIVO ────────────────────────────────────────────────────────
+// Detecta formato pelo sufixo da URL; padrão = splat
+const ext = splatUrl.split('?')[0].split('.').pop().toLowerCase();
+const fmtMap = { ply: GaussianSplats3D.SceneFormat.Ply, ksplat: GaussianSplats3D.SceneFormat.KSplat };
+const sceneFormat = fmtMap[ext] ?? GaussianSplats3D.SceneFormat.Splat;
+
 viewer.addSplatScene(splatUrl, {
   showLoadingUI: false,
+  format: sceneFormat,
   splatAlphaRemovalThreshold: 5,
   onProgress: (progress, progressMsg, loadStage) => {
     if (loadStage === GaussianSplats3D.LoaderStatus.Downloading) {
