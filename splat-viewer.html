@@ -122,14 +122,6 @@
 <div class="splat-badge">Gaussian Splatting</div>
 <div class="geo-badge">geodinamicasa.com.br</div>
 
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.168.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.168.0/examples/jsm/"
-  }
-}
-</script>
 <script type="module">
 const params    = new URLSearchParams(window.location.search);
 const splatUrl  = params.get('splat') || '';
@@ -149,9 +141,7 @@ if (!splatUrl) {
 // gaussian-splats-3d gerencia seu próprio renderer WebGL e canvas
 let GaussianSplats3D;
 try {
-  GaussianSplats3D = await import(
-    'https://cdn.jsdelivr.net/npm/@mkkellogg/gaussian-splats-3d@0.4.7/build/gaussian-splats-3d.module.min.js'
-  );
+  GaussianSplats3D = await import('https://esm.sh/@mkkellogg/gaussian-splats-3d@0.4.7');
 } catch(e) {
   document.getElementById('loading').classList.add('hidden');
   document.getElementById('error-msg').classList.add('visible');
