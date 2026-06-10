@@ -218,27 +218,27 @@ viewer.addSplatScene(splatUrl, {
       // Rotação customizada só no eixo Y para o botão do scroll (middle)
       const canvas = viewer.renderer?.domElement || document.querySelector('canvas');
       const camera = viewer.camera;
-      let midDrag = false, midLastX = 0;
+      let midDrag = false, midLastY = 0;
 
       canvas.addEventListener('pointerdown', (e) => {
         if (e.button !== 1) return;
         e.preventDefault();
         midDrag = true;
-        midLastX = e.clientX;
+        midLastY = e.clientY;
         canvas.setPointerCapture(e.pointerId);
       });
 
       canvas.addEventListener('pointermove', (e) => {
         if (!midDrag || !camera) return;
-        const dx = e.clientX - midLastX;
-        midLastX = e.clientX;
-        const angle  = -dx * 0.005;
+        const dy = e.clientY - midLastY;
+        midLastY = e.clientY;
+        const angle = -dy * 0.005;
         const cos = Math.cos(angle), sin = Math.sin(angle);
         const t = ctrl.target;
-        const ox = camera.position.x - t.x;
+        const oy = camera.position.y - t.y;
         const oz = camera.position.z - t.z;
-        camera.position.x = t.x + ox * cos + oz * sin;
-        camera.position.z = t.z - ox * sin + oz * cos;
+        camera.position.y = t.y + oy * cos - oz * sin;
+        camera.position.z = t.z + oy * sin + oz * cos;
         camera.lookAt(t);
       });
 
