@@ -110,14 +110,14 @@
 <body>
 
 <div class="topbar">
-  <a href="splats.html" class="topbar-brand">
+  <a href="modelos.html" class="topbar-brand">
     <span class="brand-text">GEO<span>DINÂMICA</span></span>
   </a>
   <div class="topbar-info">
     <div class="model-name" id="model-title">Gaussian Splatting</div>
     <div class="model-meta">Visualização imersiva</div>
   </div>
-  <a href="splats.html" class="back-btn">
+  <a href="modelos.html" class="back-btn">
     <svg viewBox="0 0 16 16"><path d="M10 4l-4 4 4 4"/></svg>
     Portfólio
   </a>
@@ -315,18 +315,30 @@ viewer.addSplatScene(splatUrl, {
     window.addEventListener('message', (ev) => {
       if (ev.data?.type !== 'capture-splat') return;
       const sCanvas = document.querySelector('canvas:not(#axis-gizmo)');
-      let thumbnail = null;
-      try { thumbnail = sCanvas?.toDataURL('image/jpeg', 0.88) ?? null; } catch(e) {}
-      const cam  = viewer.camera;
-      const ctrl = viewer.controls || viewer.orbitControls;
-      window.parent.postMessage({
-        type: 'splat-captured',
-        thumbnail,
-        camera: cam ? {
-          position: [cam.position.x, cam.position.y, cam.position.z],
-          target:   ctrl?.target ? [ctrl.target.x, ctrl.target.y, ctrl.target.z] : [0, 0, 0]
-        } : null
-      }, '*');
+
+      // Aguarda 2 frames para garantir que o splat renderizou um frame novo
+      // antes de chamar toDataURL (evita captura de buffer vazio/preto)
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        let thumbnail = null;
+        try {
+          // Tenta forçar um render explícito se o renderer estiver acessível
+          if (viewer.renderer && viewer.scene && viewer.camera) {
+            viewer.renderer.render(viewer.scene, viewer.camera);
+          }
+          thumbnail = sCanvas?.toDataURL('image/jpeg', 0.88) ?? null;
+        } catch(e) { console.warn('[splat-capture] toDataURL error:', e); }
+
+        const cam  = viewer.camera;
+        const ctrl = viewer.controls || viewer.orbitControls;
+        window.parent.postMessage({
+          type: 'splat-captured',
+          thumbnail,
+          camera: cam ? {
+            position: [cam.position.x, cam.position.y, cam.position.z],
+            target:   ctrl?.target ? [ctrl.target.x, ctrl.target.y, ctrl.target.z] : [0, 0, 0]
+          } : null
+        }, '*');
+      }));
     });
   }
 
@@ -447,7 +459,7 @@ viewer.addSplatScene(splatUrl, {
     // ZOOM — scroll (desktop)
     canvas.addEventListener('wheel', (e) => {
       e.preventDefault();
-      radius = Math.max(0.1, Math.min(3, radius + e.deltaY * 0.003));
+      radius = Math.max(0.1, Math.min(3, radius + e.deltaY * 0.0008));
       applyCamera();
     }, { passive: false });
   };
