@@ -328,22 +328,25 @@ viewer.addSplatScene(splatUrl, {
                 || document.querySelector('canvas:not(#axis-gizmo)');
     const T = ctrl.target; // alvo do orbit (referência direta)
 
-    // ── Estado esférico turntable ──────────────────────────────────────────
-    const d0 = camera.position.distanceTo(T) || 2;
-    let radius = Math.max(0.1, Math.min(6, d0));
-    let theta  = Math.atan2(camera.position.x - T.x, camera.position.z - T.z);
-    let phi    = Math.acos(Math.max(-1, Math.min(1,
-                   (camera.position.y - T.y) / radius)));
+    // ── Estado esférico turntable Z-up ────────────────────────────────────
+    // Coord esféricas: x = r·sinφ·cosθ, y = r·sinφ·sinθ, z = r·cosφ
+    // φ=0 → câmera acima (+Z); φ=π/2 → câmera no plano XY; φ=π → abaixo
+    const cx0 = camera.position.x - T.x;
+    const cy0 = camera.position.y - T.y;
+    const cz0 = camera.position.z - T.z;
+    let radius = Math.max(0.1, Math.min(6, Math.sqrt(cx0*cx0 + cy0*cy0 + cz0*cz0) || 2));
+    let theta  = Math.atan2(cy0, cx0);
+    let phi    = Math.acos(Math.max(-1, Math.min(1, cz0 / radius)));
 
     function applyCamera() {
       const sP = Math.sin(phi), cP = Math.cos(phi);
-      const sT = Math.sin(theta), cT = Math.cos(theta);
+      const cT = Math.cos(theta), sT = Math.sin(theta);
       camera.position.set(
-        T.x + radius * sP * sT,
-        T.y + radius * cP,
-        T.z + radius * sP * cT
+        T.x + radius * sP * cT,
+        T.y + radius * sP * sT,
+        T.z + radius * cP
       );
-      camera.up.set(0, 1, 0);
+      camera.up.set(0, 0, 1); // Z é o eixo vertical do modelo
       camera.lookAt(T);
     }
     applyCamera();
@@ -367,21 +370,23 @@ viewer.addSplatScene(splatUrl, {
       drag.lastY = e.clientY;
 
       if (drag.button === 0 || drag.button === 1) {
-        // ORBIT — turntable
-        // Horizontal → gira em torno do eixo Y mundial (ver lateral)
+        // ORBIT turntable Z-up
+        // Horizontal → gira em torno do eixo Z (ver lateral)
         // Vertical   → muda elevação (ver cima/baixo)
-        theta -= dx * 0.005;
-        phi = Math.max(0.05, Math.min(Math.PI - 0.05, phi + dy * 0.005));
+        theta += dx * 0.005;                                           // + = sentido correto Z-up
+        phi = Math.max(0.05, Math.min(Math.PI - 0.05, phi - dy * 0.005)); // - = igual ao viewer.html
         applyCamera();
 
       } else if (drag.button === 2) {
-        // PAN — desloca câmera + alvo no plano da câmera
+        // PAN no plano da câmera (derivado para coord Z-up)
         const s = radius * 0.001;
         const sinT = Math.sin(theta), cosT = Math.cos(theta);
         const sinP = Math.sin(phi),   cosP = Math.cos(phi);
-        const dpx = (-cosT * dx - sinT * cosP * dy) * s;
-        const dpy = ( sinP * dy) * s;
-        const dpz = ( sinT * dx - cosT * cosP * dy) * s;
+        // Direita câmera: (-sinT, cosT, 0) → mover em -direita para "conteúdo segue dedo"
+        // Cima câmera: (-cosP·cosT, -cosP·sinT, sinP)
+        const dpx = ( sinT * dx - cosP * cosT * dy) * s;
+        const dpy = (-cosT * dx - cosP * sinT * dy) * s;
+        const dpz = ( sinP * dy) * s;
         T.x += dpx; T.y += dpy; T.z += dpz;
         camera.position.x += dpx;
         camera.position.y += dpy;
