@@ -61,6 +61,17 @@
   .hint-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; font-weight: 300; color: rgba(255,255,255,0.4); }
   .hint-key { font-size: 0.65rem; color: #67C187; border: 1px solid rgba(103,193,135,0.3); padding: 0.1rem 0.4rem; border-radius: 2px; }
 
+  @media (max-width: 768px) {
+    .topbar { padding: 0.6rem 1rem; }
+    .topbar-info { display: none; }
+    .brand-text { font-size: 0.78rem; letter-spacing: 0.02em; }
+    .back-btn { font-size: 0.68rem; padding: 0.35rem 0.65rem; letter-spacing: 0.03em; }
+    #axis-gizmo { width: 60px; height: 60px; bottom: 3.5rem; left: 1rem; }
+    .geo-badge { display: none; }
+    .controls-hint { gap: 0.75rem; padding: 0.5rem 1rem; white-space: nowrap; }
+    .hint-item { font-size: 0.65rem; }
+  }
+
   /* Canvas criado pelo viewer precisa preencher o viewport como fundo */
   canvas:not(#axis-gizmo) {
     position: fixed !important;
@@ -210,6 +221,13 @@ const splatUrl  = params.get('splat') || '';
 const splatNome = params.get('nome')  || 'Gaussian Splatting';
 
 document.getElementById('model-title').textContent = splatNome;
+// Dica adaptada para toque ou mouse
+if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+  document.getElementById('controls-hint').innerHTML = `
+    <div class="hint-item"><span class="hint-key">1 dedo</span> Rotacionar</div>
+    <div class="hint-item"><span class="hint-key">2 dedos</span> Zoom</div>
+  `;
+}
 setTimeout(() => document.getElementById('controls-hint').classList.add('fade'), 5000);
 
 // Botão voltar: vai para admin se vier de lá
@@ -351,18 +369,42 @@ viewer.addSplatScene(splatUrl, {
     }
     applyCamera();
 
-    // ── Eventos de ponteiro ───────────────────────────────────────────────
+    // ── Eventos de ponteiro (mouse + touch) ──────────────────────────────
     let drag = null;
+    const activePointers = new Map(); // pointerId → {x, y}
+    let lastPinchDist = null;
 
     canvas.addEventListener('pointerdown', (e) => {
-      if (drag) return;
-      if (e.button !== 0 && e.button !== 1 && e.button !== 2) return;
       e.preventDefault();
-      drag = { button: e.button, lastX: e.clientX, lastY: e.clientY };
+      activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
       canvas.setPointerCapture(e.pointerId);
+
+      if (activePointers.size === 1 && drag === null) {
+        drag = { button: e.button, lastX: e.clientX, lastY: e.clientY };
+      }
+      if (activePointers.size === 2) {
+        drag = null; // cancela orbit ao iniciar pinça
+        const pts = [...activePointers.values()];
+        lastPinchDist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+      }
     });
 
     canvas.addEventListener('pointermove', (e) => {
+      if (!activePointers.has(e.pointerId)) return;
+      activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+      // PINCH-TO-ZOOM (2 dedos)
+      if (activePointers.size === 2) {
+        const pts = [...activePointers.values()];
+        const dist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+        if (lastPinchDist !== null) {
+          radius = Math.max(0.1, Math.min(3, radius - (dist - lastPinchDist) * 0.008));
+          applyCamera();
+        }
+        lastPinchDist = dist;
+        return;
+      }
+
       if (!drag) return;
       const dx = e.clientX - drag.lastX;
       const dy = e.clientY - drag.lastY;
@@ -371,19 +413,15 @@ viewer.addSplatScene(splatUrl, {
 
       if (drag.button === 0 || drag.button === 1) {
         // ORBIT turntable Z-up
-        // Horizontal → gira em torno do eixo Z (ver lateral)
-        // Vertical   → muda elevação (ver cima/baixo)
-        theta -= dx * 0.005;                                           // igual ao viewer.html (GLB)
-        phi = Math.max(0.05, Math.min(Math.PI / 2, phi - dy * 0.005)); // limite inferior = plano XY
+        theta -= dx * 0.005;
+        phi = Math.max(0.05, Math.min(Math.PI / 2, phi - dy * 0.005));
         applyCamera();
 
       } else if (drag.button === 2) {
-        // PAN no plano da câmera (derivado para coord Z-up)
+        // PAN Z-up
         const s = radius * 0.001;
         const sinT = Math.sin(theta), cosT = Math.cos(theta);
         const sinP = Math.sin(phi),   cosP = Math.cos(phi);
-        // Direita câmera: (-sinT, cosT, 0) → mover em -direita para "conteúdo segue dedo"
-        // Cima câmera: (-cosP·cosT, -cosP·sinT, sinP)
         const dpx = ( sinT * dx - cosP * cosT * dy) * s;
         const dpy = (-cosT * dx - cosP * sinT * dy) * s;
         const dpz = ( sinP * dy) * s;
@@ -394,11 +432,19 @@ viewer.addSplatScene(splatUrl, {
       }
     });
 
-    canvas.addEventListener('pointerup',   (e) => { if (drag?.button === e.button) drag = null; });
-    canvas.addEventListener('pointerout',  ()  => { drag = null; });
+    canvas.addEventListener('pointerup', (e) => {
+      activePointers.delete(e.pointerId);
+      if (drag?.button === e.button) drag = null;
+      if (activePointers.size < 2) lastPinchDist = null;
+    });
+    canvas.addEventListener('pointerout', (e) => {
+      activePointers.delete(e.pointerId);
+      if (activePointers.size === 0) drag = null;
+      if (activePointers.size < 2) lastPinchDist = null;
+    });
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
-    // ZOOM — scroll
+    // ZOOM — scroll (desktop)
     canvas.addEventListener('wheel', (e) => {
       e.preventDefault();
       radius = Math.max(0.1, Math.min(3, radius + e.deltaY * 0.003));
