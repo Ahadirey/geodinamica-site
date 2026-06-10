@@ -307,13 +307,7 @@
     <div class="form-row">
       <div class="field">
         <label>Tipo</label>
-        <select id="campo-tipo">
-          <option value="topografia">Topografia</option>
-          <option value="geologia">Geologia</option>
-          <option value="ambiental">Ambiental</option>
-          <option value="mineracao">Mineração</option>
-          <option value="rural">Rural</option>
-        </select>
+        <input type="text" id="campo-tipo" placeholder="Ex: Topografia, Rural, Geologia…">
       </div>
       <div class="field">
         <label>Arquivo no R2 (.glb)</label>
@@ -383,13 +377,7 @@
     <div class="form-row">
       <div class="field">
         <label>Tipo</label>
-        <select id="splat-campo-tipo">
-          <option value="topografia">Topografia</option>
-          <option value="geologia">Geologia</option>
-          <option value="ambiental">Ambiental</option>
-          <option value="mineracao">Mineração</option>
-          <option value="rural">Rural</option>
-        </select>
+        <input type="text" id="splat-campo-tipo" placeholder="Ex: Topografia, Rural, Geologia…">
       </div>
       <div class="field">
         <label>Arquivo no R2</label>
@@ -595,8 +583,13 @@ function abrirEditorVista(idx) {
   document.getElementById('save-status').className = 'save-status';
   document.getElementById('editor-loading').classList.remove('hidden');
   document.getElementById('editor-modal').classList.add('visible');
-  if (m.vista) { editorSph = { ...m.vista.spherical }; editorPan = { ...m.vista.panOffset }; }
-  else { editorSph = { theta: 0.3, phi: 1.0, radius: 5 }; editorPan = { x: 0, y: 0 }; }
+  if (m.vista) {
+    editorSph = { ...m.vista.spherical };
+    editorPan = { x: m.vista.panOffset.x ?? 0, y: m.vista.panOffset.y ?? 0, z: m.vista.panOffset.z ?? 0 };
+  } else {
+    editorSph = { theta: 0.3, phi: 1.0, radius: 5 };
+    editorPan = { x: 0, y: 0, z: 0 };
+  }
   iniciarEditorRenderer();
   carregarModeloEditor(m.url);
 }
@@ -631,8 +624,18 @@ function iniciarEditorRenderer() {
   };
   canvas.onmousemove = e => {
     const dx = e.clientX - prevMouse.x, dy = e.clientY - prevMouse.y;
-    if (isDragging) { editorSph.theta -= dx * 0.005; editorSph.phi = Math.max(0.08, Math.min(Math.PI/2, editorSph.phi - dy * 0.005)); }
-    if (isPanning) { editorPan.x -= dx * 0.003; editorPan.y += dy * 0.003; }
+    if (isDragging) {
+      editorSph.theta -= dx * 0.005;
+      editorSph.phi = Math.max(0.01, Math.min(Math.PI - 0.01, editorSph.phi - dy * 0.005));
+    }
+    if (isPanning) {
+      const s = 0.003;
+      const sinT = Math.sin(editorSph.theta), cosT = Math.cos(editorSph.theta);
+      const sinP = Math.sin(editorSph.phi),   cosP = Math.cos(editorSph.phi);
+      editorPan.x += (-cosT * dx - sinT * cosP * dy) * s;
+      editorPan.y += (sinP * dy) * s;
+      editorPan.z += (sinT * dx - cosT * cosP * dy) * s;
+    }
     prevMouse = { x: e.clientX, y: e.clientY };
     editorUpdateCam();
   };
@@ -645,8 +648,11 @@ function iniciarEditorRenderer() {
 function editorUpdateCam() {
   if (!editorCamera) return;
   const { theta, phi, radius } = editorSph;
-  editorCamera.position.set(radius * Math.sin(phi) * Math.sin(theta) + editorPan.x, radius * Math.cos(phi) + editorPan.y, radius * Math.sin(phi) * Math.cos(theta));
-  editorCamera.lookAt(editorPan.x, editorPan.y, 0);
+  const ex = radius * Math.sin(phi) * Math.sin(theta);
+  const ey = radius * Math.cos(phi);
+  const ez = radius * Math.sin(phi) * Math.cos(theta);
+  editorCamera.position.set(ex + editorPan.x, ey + editorPan.y, ez + editorPan.z);
+  editorCamera.lookAt(editorPan.x, editorPan.y, editorPan.z);
   document.getElementById('val-theta').textContent = theta.toFixed(3);
   document.getElementById('val-phi').textContent = phi.toFixed(3);
   document.getElementById('val-radius').textContent = radius.toFixed(3);
@@ -755,7 +761,7 @@ function abrirDadosModal(idx) {
   const m = isNovo ? {} : modelosData[idx];
   document.getElementById('campo-nome').value = m.nome || '';
   document.getElementById('campo-descricao').value = m.descricao || '';
-  document.getElementById('campo-tipo').value = m.tipo || 'topografia';
+  document.getElementById('campo-tipo').value = m.tipo || '';
   document.getElementById('campo-arquivo').value = m.arquivo || '';
   document.getElementById('campo-publico').checked = isNovo ? true : !!m.publico;
   document.getElementById('campo-arquivo').disabled = !isNovo;
@@ -906,7 +912,7 @@ function abrirSplatDadosModal(idx) {
   const s = isNovo ? {} : splatsData[idx];
   document.getElementById('splat-campo-nome').value = s.nome || '';
   document.getElementById('splat-campo-descricao').value = s.descricao || '';
-  document.getElementById('splat-campo-tipo').value = s.tipo || 'topografia';
+  document.getElementById('splat-campo-tipo').value = s.tipo || '';
   document.getElementById('splat-campo-arquivo').value = s.arquivo || '';
   document.getElementById('splat-campo-formato').value = s.formato || 'splat';
   document.getElementById('splat-campo-publico').checked = isNovo ? true : !!s.publico;

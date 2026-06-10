@@ -201,7 +201,7 @@ function aplicarVista() {
   spherical.theta  = vistaSalva.spherical.theta;
   spherical.phi    = vistaSalva.spherical.phi;
   spherical.radius = vistaSalva.spherical.radius;
-  panOffset.set(vistaSalva.panOffset.x, vistaSalva.panOffset.y, 0);
+  panOffset.set(vistaSalva.panOffset.x, vistaSalva.panOffset.y, vistaSalva.panOffset.z ?? 0);
   vistaCarregada = true;
   updateCamera();
 }
