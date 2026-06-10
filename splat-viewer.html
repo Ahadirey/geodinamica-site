@@ -327,13 +327,14 @@ viewer.addSplatScene(splatUrl, {
       ctrl.dampingFactor    = 0.07;
       ctrl.screenSpacePanning = true; // pan em 2D do ecrã (mais intuitivo)
       if (ctrl.target) ctrl.target.set(0, 0, 0);
-      // Desativa o comportamento padrão do botão do scroll no OrbitControls
+      // Desativa comportamentos padrão do MIDDLE e RIGHT no OrbitControls
       if (ctrl.mouseButtons !== undefined)
-        ctrl.mouseButtons = { LEFT: 0, MIDDLE: -1, RIGHT: 2 };
+        ctrl.mouseButtons = { LEFT: 0, MIDDLE: -1, RIGHT: -1 };
 
-      // Rotação customizada só no eixo Y para o botão do scroll (middle)
       const canvas = viewer.renderer?.domElement || document.querySelector('canvas');
       const camera = viewer.camera;
+
+      // ── MIDDLE: rotação no eixo Z (roll) ──────────────────────────────────
       let midDrag = false, midLastX = 0;
 
       canvas.addEventListener('pointerdown', (e) => {
@@ -358,8 +359,55 @@ viewer.addSplatScene(splatUrl, {
         camera.lookAt(t);
       });
 
-      canvas.addEventListener('pointerup',   (e) => { if (e.button === 1) midDrag = false; });
-      canvas.addEventListener('pointerout',  ()  => { midDrag = false; });
+      canvas.addEventListener('pointerup',  (e) => { if (e.button === 1) midDrag = false; });
+      canvas.addEventListener('pointerout', ()  => { midDrag = false; });
+
+      // ── RIGHT: pan livre em 3 eixos (lateral + profundidade) ─────────────
+      let rightDrag = false, rightLastX = 0, rightLastY = 0;
+
+      canvas.addEventListener('pointerdown', (e) => {
+        if (e.button !== 2) return;
+        e.preventDefault();
+        rightDrag = true;
+        rightLastX = e.clientX;
+        rightLastY = e.clientY;
+        canvas.setPointerCapture(e.pointerId);
+      });
+
+      canvas.addEventListener('pointermove', (e) => {
+        if (!rightDrag || !camera) return;
+        const dx = e.clientX - rightLastX;
+        const dy = e.clientY - rightLastY;
+        rightLastX = e.clientX;
+        rightLastY = e.clientY;
+
+        camera.updateMatrixWorld();
+        const m = camera.matrixWorld.elements; // column-major
+
+        // Vetor direita da câmera (coluna 0)
+        const rx = m[0], ry = m[1], rz = m[2];
+
+        // Vetor frente: de câmera → target, normalizado
+        const tx = ctrl.target.x - camera.position.x;
+        const ty = ctrl.target.y - camera.position.y;
+        const tz = ctrl.target.z - camera.position.z;
+        const tl = Math.sqrt(tx*tx + ty*ty + tz*tz) || 1;
+        const fx = tx/tl, fy = ty/tl, fz = tz/tl;
+
+        const s = 0.003;
+        const pdx = -dx * s;   // lateral
+        const pdy = -dy * s;   // profundidade
+
+        ctrl.target.x    += rx * pdx + fx * pdy;
+        ctrl.target.y    += ry * pdx + fy * pdy;
+        ctrl.target.z    += rz * pdx + fz * pdy;
+        camera.position.x += rx * pdx + fx * pdy;
+        camera.position.y += ry * pdx + fy * pdy;
+        camera.position.z += rz * pdx + fz * pdy;
+      });
+
+      canvas.addEventListener('pointerup',  (e) => { if (e.button === 2) rightDrag = false; });
+      canvas.addEventListener('contextmenu', (e) => e.preventDefault());
     } else {
       // Tenta de novo se os controles ainda não estão prontos
       setTimeout(configureControls, 100);
