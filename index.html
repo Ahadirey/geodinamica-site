@@ -235,7 +235,7 @@
     z-index: 5; pointer-events: none;
   }
   .phone-model-lbl { font-size: 10.5px; font-weight: 300; color: rgba(255,255,255,0.5); font-family: 'DM Sans', sans-serif; line-height: 1.5; }
-  .phone-model-lbl small { display: block; font-size: 8.5px; color: rgba(103,193,135,0.75); letter-spacing: 0.08em; text-transform: uppercase; }
+  .phone-model-lbl small { display: block; font-size: 8.5px; color: rgba(255,165,60,0.85); letter-spacing: 0.08em; text-transform: uppercase; }
   .phone-3d-badge {
     font-size: 9px; font-weight: 500; letter-spacing: 0.1em;
     text-transform: uppercase; color: #67C187;
@@ -932,13 +932,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!arr.length) return null;
             var geo = new THREE.BufferGeometry();
             geo.setAttribute('position', new THREE.Float32BufferAttribute(arr, 3));
-            var mat = new THREE.LineBasicMaterial({ color: color, transparent: true, opacity: opacity, depthTest: true });
+            var mat = new THREE.LineBasicMaterial({
+              color: color, transparent: true, opacity: opacity,
+              depthTest: true, blending: THREE.AdditiveBlending /* brilho "fosforescente" */
+            });
             return new THREE.LineSegments(geo, mat);
           }
 
           var g = new THREE.Group();
-          var l1 = makeLines(normais, 0x4fa86f, 0.45);
-          var l2 = makeLines(mestras, 0x9bf0bd, 0.85);
+          var l1 = makeLines(normais, 0xff9120, 0.7);   /* laranja neon */
+          var l2 = makeLines(mestras, 0xffc14d, 1.0);   /* mestras mais claras */
           if (l1) g.add(l1);
           if (l2) g.add(l2);
           root.add(g);
