@@ -830,7 +830,7 @@ document.addEventListener('DOMContentLoaded', () => {
       var dt = Math.min(clock.getDelta(), 0.05);
       if (!inView) return;
       if (modelReady) {
-        if (autoRotate && !reduceMotion && !isDragging) {
+        if (autoRotate && !isDragging) {
           theta += 0.16 * dt;   /* rad/s — suave e constante */
         }
         /* inércia após soltar o arrasto */
