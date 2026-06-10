@@ -319,97 +319,23 @@ viewer.addSplatScene(splatUrl, {
   const configureControls = () => {
     const ctrl = viewer.controls || viewer.orbitControls || viewer.camera?.controls;
     if (ctrl) {
-      ctrl.minDistance      = 0.1;    // pode chegar bem perto
-      ctrl.maxDistance      = 6;      // limite do zoom-out (~distância inicial)
-      ctrl.minPolarAngle    = 0;      // rotação vertical livre (de cima)
-      ctrl.maxPolarAngle    = Math.PI;// rotação vertical livre (de baixo)
-      ctrl.enableDamping    = true;
-      ctrl.dampingFactor    = 0.07;
-      ctrl.screenSpacePanning = true; // pan em 2D do ecrã (mais intuitivo)
+      ctrl.minDistance        = 0.1;
+      ctrl.maxDistance        = 6;
+      ctrl.minPolarAngle      = 0;           // rotação vertical livre (de cima)
+      ctrl.maxPolarAngle      = Math.PI;     // rotação vertical livre (de baixo)
+      ctrl.enableDamping      = true;
+      ctrl.dampingFactor      = 0.07;
+      ctrl.screenSpacePanning = true;        // pan direito = XY da tela, sem zoom
       if (ctrl.target) ctrl.target.set(0, 0, 0);
-      // Desativa comportamentos padrão do MIDDLE e RIGHT no OrbitControls
+
+      // Esquerdo = orbit | Scroll (middle) = orbit também | Direito = pan XY
       if (ctrl.mouseButtons !== undefined)
-        ctrl.mouseButtons = { LEFT: 0, MIDDLE: -1, RIGHT: -1 };
+        ctrl.mouseButtons = { LEFT: 0, MIDDLE: 0, RIGHT: 2 };
 
+      // Bloqueia menu de contexto do browser no canvas
       const canvas = viewer.renderer?.domElement || document.querySelector('canvas');
-      const camera = viewer.camera;
-
-      // ── MIDDLE: rotação no eixo Z (roll) ──────────────────────────────────
-      let midDrag = false, midLastX = 0;
-
-      canvas.addEventListener('pointerdown', (e) => {
-        if (e.button !== 1) return;
-        e.preventDefault();
-        midDrag = true;
-        midLastX = e.clientX;
-        canvas.setPointerCapture(e.pointerId);
-      });
-
-      canvas.addEventListener('pointermove', (e) => {
-        if (!midDrag || !camera) return;
-        const dx = e.clientX - midLastX;
-        midLastX = e.clientX;
-        const angle = -dx * 0.005;
-        const cos = Math.cos(angle), sin = Math.sin(angle);
-        const t = ctrl.target;
-        const ox = camera.position.x - t.x;
-        const oy = camera.position.y - t.y;
-        camera.position.x = t.x + ox * cos - oy * sin;
-        camera.position.y = t.y + ox * sin + oy * cos;
-        camera.lookAt(t);
-      });
-
-      canvas.addEventListener('pointerup',  (e) => { if (e.button === 1) midDrag = false; });
-      canvas.addEventListener('pointerout', ()  => { midDrag = false; });
-
-      // ── RIGHT: pan livre em 3 eixos (lateral + profundidade) ─────────────
-      let rightDrag = false, rightLastX = 0, rightLastY = 0;
-
-      canvas.addEventListener('pointerdown', (e) => {
-        if (e.button !== 2) return;
-        e.preventDefault();
-        rightDrag = true;
-        rightLastX = e.clientX;
-        rightLastY = e.clientY;
-        canvas.setPointerCapture(e.pointerId);
-      });
-
-      canvas.addEventListener('pointermove', (e) => {
-        if (!rightDrag || !camera) return;
-        const dx = e.clientX - rightLastX;
-        const dy = e.clientY - rightLastY;
-        rightLastX = e.clientX;
-        rightLastY = e.clientY;
-
-        camera.updateMatrixWorld();
-        const m = camera.matrixWorld.elements; // column-major
-
-        // Vetor direita da câmera (coluna 0)
-        const rx = m[0], ry = m[1], rz = m[2];
-
-        // Vetor frente: de câmera → target, normalizado
-        const tx = ctrl.target.x - camera.position.x;
-        const ty = ctrl.target.y - camera.position.y;
-        const tz = ctrl.target.z - camera.position.z;
-        const tl = Math.sqrt(tx*tx + ty*ty + tz*tz) || 1;
-        const fx = tx/tl, fy = ty/tl, fz = tz/tl;
-
-        const s = 0.003;
-        const pdx = -dx * s;   // lateral
-        const pdy = -dy * s;   // profundidade
-
-        ctrl.target.x    += rx * pdx + fx * pdy;
-        ctrl.target.y    += ry * pdx + fy * pdy;
-        ctrl.target.z    += rz * pdx + fz * pdy;
-        camera.position.x += rx * pdx + fx * pdy;
-        camera.position.y += ry * pdx + fy * pdy;
-        camera.position.z += rz * pdx + fz * pdy;
-      });
-
-      canvas.addEventListener('pointerup',  (e) => { if (e.button === 2) rightDrag = false; });
       canvas.addEventListener('contextmenu', (e) => e.preventDefault());
     } else {
-      // Tenta de novo se os controles ainda não estão prontos
       setTimeout(configureControls, 100);
     }
   };
