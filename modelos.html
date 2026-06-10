@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Modelos 3D – Geodinâmica</title>
+<title>Portfólio 3D – Geodinâmica</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -39,9 +39,9 @@
   .nav-back:hover { color: #fff; border-color: rgba(255,255,255,0.25); }
   .nav-back svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; }
 
-  /* HEADER */
+  /* PAGE HEADER */
   .page-header {
-    padding: 4rem 3rem 2rem;
+    padding: 4rem 3rem 3rem;
     border-bottom: 1px solid rgba(255,255,255,0.06);
   }
   .page-tag {
@@ -50,21 +50,56 @@
   }
   .page-title {
     font-family: 'Syne', sans-serif; font-weight: 700;
-    font-size: clamp(1.8rem, 3vw, 2.5rem); letter-spacing: -0.02em; line-height: 1.1;
+    font-size: clamp(2rem, 3.5vw, 3rem); letter-spacing: -0.02em; line-height: 1.1;
     margin-bottom: 0.75rem;
   }
   .page-sub {
-    font-size: 0.9rem; font-weight: 300; color: rgba(255,255,255,0.45); max-width: 500px;
+    font-size: 0.95rem; font-weight: 300; color: rgba(255,255,255,0.45); max-width: 560px; line-height: 1.7;
   }
 
+  /* SECTION HEADER */
+  .section-block {
+    padding: 3.5rem 3rem 0;
+  }
+  .section-block + .section-block {
+    margin-top: 1rem;
+    padding-top: 4rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .section-label {
+    font-size: 0.65rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(255,255,255,0.3); margin-bottom: 0.5rem;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .section-label::after {
+    content: ''; flex: 1; max-width: 40px; height: 1px; background: rgba(255,255,255,0.1);
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: clamp(1.4rem, 2.5vw, 2rem); letter-spacing: -0.02em; line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+  .section-sub {
+    font-size: 0.85rem; font-weight: 300; color: rgba(255,255,255,0.4); max-width: 480px; line-height: 1.65;
+  }
+  .tech-pill {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    margin-top: 0.9rem; padding: 0.3rem 0.75rem; border-radius: 2px;
+    font-size: 0.65rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--verde-claro); border: 1px solid rgba(103,193,135,0.22);
+    background: rgba(0,40,30,0.5);
+  }
+  .tech-pill-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--verde-claro); }
+
   /* GRID */
-  .modelos-container { padding: 3rem; }
+  .modelos-grid-wrap { padding: 2rem 3rem 0; }
   .modelos-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.5rem;
   }
 
+  /* CARDS */
   .modelo-card {
     background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
     border-radius: 4px; overflow: hidden;
@@ -89,12 +124,15 @@
     font-size: 0.62rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
     color: var(--verde-claro); background: rgba(0,40,30,0.85); padding: 0.25rem 0.6rem; border-radius: 2px;
   }
+  .splat-badge {
+    position: absolute; bottom: 0.75rem; right: 0.75rem;
+    font-size: 0.58rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    color: rgba(255,255,255,0.5); background: rgba(0,0,0,0.5); padding: 0.2rem 0.5rem; border-radius: 2px;
+  }
   .modelo-thumb-play {
     position: absolute;
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    background: rgba(0,88,73,0.7);
-    border: 1px solid rgba(103,193,135,0.3);
+    width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(0,88,73,0.7); border: 1px solid rgba(103,193,135,0.3);
     display: flex; align-items: center; justify-content: center;
     opacity: 0; transition: opacity 0.2s;
   }
@@ -105,19 +143,19 @@
   .modelo-nome { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.35rem; }
   .modelo-meta { font-size: 0.78rem; font-weight: 300; color: rgba(255,255,255,0.38); }
 
-  /* EMPTY CARD */
+  /* EMPTY */
   .modelo-card-empty {
     border: 1px dashed rgba(255,255,255,0.08); background: transparent;
-    border-radius: 4px; aspect-ratio: unset; min-height: 180px;
+    border-radius: 4px; min-height: 160px;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: 0.75rem; cursor: default;
   }
-  .modelo-card-empty svg { width: 28px; height: 28px; stroke: rgba(255,255,255,0.12); fill: none; stroke-width: 1.5; }
-  .modelo-card-empty span { font-size: 0.75rem; color: rgba(255,255,255,0.18); font-weight: 300; }
+  .modelo-card-empty svg { width: 26px; height: 26px; stroke: rgba(255,255,255,0.12); fill: none; stroke-width: 1.5; }
+  .modelo-card-empty span { font-size: 0.72rem; color: rgba(255,255,255,0.18); font-weight: 300; }
 
   /* FOOTER */
   footer {
-    margin-top: 4rem; padding: 2rem 3rem;
+    margin-top: 5rem; padding: 2rem 3rem;
     border-top: 1px solid rgba(255,255,255,0.06);
     display: flex; justify-content: space-between; align-items: center;
   }
@@ -125,7 +163,7 @@
   .crea-badge { font-size: 0.68rem; color: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.08); padding: 0.25rem 0.6rem; border-radius: 2px; }
 
   @media (max-width: 768px) {
-    nav, .page-header, .modelos-container, footer { padding-left: 1.5rem; padding-right: 1.5rem; }
+    nav, .page-header, .section-block, .modelos-grid-wrap, footer { padding-left: 1.5rem; padding-right: 1.5rem; }
     .modelos-grid { grid-template-columns: 1fr; }
   }
 </style>
@@ -149,12 +187,34 @@
 
 <div class="page-header">
   <div class="page-tag">Portfólio</div>
-  <h1 class="page-title">Modelos 3D</h1>
-  <p class="page-sub">Clique em qualquer modelo para abrir a visualização interativa.</p>
+  <h1 class="page-title">Modelos 3D Interativos</h1>
+  <p class="page-sub">Explore os levantamentos em três dimensões. Gire, aproxime e inspecione cada modelo diretamente no navegador, sem instalar nada.</p>
 </div>
 
-<div class="modelos-container">
-  <div class="modelos-grid" id="modelos-grid">
+<!-- ── SEÇÃO 1: GLB ──────────────────────────────────────────── -->
+<div class="section-block">
+  <div class="section-label">Fotogrametria</div>
+  <h2 class="section-title">Modelos 3D</h2>
+  <p class="section-sub">Malha poligonal texturizada com curvas de nível reais geradas a partir de nuvem de pontos densa.</p>
+</div>
+<div class="modelos-grid-wrap">
+  <div class="modelos-grid" id="glb-grid">
+    <div class="modelo-card-empty" style="grid-column:1/-1;border:none;">
+      <svg viewBox="0 0 24 24" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+      <span>Carregando modelos...</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── SEÇÃO 2: GAUSSIAN SPLATTING ──────────────────────────── -->
+<div class="section-block">
+  <div class="section-label">Nova Tecnologia</div>
+  <h2 class="section-title">Gaussian Splatting</h2>
+  <p class="section-sub">Reconstrução volumétrica a partir de imagens de drone. Visualização imersiva com qualidade fotorrealista.</p>
+  <div class="tech-pill"><span class="tech-pill-dot"></span>3D Gaussian Splatting · Renderização Neural</div>
+</div>
+<div class="modelos-grid-wrap">
+  <div class="modelos-grid" id="splats-grid">
     <div class="modelo-card-empty" style="grid-column:1/-1;border:none;">
       <svg viewBox="0 0 24 24" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
       <span>Carregando modelos...</span>
@@ -167,47 +227,54 @@
   <div class="crea-badge">CREA SC 187958-4</div>
 </footer>
 
-
 <script>
 const R2_BASE = "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev";
 
+// ── Ícones por tipo (GLB) ──────────────────────────────────────
 const TIPO_ICONS = {
   topografia: `<svg viewBox="0 0 60 45" xmlns="http://www.w3.org/2000/svg"><polyline points="5,35 15,20 25,25 35,10 45,18 55,8" fill="none" stroke="#005849" stroke-width="1.5"/><polyline points="5,40 15,28 25,33 35,18 45,26 55,16" fill="none" stroke="#003d33" stroke-width="1"/></svg>`,
-  geologia: `<svg viewBox="0 0 60 45" xmlns="http://www.w3.org/2000/svg"><polyline points="5,40 20,15 30,25 40,8 55,20" fill="none" stroke="#005849" stroke-width="1.5"/><circle cx="40" cy="8" r="3" fill="none" stroke="#67C187" stroke-width="1"/></svg>`,
-  ambiental: `<svg viewBox="0 0 60 45" xmlns="http://www.w3.org/2000/svg"><path d="M30,5 C30,5 10,20 10,32 C10,38 19,42 30,42 C41,42 50,38 50,32 C50,20 30,5 30,5Z" fill="none" stroke="#005849" stroke-width="1.5"/><line x1="30" y1="42" x2="30" y2="15" stroke="#67C187" stroke-width="1"/></svg>`,
-  mineracao: `<svg viewBox="0 0 60 45" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="22" r="14" fill="none" stroke="#005849" stroke-width="1.5"/><circle cx="30" cy="22" r="8" fill="none" stroke="#003d33" stroke-width="1"/><circle cx="30" cy="22" r="3" fill="none" stroke="#67C187" stroke-width="1"/></svg>`,
-  rural: `<svg viewBox="0 0 60 45" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="15" width="12" height="20" fill="none" stroke="#005849" stroke-width="1.5"/><rect x="28" y="20" width="8" height="15" fill="none" stroke="#003d33" stroke-width="1"/><rect x="42" y="10" width="10" height="25" fill="none" stroke="#005849" stroke-width="1.5"/><line x1="5" y1="35" x2="55" y2="35" stroke="#67C187" stroke-width="0.5"/></svg>`
+  geologia:   `<svg viewBox="0 0 60 45" xmlns="http://www.w3.org/2000/svg"><polyline points="5,40 20,15 30,25 40,8 55,20" fill="none" stroke="#005849" stroke-width="1.5"/><circle cx="40" cy="8" r="3" fill="none" stroke="#67C187" stroke-width="1"/></svg>`,
+  ambiental:  `<svg viewBox="0 0 60 45" xmlns="http://www.w3.org/2000/svg"><path d="M30,5 C30,5 10,20 10,32 C10,38 19,42 30,42 C41,42 50,38 50,32 C50,20 30,5 30,5Z" fill="none" stroke="#005849" stroke-width="1.5"/><line x1="30" y1="42" x2="30" y2="15" stroke="#67C187" stroke-width="1"/></svg>`,
+  mineracao:  `<svg viewBox="0 0 60 45" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="22" r="14" fill="none" stroke="#005849" stroke-width="1.5"/><circle cx="30" cy="22" r="8" fill="none" stroke="#003d33" stroke-width="1"/><circle cx="30" cy="22" r="3" fill="none" stroke="#67C187" stroke-width="1"/></svg>`,
+  rural:      `<svg viewBox="0 0 60 45" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="15" width="12" height="20" fill="none" stroke="#005849" stroke-width="1.5"/><rect x="28" y="20" width="8" height="15" fill="none" stroke="#003d33" stroke-width="1"/><rect x="42" y="10" width="10" height="25" fill="none" stroke="#005849" stroke-width="1.5"/><line x1="5" y1="35" x2="55" y2="35" stroke="#67C187" stroke-width="0.5"/></svg>`
 };
 
+// ── Ícone padrão splat ─────────────────────────────────────────
+const SPLAT_ICON = `<svg style="width:55%;opacity:0.25" viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="40" cy="30" rx="28" ry="18" fill="none" stroke="#005849" stroke-width="1.2" opacity="0.6"/>
+  <ellipse cx="40" cy="30" rx="18" ry="10" fill="none" stroke="#005849" stroke-width="1" opacity="0.5"/>
+  <ellipse cx="40" cy="30" rx="8" ry="4" fill="rgba(103,193,135,0.2)" stroke="#67C187" stroke-width="0.8"/>
+  <circle cx="40" cy="30" r="2" fill="#67C187" opacity="0.5"/>
+  <circle cx="22" cy="22" r="1.5" fill="#005849" opacity="0.4"/>
+  <circle cx="58" cy="20" r="1.5" fill="#005849" opacity="0.4"/>
+  <circle cx="20" cy="38" r="1.5" fill="#005849" opacity="0.4"/>
+  <circle cx="60" cy="40" r="1.5" fill="#005849" opacity="0.4"/>
+</svg>`;
+
+const TIPO_LABELS = { topografia:'Topografia', geologia:'Geologia', ambiental:'Ambiental', mineracao:'Mineração', rural:'Rural' };
+
+// ── Carrega GLB ────────────────────────────────────────────────
 async function carregarModelos() {
-  const grid = document.getElementById('modelos-grid');
+  const grid = document.getElementById('glb-grid');
   try {
     const resp = await fetch('modelos.json?v=' + Date.now());
     const modelos = await resp.json();
     const publicos = modelos.filter(m => m.publico);
-
     if (publicos.length === 0) {
       grid.innerHTML = `<div class="modelo-card-empty" style="grid-column:1/-1;border:none;">
-        <svg viewBox="0 0 24 24" stroke-linecap="round" fill="none" stroke="#fff" stroke-width="1.5"><path d="M12 5v14M5 12h14"/></svg>
-        <span>Nenhum modelo publicado ainda</span>
-      </div>`;
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        <span>Nenhum modelo publicado ainda</span></div>`;
       return;
     }
-
     grid.innerHTML = publicos.map(m => {
       const icon = TIPO_ICONS[m.tipo] || TIPO_ICONS.topografia;
-      const url = encodeURIComponent(m.url);
-      const nome = encodeURIComponent(m.nome);
       const thumbHtml = m.thumb
         ? `<img src="${m.thumb}?v=${Date.now()}" alt="${m.nome}" loading="lazy">`
         : icon;
-      return `
-      <a href="viewer.html?modelo=${m.url}&nome=${m.nome.replace(/ /g,'+')}` + `" class="modelo-card">
+      return `<a href="viewer.html?modelo=${encodeURIComponent(m.url)}&nome=${encodeURIComponent(m.nome)}" class="modelo-card">
         <div class="modelo-thumb">
           ${thumbHtml}
-          <div class="modelo-thumb-play">
-            <svg viewBox="0 0 16 16"><polygon points="4,2 14,8 4,14" fill="#fff"/></svg>
-          </div>
+          <div class="modelo-thumb-play"><svg viewBox="0 0 16 16"><polygon points="4,2 14,8 4,14" fill="#fff"/></svg></div>
           <span class="modelo-thumb-label">${m.tipo.charAt(0).toUpperCase()+m.tipo.slice(1)}</span>
         </div>
         <div class="modelo-info">
@@ -216,14 +283,50 @@ async function carregarModelos() {
         </div>
       </a>`;
     }).join('');
-
   } catch(e) {
     grid.innerHTML = `<div class="modelo-card-empty" style="grid-column:1/-1;border:none;"><span>Erro ao carregar modelos.</span></div>`;
-    console.error(e);
+  }
+}
+
+// ── Carrega Splats ─────────────────────────────────────────────
+async function carregarSplats() {
+  const grid = document.getElementById('splats-grid');
+  try {
+    const resp = await fetch('splats.json?v=' + Date.now());
+    const splats = await resp.json();
+    const publicos = splats.filter(s => s.publico);
+    if (publicos.length === 0) {
+      grid.innerHTML = `<div class="modelo-card-empty" style="grid-column:1/-1;border:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        <span>Nenhum modelo publicado ainda</span></div>`;
+      return;
+    }
+    grid.innerHTML = publicos.map(s => {
+      const tipoLabel = TIPO_LABELS[s.tipo] || s.tipo;
+      const formatoLabel = (s.formato || 'splat').toUpperCase();
+      const thumbHtml = s.thumb
+        ? `<img src="${s.thumb}?v=${Date.now()}" alt="${s.nome}" loading="lazy">`
+        : SPLAT_ICON;
+      return `<a href="splat-viewer.html?splat=${encodeURIComponent(s.url)}&nome=${encodeURIComponent(s.nome)}" class="modelo-card">
+        <div class="modelo-thumb">
+          ${thumbHtml}
+          <div class="modelo-thumb-play"><svg viewBox="0 0 16 16"><polygon points="4,2 14,8 4,14" fill="#fff"/></svg></div>
+          <span class="modelo-thumb-label">${tipoLabel}</span>
+          <span class="splat-badge">${formatoLabel}</span>
+        </div>
+        <div class="modelo-info">
+          <div class="modelo-nome">${s.nome}</div>
+          <div class="modelo-meta">${s.descricao}</div>
+        </div>
+      </a>`;
+    }).join('');
+  } catch(e) {
+    grid.innerHTML = `<div class="modelo-card-empty" style="grid-column:1/-1;border:none;"><span>Erro ao carregar modelos.</span></div>`;
   }
 }
 
 carregarModelos();
+carregarSplats();
 </script>
 
 </body>
