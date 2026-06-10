@@ -373,8 +373,8 @@ viewer.addSplatScene(splatUrl, {
         // ORBIT turntable Z-up
         // Horizontal → gira em torno do eixo Z (ver lateral)
         // Vertical   → muda elevação (ver cima/baixo)
-        theta += dx * 0.005;                                           // + = sentido correto Z-up
-        phi = Math.max(0.05, Math.min(Math.PI - 0.05, phi - dy * 0.005)); // - = igual ao viewer.html
+        theta -= dx * 0.005;                                           // igual ao viewer.html (GLB)
+        phi = Math.max(0.05, Math.min(Math.PI / 2, phi - dy * 0.005)); // limite inferior = plano XY
         applyCamera();
 
       } else if (drag.button === 2) {
