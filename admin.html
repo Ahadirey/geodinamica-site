@@ -147,6 +147,18 @@
   .modal-status.err { display: block; color: #ff6b6b; background: rgba(255,107,107,0.06); border: 1px solid rgba(255,107,107,0.18); }
   .modal-status.loading { display: block; color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
 
+  /* Editor de vista splat (iframe) */
+  #splat-editor-modal { align-items: stretch; }
+  #splat-editor-modal.visible { display: flex; }
+  #splat-editor-iframe { width: 100%; height: 100%; border: none; display: block; }
+  #splat-editor-loading {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 1rem; background: #1a1f1d; z-index: 10;
+  }
+  #splat-editor-loading.hidden { display: none; }
+  #splat-editor-loading svg { width: 36px; height: 36px; animation: spin 2s linear infinite; }
+  #splat-editor-loading span { font-size: 0.75rem; color: rgba(255,255,255,0.35); letter-spacing: 0.08em; text-transform: uppercase; }
+
   /* Modal confirmar delete */
   .confirm-box { background: rgba(22,28,25,0.99); border: 1px solid rgba(224,85,85,0.2); border-radius: 6px; padding: 2rem; width: 380px; max-width: 95vw; }
   .confirm-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--danger); }
@@ -323,6 +335,35 @@
       <button class="btn-modal-cancel" id="btn-cancelar-dados">Cancelar</button>
       <button class="btn-modal-primary" id="btn-salvar-dados">Salvar</button>
     </div>
+  </div>
+</div>
+
+<!-- MODAL EDITOR VISTA SPLAT (iframe) -->
+<div class="modal-overlay" id="splat-editor-modal">
+  <div class="editor-sidebar">
+    <div class="editor-title" id="splat-editor-model-name">Modelo</div>
+    <div class="editor-sub">Posicione a vista no visualizador e clique em salvar.</div>
+    <div class="instrucoes">
+      <p>🖱 <strong>Btn esquerdo</strong> — rotacionar</p>
+      <p>🖱 <strong>Btn direito</strong> — mover</p>
+      <p>🖱 <strong>Scroll</strong> — zoom</p>
+      <p>🖱 <strong>Btn scroll</strong> — inclinar</p>
+    </div>
+    <div class="editor-actions">
+      <div class="save-status" id="splat-save-status"></div>
+      <button class="btn-salvar" id="btn-salvar-splat-vista">💾 Salvar vista</button>
+      <button class="btn-cancelar-editor" id="btn-cancelar-splat-editor">Cancelar</button>
+    </div>
+  </div>
+  <div class="editor-viewer">
+    <div id="splat-editor-loading">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#005849" stroke-width="2" stroke-linecap="round">
+        <circle cx="24" cy="24" r="20" stroke="rgba(0,88,73,0.15)"/>
+        <path d="M24 4 A20 20 0 0 1 44 24"/>
+      </svg>
+      <span>Carregando splat...</span>
+    </div>
+    <iframe id="splat-editor-iframe" allow="cross-origin-isolated" src="about:blank"></iframe>
   </div>
 </div>
 
@@ -520,9 +561,10 @@ function renderSplatGrid() {
           ${s.thumb ? 'Thumbnail salva' : 'Sem thumbnail'}
         </div>
         <div class="card-actions">
+          <button class="btn-card btn-vista" onclick="abrirSplatEditorVista(${i})">✏ Vista</button>
           <button class="btn-card btn-editar-dados" onclick="abrirSplatEditarDados(${i})">Editar</button>
           <button class="btn-card btn-toggle" onclick="toggleSplatPublico(${i})">${s.publico ? 'Ocultar' : 'Publicar'}</button>
-          <a class="btn-card btn-ver" href="splat-viewer.html?splat=${encodeURIComponent(s.url)}&nome=${encodeURIComponent(s.nome)}" target="_blank">↗ Ver</a>
+          <a class="btn-card btn-ver" href="splat-viewer.html?splat=${encodeURIComponent(s.url)}&nome=${encodeURIComponent(s.nome)}&from=admin" target="_blank">↗ Ver</a>
           <button class="btn-card btn-deletar" onclick="abrirDelete('splat', ${i})">🗑</button>
         </div>
       </div>
@@ -769,6 +811,82 @@ document.getElementById('btn-salvar-dados').addEventListener('click', async () =
     status.className = 'modal-status err';
     status.textContent = '✗ ' + e.message;
     if (isNovo) modelosData.pop();
+  }
+  btn.disabled = false;
+});
+
+// ── EDITOR DE VISTA SPLAT ────────────────────────────────────────────────────
+let splatEditorIdx = null;
+
+function abrirSplatEditorVista(idx) {
+  splatEditorIdx = idx;
+  const s = splatsData[idx];
+  document.getElementById('splat-editor-model-name').textContent = s.nome;
+  document.getElementById('splat-save-status').className = 'save-status';
+  document.getElementById('btn-salvar-splat-vista').disabled = false;
+  document.getElementById('splat-editor-loading').classList.remove('hidden');
+  document.getElementById('splat-editor-modal').classList.add('visible');
+  // Carrega o splat no iframe em modo admin
+  document.getElementById('splat-editor-iframe').src =
+    `splat-viewer.html?splat=${encodeURIComponent(s.url)}&nome=${encodeURIComponent(s.nome)}&admin=1`;
+}
+
+function fecharSplatEditor() {
+  document.getElementById('splat-editor-modal').classList.remove('visible');
+  document.getElementById('splat-editor-iframe').src = 'about:blank';
+  splatEditorIdx = null;
+}
+
+document.getElementById('btn-cancelar-splat-editor').addEventListener('click', fecharSplatEditor);
+
+document.getElementById('btn-salvar-splat-vista').addEventListener('click', () => {
+  const btn    = document.getElementById('btn-salvar-splat-vista');
+  const status = document.getElementById('splat-save-status');
+  btn.disabled = true;
+  status.className = 'save-status loading';
+  status.textContent = 'Capturando vista...';
+  document.getElementById('splat-editor-iframe').contentWindow.postMessage({ type: 'capture-splat' }, '*');
+});
+
+// Recebe thumbnail + câmera do iframe
+window.addEventListener('message', async (ev) => {
+  if (ev.data?.type === 'splat-ready') {
+    document.getElementById('splat-editor-loading').classList.add('hidden');
+    return;
+  }
+  if (ev.data?.type !== 'splat-captured') return;
+  if (splatEditorIdx === null) return;
+
+  const { thumbnail, camera } = ev.data;
+  const status = document.getElementById('splat-save-status');
+  const btn    = document.getElementById('btn-salvar-splat-vista');
+
+  try {
+    if (thumbnail) {
+      status.textContent = 'Enviando thumbnail...';
+      const thumbResp = await fetch('/api/upload-thumb', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          senha: ADMIN_PASSWORD,
+          modeloId: splatsData[splatEditorIdx].id,
+          imagem: thumbnail
+        })
+      });
+      const thumbResult = await thumbResp.json();
+      if (!thumbResp.ok) throw new Error('Thumb: ' + (thumbResult.error || 'erro'));
+      splatsData[splatEditorIdx].thumb = thumbResult.url;
+    }
+    if (camera) splatsData[splatEditorIdx].vista = camera;
+
+    status.textContent = 'Salvando...';
+    await salvarSplats(`Vista splat: ${splatsData[splatEditorIdx].nome}`);
+    status.className = 'save-status ok';
+    status.textContent = '✓ Vista e thumbnail salvas!';
+    renderSplatGrid();
+  } catch(e) {
+    status.className = 'save-status err';
+    status.textContent = '✗ ' + e.message;
   }
   btn.disabled = false;
 });

@@ -62,7 +62,7 @@
   .hint-key { font-size: 0.65rem; color: #67C187; border: 1px solid rgba(103,193,135,0.3); padding: 0.1rem 0.4rem; border-radius: 2px; }
 
   /* Canvas criado pelo viewer precisa preencher o viewport como fundo */
-  canvas {
+  canvas:not(#axis-gizmo) {
     position: fixed !important;
     top: 0 !important; left: 0 !important;
     width: 100vw !important; height: 100vh !important;
@@ -212,6 +212,14 @@ const splatNome = params.get('nome')  || 'Gaussian Splatting';
 document.getElementById('model-title').textContent = splatNome;
 setTimeout(() => document.getElementById('controls-hint').classList.add('fade'), 5000);
 
+// Botão voltar: vai para admin se vier de lá
+const isAdmin = params.get('admin') === '1';
+const fromAdmin = params.get('from') === 'admin' || isAdmin;
+if (fromAdmin) {
+  const btn = document.querySelector('.back-btn');
+  if (btn) { btn.href = 'admin.html'; btn.lastChild.textContent = ' Admin'; }
+}
+
 if (!splatUrl) {
   document.getElementById('loading').classList.add('hidden');
   document.getElementById('error-msg').classList.add('visible');
@@ -242,14 +250,23 @@ const SF  = GaussianSplats3D.SceneFormat || {};
 const fmtMap = { ply: SF.Ply ?? 1, ksplat: SF.KSplat ?? 2 };
 const sceneFormat = fmtMap[ext] ?? (SF.Splat ?? 0);
 
+// Carrega vista salva (se existir) antes de criar o viewer
+let vistaSalva = null;
+try {
+  const splatList = await fetch('splats.json?v=' + Date.now()).then(r => r.json());
+  const entry = splatList.find(s => s.url === splatUrl || s.url === decodeURIComponent(splatUrl));
+  if (entry?.vista) vistaSalva = entry.vista;
+} catch(e) { /* sem vista */ }
+
 // Monta opções do Viewer defensivamente (enums podem variar por versão)
 const viewerOpts = {
   sharedMemoryForWorkers: false,
   gpuAcceleratedSort: false,
   selfDrivenMode: true,
   antialiased: true,
-  initialCameraPosition: [0, -1, 0.5],   // ~10x mais próximo
-  initialCameraLookAt:   [0,  0,  0],
+  preserveDrawingBuffer: isAdmin,          // necessário para captura de thumbnail
+  initialCameraPosition: vistaSalva?.position ?? [0, -1, 0.5],
+  initialCameraLookAt:   vistaSalva?.target   ?? [0,  0,  0],
 };
 if (GaussianSplats3D.SceneRevealMode?.Gradual !== undefined)
   viewerOpts.sceneRevealMode = GaussianSplats3D.SceneRevealMode.Gradual;
@@ -271,6 +288,29 @@ viewer.addSplatScene(splatUrl, {
   bar.style.width = '100%';
   setTimeout(() => document.getElementById('loading').classList.add('hidden'), 400);
   viewer.start();
+
+  // Notifica admin que o splat carregou (quando em iframe)
+  if (isAdmin) window.parent.postMessage({ type: 'splat-ready' }, '*');
+
+  // Modo admin: responde a pedidos de captura
+  if (isAdmin) {
+    window.addEventListener('message', (ev) => {
+      if (ev.data?.type !== 'capture-splat') return;
+      const sCanvas = document.querySelector('canvas:not(#axis-gizmo)');
+      let thumbnail = null;
+      try { thumbnail = sCanvas?.toDataURL('image/jpeg', 0.88) ?? null; } catch(e) {}
+      const cam  = viewer.camera;
+      const ctrl = viewer.controls || viewer.orbitControls;
+      window.parent.postMessage({
+        type: 'splat-captured',
+        thumbnail,
+        camera: cam ? {
+          position: [cam.position.x, cam.position.y, cam.position.z],
+          target:   ctrl?.target ? [ctrl.target.x, ctrl.target.y, ctrl.target.z] : [0, 0, 0]
+        } : null
+      }, '*');
+    });
+  }
 
   // Gizmo de eixos
   initGizmo(() => viewer.camera);
