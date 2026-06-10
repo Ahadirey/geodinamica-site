@@ -52,11 +52,19 @@
   .logout-btn:hover { color: #fff; border-color: rgba(255,255,255,0.2); }
 
   .page-content { padding: 2.5rem 2rem; max-width: 1200px; margin: 0 auto; }
-  .page-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+  .page-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
   .page-tag { font-size: 0.68rem; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--verde-claro); margin-bottom: 0.4rem; }
   .page-title { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 700; }
   .btn-add { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.2rem; background: var(--verde); border: none; border-radius: 3px; font-family: inherit; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: #fff; cursor: pointer; transition: background 0.2s; }
   .btn-add:hover { background: #007060; }
+
+  /* ── ABAS ── */
+  .tab-nav { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+  .tab-btn { padding: 0.65rem 1.4rem; font-family: inherit; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; background: none; border: none; border-bottom: 2px solid transparent; color: rgba(255,255,255,0.35); cursor: pointer; transition: all 0.2s; margin-bottom: -1px; }
+  .tab-btn:hover { color: rgba(255,255,255,0.7); }
+  .tab-btn.active { color: var(--verde-claro); border-bottom-color: var(--verde-claro); }
+  .tab-section { display: none; }
+  .tab-section.active { display: block; }
 
   /* ── GRID ── */
   .modelos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.25rem; }
@@ -194,7 +202,8 @@
     </div>
     <div class="nav-right">
       <a href="index.html" class="nav-link">Site</a>
-      <a href="modelos.html" class="nav-link" target="_blank">Portfólio</a>
+      <a href="modelos.html" class="nav-link" target="_blank">Portfólio GLB</a>
+      <a href="splats.html" class="nav-link" target="_blank">Portfólio Splat</a>
       <button class="logout-btn" id="logout-btn">Sair</button>
     </div>
   </nav>
@@ -205,18 +214,35 @@
         <div class="page-tag">Administração</div>
         <h1 class="page-title">Modelos 3D</h1>
       </div>
-      <button class="btn-add" id="btn-novo-modelo">
+      <button class="btn-add" id="btn-novo-item">
         <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
         Adicionar modelo
       </button>
     </div>
-    <div class="modelos-grid" id="modelos-grid">
-      <div style="color:rgba(255,255,255,0.3);font-size:0.8rem;grid-column:1/-1;">Carregando...</div>
+
+    <!-- ABAS -->
+    <div class="tab-nav">
+      <button class="tab-btn active" data-tab="glb">Modelos GLB</button>
+      <button class="tab-btn" data-tab="splat">Gaussian Splatting</button>
+    </div>
+
+    <!-- SECAO GLB -->
+    <div class="tab-section active" id="tab-glb">
+      <div class="modelos-grid" id="modelos-grid">
+        <div style="color:rgba(255,255,255,0.3);font-size:0.8rem;grid-column:1/-1;">Carregando...</div>
+      </div>
+    </div>
+
+    <!-- SECAO SPLAT -->
+    <div class="tab-section" id="tab-splat">
+      <div class="modelos-grid" id="splats-grid">
+        <div style="color:rgba(255,255,255,0.3);font-size:0.8rem;grid-column:1/-1;">Carregando...</div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- MODAL EDITOR VISTA -->
+<!-- MODAL EDITOR VISTA (GLB) -->
 <div class="modal-overlay" id="editor-modal">
   <div class="editor-sidebar">
     <div class="editor-title" id="editor-model-name">Modelo</div>
@@ -253,7 +279,7 @@
   </div>
 </div>
 
-<!-- MODAL DADOS (adicionar / editar) -->
+<!-- MODAL DADOS GLB (adicionar / editar) -->
 <div class="modal-overlay" id="dados-modal">
   <div class="modal-box">
     <div class="modal-title" id="dados-modal-title">Adicionar modelo</div>
@@ -300,7 +326,62 @@
   </div>
 </div>
 
-<!-- MODAL CONFIRMAR DELETE -->
+<!-- MODAL DADOS SPLAT (adicionar / editar) -->
+<div class="modal-overlay" id="splat-dados-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="splat-modal-title">Adicionar splat</div>
+    <div class="modal-sub" id="splat-modal-sub">Preencha os dados do novo modelo Gaussian Splatting.</div>
+
+    <div class="field">
+      <label>Nome do projeto</label>
+      <input type="text" id="splat-campo-nome" placeholder="Ex: Fazenda Rio Negro">
+    </div>
+    <div class="field">
+      <label>Descrição</label>
+      <textarea id="splat-campo-descricao" placeholder="Ex: Aerolevantamento · 240 ha"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label>Tipo</label>
+        <select id="splat-campo-tipo">
+          <option value="topografia">Topografia</option>
+          <option value="geologia">Geologia</option>
+          <option value="ambiental">Ambiental</option>
+          <option value="mineracao">Mineração</option>
+          <option value="rural">Rural</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Arquivo no R2</label>
+        <input type="text" id="splat-campo-arquivo" placeholder="modelo.splat">
+      </div>
+    </div>
+    <div class="field">
+      <label>Formato</label>
+      <select id="splat-campo-formato">
+        <option value="splat">.splat (padrão)</option>
+        <option value="ply">.ply</option>
+        <option value="ksplat">.ksplat</option>
+      </select>
+    </div>
+    <div class="toggle-row">
+      <span class="toggle-label">Visível no portfólio público</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="splat-campo-publico" checked>
+        <div class="toggle-track"></div>
+        <div class="toggle-knob"></div>
+      </label>
+    </div>
+
+    <div class="modal-status" id="splat-dados-status"></div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" id="btn-cancelar-splat-dados">Cancelar</button>
+      <button class="btn-modal-primary" id="btn-salvar-splat-dados">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR DELETE (compartilhado) -->
 <div class="modal-overlay" id="delete-modal">
   <div class="confirm-box">
     <div class="confirm-title">Deletar modelo</div>
@@ -326,7 +407,7 @@ function tentarLogin() {
     sessionStorage.setItem('geo_admin', ADMIN_PASSWORD);
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('main-screen').classList.add('visible');
-    carregarModelos();
+    carregarTudo();
   } else {
     document.getElementById('login-error').classList.add('visible');
     document.getElementById('senha-input').value = '';
@@ -336,10 +417,27 @@ document.getElementById('logout-btn').addEventListener('click', () => { sessionS
 if (sessionStorage.getItem('geo_admin') === ADMIN_PASSWORD) {
   document.getElementById('login-screen').classList.add('hidden');
   document.getElementById('main-screen').classList.add('visible');
-  carregarModelos();
+  carregarTudo();
 }
 
-// ── DADOS ─────────────────────────────────────────────────────────────────────
+// ── ABAS ──────────────────────────────────────────────────────────────────────
+let abaAtiva = 'glb';
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    abaAtiva = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+    document.querySelectorAll('.tab-section').forEach(s => s.classList.toggle('active', s.id === 'tab-' + abaAtiva));
+    document.getElementById('btn-novo-item').textContent = abaAtiva === 'glb' ? '+ Adicionar modelo' : '+ Adicionar splat';
+  });
+});
+document.getElementById('btn-novo-item').addEventListener('click', () => {
+  if (abaAtiva === 'glb') abrirDadosModal(null);
+  else abrirSplatDadosModal(null);
+});
+
+function carregarTudo() { carregarModelos(); carregarSplats(); }
+
+// ── DADOS GLB ─────────────────────────────────────────────────────────────────
 let modelosData = [];
 
 async function carregarModelos() {
@@ -374,13 +472,12 @@ function renderGrid() {
           <button class="btn-card btn-editar-dados" onclick="abrirEditarDados(${i})">Editar</button>
           <button class="btn-card btn-toggle" onclick="togglePublico(${i})">${m.publico ? 'Ocultar' : 'Publicar'}</button>
           <a class="btn-card btn-ver" href="viewer.html?modelo=${encodeURIComponent(m.url)}&nome=${encodeURIComponent(m.nome)}" target="_blank">↗</a>
-          <button class="btn-card btn-deletar" onclick="abrirDelete(${i})">🗑</button>
+          <button class="btn-card btn-deletar" onclick="abrirDelete('glb', ${i})">🗑</button>
         </div>
       </div>
     </div>`).join('');
 }
 
-// ── API CALL HELPER ───────────────────────────────────────────────────────────
 async function salvarModelos(mensagem) {
   const resp = await fetch('/api/save-vista', {
     method: 'POST',
@@ -392,7 +489,58 @@ async function salvarModelos(mensagem) {
   return result;
 }
 
-// ── EDITOR DE VISTA ───────────────────────────────────────────────────────────
+// ── DADOS SPLAT ───────────────────────────────────────────────────────────────
+let splatsData = [];
+
+async function carregarSplats() {
+  try {
+    const r = await fetch('splats.json?v=' + Date.now());
+    splatsData = await r.json();
+    renderSplatGrid();
+  } catch(e) {
+    document.getElementById('splats-grid').innerHTML = '<div style="color:#ff6b6b;font-size:0.8rem;">Erro ao carregar splats.json</div>';
+  }
+}
+
+function renderSplatGrid() {
+  const grid = document.getElementById('splats-grid');
+  if (!splatsData.length) { grid.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:0.8rem;grid-column:1/-1;">Nenhum modelo splat.</div>'; return; }
+  grid.innerHTML = splatsData.map((s, i) => `
+    <div class="modelo-card">
+      <div class="modelo-card-header">
+        <div class="modelo-card-info">
+          <div class="modelo-card-nome">${s.nome}</div>
+          <div class="modelo-card-meta">${s.tipo} · ${s.data} · ${(s.formato || 'splat').toUpperCase()}</div>
+        </div>
+        <span class="publico-badge ${s.publico ? 'sim' : 'nao'}">${s.publico ? 'Público' : 'Oculto'}</span>
+      </div>
+      <div class="modelo-card-body">
+        <div class="vista-info ${s.thumb ? 'vista-salva' : ''}">
+          <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          ${s.thumb ? 'Thumbnail salva' : 'Sem thumbnail'}
+        </div>
+        <div class="card-actions">
+          <button class="btn-card btn-editar-dados" onclick="abrirSplatEditarDados(${i})">Editar</button>
+          <button class="btn-card btn-toggle" onclick="toggleSplatPublico(${i})">${s.publico ? 'Ocultar' : 'Publicar'}</button>
+          <a class="btn-card btn-ver" href="splat-viewer.html?splat=${encodeURIComponent(s.url)}&nome=${encodeURIComponent(s.nome)}" target="_blank">↗ Ver</a>
+          <button class="btn-card btn-deletar" onclick="abrirDelete('splat', ${i})">🗑</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+async function salvarSplats(mensagem) {
+  const resp = await fetch('/api/save-splats', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ senha: ADMIN_PASSWORD, splats: splatsData, mensagem })
+  });
+  const result = await resp.json();
+  if (!resp.ok) throw new Error(result.error || 'Erro desconhecido');
+  return result;
+}
+
+// ── EDITOR DE VISTA (GLB) ─────────────────────────────────────────────────────
 let editorRenderer, editorScene, editorCamera, editorAnimId;
 let editorSph = { theta: 0.3, phi: 1.0, radius: 5 };
 let editorPan = { x: 0, y: 0 };
@@ -435,9 +583,9 @@ function iniciarEditorRenderer() {
   editorCamera = new THREE.PerspectiveCamera(45, w / h, 0.01, 1000);
   editorUpdateCam();
   canvas.onmousedown = e => {
-    if (e.button === 0) { isDragging = true; }                       // esquerdo = rotacionar
-    if (e.button === 1) { isDragging = true; e.preventDefault(); }  // scroll = rotacionar
-    if (e.button === 2) { isPanning = true; }                        // direito = pan
+    if (e.button === 0) { isDragging = true; }
+    if (e.button === 1) { isDragging = true; e.preventDefault(); }
+    if (e.button === 2) { isPanning = true; }
     prevMouse = { x: e.clientX, y: e.clientY };
   };
   canvas.onmousemove = e => {
@@ -517,7 +665,6 @@ document.getElementById('btn-salvar-vista').addEventListener('click', async () =
   status.className = 'save-status loading';
   status.textContent = 'Capturando thumbnail...';
 
-  // Força render de um frame e aguarda antes de capturar
   editorRenderer.render(editorScene, editorCamera);
   await new Promise(r => setTimeout(r, 100));
 
@@ -527,20 +674,14 @@ document.getElementById('btn-salvar-vista').addEventListener('click', async () =
   status.textContent = 'Enviando thumbnail...';
 
   try {
-    // 1. Upload da thumbnail no R2
     const thumbResp = await fetch('/api/upload-thumb', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        senha: ADMIN_PASSWORD,
-        modeloId: modelosData[currentIdx].id,
-        imagem: thumbBase64
-      })
+      body: JSON.stringify({ senha: ADMIN_PASSWORD, modeloId: modelosData[currentIdx].id, imagem: thumbBase64 })
     });
     const thumbResult = await thumbResp.json();
     if (!thumbResp.ok) throw new Error('Thumb: ' + (thumbResult.error || 'erro'));
 
-    // 2. Salva vista + URL da thumb no modelos.json
     modelosData[currentIdx].vista = { spherical: { ...editorSph }, panOffset: { ...editorPan } };
     modelosData[currentIdx].thumb = thumbResult.url;
 
@@ -557,10 +698,9 @@ document.getElementById('btn-salvar-vista').addEventListener('click', async () =
   btn.disabled = false;
 });
 
-// ── EDITAR / ADICIONAR DADOS ──────────────────────────────────────────────────
+// ── EDITAR / ADICIONAR GLB ────────────────────────────────────────────────────
 let editandoIdx = null;
 
-document.getElementById('btn-novo-modelo').addEventListener('click', () => abrirDadosModal(null));
 document.getElementById('btn-cancelar-dados').addEventListener('click', () => document.getElementById('dados-modal').classList.remove('visible'));
 
 function abrirDadosModal(idx) {
@@ -577,7 +717,7 @@ function abrirDadosModal(idx) {
   document.getElementById('campo-tipo').value = m.tipo || 'topografia';
   document.getElementById('campo-arquivo').value = m.arquivo || '';
   document.getElementById('campo-publico').checked = isNovo ? true : !!m.publico;
-  document.getElementById('campo-arquivo').disabled = !isNovo; // arquivo não pode mudar ao editar
+  document.getElementById('campo-arquivo').disabled = !isNovo;
 
   document.getElementById('dados-modal').classList.add('visible');
 }
@@ -600,8 +740,8 @@ document.getElementById('btn-salvar-dados').addEventListener('click', async () =
 
   const hoje = new Date().toISOString().split('T')[0];
 
-    if (isNovo) {
-    const novoModelo = {
+  if (isNovo) {
+    modelosData.push({
       id: arquivo.replace('.glb','').replace(/[^a-z0-9]/gi,'-').toLowerCase(),
       nome,
       descricao: document.getElementById('campo-descricao').value.trim(),
@@ -610,8 +750,7 @@ document.getElementById('btn-salvar-dados').addEventListener('click', async () =
       tipo: document.getElementById('campo-tipo').value,
       publico: document.getElementById('campo-publico').checked,
       data: hoje
-    };
-    modelosData.push(novoModelo);
+    });
   } else {
     const m = modelosData[editandoIdx];
     m.nome = nome;
@@ -629,8 +768,86 @@ document.getElementById('btn-salvar-dados').addEventListener('click', async () =
   } catch(e) {
     status.className = 'modal-status err';
     status.textContent = '✗ ' + e.message;
-    // Reverte se novo
     if (isNovo) modelosData.pop();
+  }
+  btn.disabled = false;
+});
+
+// ── EDITAR / ADICIONAR SPLAT ──────────────────────────────────────────────────
+let splatEditandoIdx = null;
+
+document.getElementById('btn-cancelar-splat-dados').addEventListener('click', () => document.getElementById('splat-dados-modal').classList.remove('visible'));
+
+function abrirSplatDadosModal(idx) {
+  splatEditandoIdx = idx;
+  const isNovo = idx === null;
+  document.getElementById('splat-modal-title').textContent = isNovo ? 'Adicionar splat' : 'Editar splat';
+  document.getElementById('splat-modal-sub').textContent = isNovo ? 'Preencha os dados. O arquivo já deve estar no R2.' : 'Edite os dados do modelo.';
+  document.getElementById('splat-dados-status').className = 'modal-status';
+  document.getElementById('btn-salvar-splat-dados').disabled = false;
+
+  const s = isNovo ? {} : splatsData[idx];
+  document.getElementById('splat-campo-nome').value = s.nome || '';
+  document.getElementById('splat-campo-descricao').value = s.descricao || '';
+  document.getElementById('splat-campo-tipo').value = s.tipo || 'topografia';
+  document.getElementById('splat-campo-arquivo').value = s.arquivo || '';
+  document.getElementById('splat-campo-formato').value = s.formato || 'splat';
+  document.getElementById('splat-campo-publico').checked = isNovo ? true : !!s.publico;
+  document.getElementById('splat-campo-arquivo').disabled = !isNovo;
+
+  document.getElementById('splat-dados-modal').classList.add('visible');
+}
+
+function abrirSplatEditarDados(idx) { abrirSplatDadosModal(idx); }
+
+document.getElementById('btn-salvar-splat-dados').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-salvar-splat-dados');
+  const status = document.getElementById('splat-dados-status');
+  const isNovo = splatEditandoIdx === null;
+
+  const nome = document.getElementById('splat-campo-nome').value.trim();
+  const arquivo = document.getElementById('splat-campo-arquivo').value.trim();
+  if (!nome) { status.className = 'modal-status err'; status.textContent = 'Nome é obrigatório.'; return; }
+  if (isNovo && !arquivo) { status.className = 'modal-status err'; status.textContent = 'Arquivo é obrigatório.'; return; }
+
+  btn.disabled = true;
+  status.className = 'modal-status loading';
+  status.textContent = 'Salvando...';
+
+  const hoje = new Date().toISOString().split('T')[0];
+  const formato = document.getElementById('splat-campo-formato').value;
+
+  if (isNovo) {
+    splatsData.push({
+      id: arquivo.replace(/\.[^.]+$/, '').replace(/[^a-z0-9]/gi, '-').toLowerCase(),
+      nome,
+      descricao: document.getElementById('splat-campo-descricao').value.trim(),
+      arquivo,
+      url: `${R2_BASE}/${arquivo}`,
+      formato,
+      tipo: document.getElementById('splat-campo-tipo').value,
+      publico: document.getElementById('splat-campo-publico').checked,
+      data: hoje
+    });
+  } else {
+    const s = splatsData[splatEditandoIdx];
+    s.nome = nome;
+    s.descricao = document.getElementById('splat-campo-descricao').value.trim();
+    s.tipo = document.getElementById('splat-campo-tipo').value;
+    s.formato = formato;
+    s.publico = document.getElementById('splat-campo-publico').checked;
+  }
+
+  try {
+    await salvarSplats(isNovo ? `Adiciona splat: ${nome}` : `Edita splat: ${nome}`);
+    status.className = 'modal-status ok';
+    status.textContent = '✓ Salvo com sucesso!';
+    renderSplatGrid();
+    setTimeout(() => document.getElementById('splat-dados-modal').classList.remove('visible'), 1000);
+  } catch(e) {
+    status.className = 'modal-status err';
+    status.textContent = '✗ ' + e.message;
+    if (isNovo) splatsData.pop();
   }
   btn.disabled = false;
 });
@@ -642,18 +859,33 @@ async function togglePublico(idx) {
   try {
     await salvarModelos(`Visibilidade: ${modelosData[idx].nome}`);
   } catch(e) {
-    modelosData[idx].publico = !modelosData[idx].publico; // reverte
+    modelosData[idx].publico = !modelosData[idx].publico;
     renderGrid();
     alert('Erro ao salvar: ' + e.message);
   }
 }
 
-// ── DELETE ────────────────────────────────────────────────────────────────────
-let deleteIdx = null;
+async function toggleSplatPublico(idx) {
+  splatsData[idx].publico = !splatsData[idx].publico;
+  renderSplatGrid();
+  try {
+    await salvarSplats(`Visibilidade splat: ${splatsData[idx].nome}`);
+  } catch(e) {
+    splatsData[idx].publico = !splatsData[idx].publico;
+    renderSplatGrid();
+    alert('Erro ao salvar: ' + e.message);
+  }
+}
 
-function abrirDelete(idx) {
+// ── DELETE (compartilhado) ────────────────────────────────────────────────────
+let deleteIdx = null;
+let deleteTipo = null;
+
+function abrirDelete(tipo, idx) {
+  deleteTipo = tipo;
   deleteIdx = idx;
-  document.getElementById('delete-nome').textContent = `"${modelosData[idx].nome}"`;
+  const nome = tipo === 'glb' ? modelosData[idx].nome : splatsData[idx].nome;
+  document.getElementById('delete-nome').textContent = `"${nome}"`;
   document.getElementById('delete-status').className = 'modal-status';
   document.getElementById('btn-confirmar-delete').disabled = false;
   document.getElementById('delete-modal').classList.add('visible');
@@ -668,27 +900,39 @@ document.getElementById('btn-confirmar-delete').addEventListener('click', async 
   status.className = 'modal-status loading';
   status.textContent = 'Deletando...';
 
-  const nome = modelosData[deleteIdx].nome;
-  const backup = [...modelosData];
-  modelosData.splice(deleteIdx, 1);
-
-  try {
-    await salvarModelos(`Remove: ${nome}`);
-    status.className = 'modal-status ok';
-    status.textContent = '✓ Deletado!';
-    renderGrid();
-    setTimeout(() => document.getElementById('delete-modal').classList.remove('visible'), 800);
-  } catch(e) {
-    modelosData = backup;
-    renderGrid();
-    status.className = 'modal-status err';
-    status.textContent = '✗ ' + e.message;
-    btn.disabled = false;
+  if (deleteTipo === 'glb') {
+    const nome = modelosData[deleteIdx].nome;
+    const backup = [...modelosData];
+    modelosData.splice(deleteIdx, 1);
+    try {
+      await salvarModelos(`Remove: ${nome}`);
+      status.className = 'modal-status ok'; status.textContent = '✓ Deletado!';
+      renderGrid();
+      setTimeout(() => document.getElementById('delete-modal').classList.remove('visible'), 800);
+    } catch(e) {
+      modelosData = backup; renderGrid();
+      status.className = 'modal-status err'; status.textContent = '✗ ' + e.message;
+      btn.disabled = false;
+    }
+  } else {
+    const nome = splatsData[deleteIdx].nome;
+    const backup = [...splatsData];
+    splatsData.splice(deleteIdx, 1);
+    try {
+      await salvarSplats(`Remove splat: ${nome}`);
+      status.className = 'modal-status ok'; status.textContent = '✓ Deletado!';
+      renderSplatGrid();
+      setTimeout(() => document.getElementById('delete-modal').classList.remove('visible'), 800);
+    } catch(e) {
+      splatsData = backup; renderSplatGrid();
+      status.className = 'modal-status err'; status.textContent = '✗ ' + e.message;
+      btn.disabled = false;
+    }
   }
 });
 
 // Fecha modais clicando fora
-['dados-modal','delete-modal'].forEach(id => {
+['dados-modal','splat-dados-modal','delete-modal'].forEach(id => {
   document.getElementById(id).addEventListener('click', e => {
     if (e.target === document.getElementById(id)) document.getElementById(id).classList.remove('visible');
   });
