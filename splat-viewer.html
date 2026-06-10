@@ -146,6 +146,8 @@ if (!splatUrl) {
   throw new Error('URL ausente');
 }
 
+// ─── IMPORTA BIBLIOTECA ────────────────────────────────────────────────────────
+// gaussian-splats-3d gerencia seu próprio renderer WebGL e canvas
 let GaussianSplats3D;
 try {
   GaussianSplats3D = await import('https://esm.sh/@mkkellogg/gaussian-splats-3d@0.4.7');
@@ -157,20 +159,23 @@ try {
   throw e;
 }
 
+// ─── VIEWER ───────────────────────────────────────────────────────────────────
 const bar   = document.getElementById('loading-bar');
 const stage = document.getElementById('loading-stage');
 
+// Detecta formato pelo sufixo da URL; usa SceneFormat se disponível
 const ext = splatUrl.split('?')[0].split('.').pop().toLowerCase();
 const SF  = GaussianSplats3D.SceneFormat || {};
 const fmtMap = { ply: SF.Ply ?? 1, ksplat: SF.KSplat ?? 2 };
 const sceneFormat = fmtMap[ext] ?? (SF.Splat ?? 0);
 
+// Monta opções do Viewer defensivamente (enums podem variar por versão)
 const viewerOpts = {
   sharedMemoryForWorkers: false,
   gpuAcceleratedSort: false,
   selfDrivenMode: true,
   antialiased: true,
-  initialCameraPosition: [0, -10, 5],
+  initialCameraPosition: [0, -1, 0.5],   // ~10x mais próximo
   initialCameraLookAt:   [0,  0,  0],
 };
 if (GaussianSplats3D.SceneRevealMode?.Gradual !== undefined)
@@ -178,6 +183,7 @@ if (GaussianSplats3D.SceneRevealMode?.Gradual !== undefined)
 
 const viewer = new GaussianSplats3D.Viewer(viewerOpts);
 
+// ─── CARREGA O ARQUIVO ────────────────────────────────────────────────────────
 viewer.addSplatScene(splatUrl, {
   showLoadingUI: false,
   format: sceneFormat,
@@ -192,6 +198,25 @@ viewer.addSplatScene(splatUrl, {
   bar.style.width = '100%';
   setTimeout(() => document.getElementById('loading').classList.add('hidden'), 400);
   viewer.start();
+
+  // Configura OrbitControls para orbita livre e limita zoom-out
+  const configureControls = () => {
+    const ctrl = viewer.controls || viewer.orbitControls || viewer.camera?.controls;
+    if (ctrl) {
+      ctrl.minDistance      = 0.1;    // pode chegar bem perto
+      ctrl.maxDistance      = 6;      // limite do zoom-out (~distância inicial)
+      ctrl.minPolarAngle    = 0;      // rotação vertical livre (de cima)
+      ctrl.maxPolarAngle    = Math.PI;// rotação vertical livre (de baixo)
+      ctrl.enableDamping    = true;
+      ctrl.dampingFactor    = 0.07;
+      ctrl.screenSpacePanning = true; // pan em 2D do ecrã (mais intuitivo)
+      if (ctrl.target) ctrl.target.set(0, 0, 0);
+    } else {
+      // Tenta de novo se os controles ainda não estão prontos
+      setTimeout(configureControls, 100);
+    }
+  };
+  configureControls();
 })
 .catch(err => {
   console.error(err);
