@@ -401,7 +401,7 @@ viewer.addSplatScene(splatUrl, {
     // ZOOM — scroll
     canvas.addEventListener('wheel', (e) => {
       e.preventDefault();
-      radius = Math.max(0.1, Math.min(6, radius + e.deltaY * 0.003));
+      radius = Math.max(0.1, Math.min(3, radius + e.deltaY * 0.003));
       applyCamera();
     }, { passive: false });
   };
