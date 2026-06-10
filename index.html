@@ -13,6 +13,7 @@
     --verde: #005849;
     --verde-escuro: #003d33;
     --verde-claro: #E1F5EE;
+    --verde-vivo: #67C187;
     --pedra: #222825;
     --pedra-medio: #5F5E5A;
     --branco: #ffffff;
@@ -20,6 +21,11 @@
   }
   html { scroll-behavior: smooth; }
   body { font-family: 'DM Sans', sans-serif; background: var(--pedra); color: var(--branco); overflow-x: hidden; }
+  ::selection { background: rgba(0,88,73,0.6); color: #fff; }
+  section[id] { scroll-margin-top: 5rem; }
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--verde-vivo); outline-offset: 2px; border-radius: 2px;
+  }
 
   /* NAV */
   nav {
@@ -35,8 +41,17 @@
   .nav-logo-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.05rem; letter-spacing: 0.04em; color: var(--branco); }
   .nav-logo-text span { color: var(--verde); }
   .nav-links { display: flex; gap: 2.5rem; list-style: none; }
-  .nav-links a { font-size: 0.82rem; font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.55); text-decoration: none; transition: color 0.2s; }
-  .nav-links a:hover { color: var(--verde); }
+  .nav-links a {
+    font-size: 0.82rem; font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase;
+    color: rgba(255,255,255,0.55); text-decoration: none; transition: color 0.2s;
+    position: relative; padding-bottom: 3px;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; left: 0; bottom: 0; height: 1px; width: 0;
+    background: var(--verde-vivo); transition: width 0.25s ease;
+  }
+  .nav-links a:hover { color: var(--verde-vivo); }
+  .nav-links a:hover::after { width: 100%; }
   .nav-cta { font-size: 0.78rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: #ffffff; background: var(--verde); padding: 0.5rem 1.2rem; border-radius: 2px; text-decoration: none; transition: background 0.2s; }
   .nav-cta:hover { background: #67C187; }
 
@@ -78,7 +93,7 @@
   .btn-ghost svg { transition: transform 0.2s; }
   .btn-ghost:hover svg { transform: translateX(3px); }
 
-  /* ─── PHONE MOCKUP ─────────────────────────────────────── */
+  /* ─── PHONE MOCKUP (25% maior) ─────────────────────────── */
   .hero-phone-wrap {
     position: relative; z-index: 1;
     padding-top: 6rem;
@@ -94,16 +109,16 @@
   /* subtle glow under the phone */
   .phone-glow {
     position: absolute;
-    bottom: -20px; left: 50%; transform: translateX(-50%);
-    width: 260px; height: 80px;
+    bottom: -25px; left: 50%; transform: translateX(-50%);
+    width: 325px; height: 100px;
     background: radial-gradient(ellipse, rgba(0,88,73,0.25) 0%, transparent 70%);
     pointer-events: none; filter: blur(4px);
   }
 
   .phone-frame {
-    width: 245px; height: 500px;
+    width: 306px; height: 625px;
     background: linear-gradient(160deg, #2c2c2c 0%, #1a1a1a 100%);
-    border-radius: 44px;
+    border-radius: 55px;
     border: 1.5px solid rgba(255,255,255,0.13);
     box-shadow:
       0 0 0 1px rgba(0,0,0,0.75),
@@ -111,63 +126,63 @@
       inset 0 1px 0 rgba(255,255,255,0.07),
       inset 0 -1px 0 rgba(0,0,0,0.4);
     position: relative;
-    transform: perspective(1000px) rotateY(-9deg) rotateX(2deg);
+    transform: perspective(1200px) rotateY(-9deg) rotateX(2deg);
     transition: transform 0.5s cubic-bezier(0.25,0.8,0.25,1);
   }
   .phone-frame:hover {
-    transform: perspective(1000px) rotateY(-4deg) rotateX(1deg);
+    transform: perspective(1200px) rotateY(-4deg) rotateX(1deg);
   }
 
   /* power button */
   .phone-frame::after {
     content: '';
-    position: absolute; right: -2.5px; top: 140px;
-    width: 2.5px; height: 48px;
+    position: absolute; right: -3px; top: 175px;
+    width: 3px; height: 60px;
     background: linear-gradient(to bottom, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
     border-radius: 0 3px 3px 0;
   }
 
   /* volume buttons */
   .phone-vol {
-    position: absolute; left: -2.5px;
-    display: flex; flex-direction: column; gap: 10px;
-    top: 110px;
+    position: absolute; left: -3px;
+    display: flex; flex-direction: column; gap: 12px;
+    top: 138px;
   }
   .phone-vol span {
-    display: block; width: 2.5px; height: 28px;
+    display: block; width: 3px; height: 35px;
     background: linear-gradient(to bottom, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
     border-radius: 3px 0 0 3px;
   }
 
   .phone-screen {
     position: absolute;
-    top: 9px; left: 7px; right: 7px; bottom: 9px;
+    top: 11px; left: 9px; right: 9px; bottom: 11px;
     background: #0b1812;
-    border-radius: 36px;
+    border-radius: 45px;
     overflow: hidden;
     display: flex; flex-direction: column;
   }
 
   /* status bar */
   .phone-status {
-    padding: 13px 18px 4px;
+    padding: 16px 22px 5px;
     display: flex; justify-content: space-between; align-items: center;
     flex-shrink: 0; position: relative; z-index: 5;
   }
   .phone-notch {
     position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-    width: 88px; height: 25px;
+    width: 110px; height: 31px;
     background: #1a1a1a;
-    border-radius: 0 0 13px 13px;
+    border-radius: 0 0 16px 16px;
     z-index: 10;
   }
   .phone-time {
-    font-size: 10.5px; font-weight: 700;
+    font-size: 13px; font-weight: 700;
     color: rgba(255,255,255,0.85);
     font-family: -apple-system, 'DM Sans', sans-serif;
     letter-spacing: 0.02em;
   }
-  .phone-icons { display: flex; align-items: center; gap: 4px; }
+  .phone-icons { display: flex; align-items: center; gap: 5px; }
 
   /* 3D viewer area */
   .phone-3d {
@@ -176,7 +191,9 @@
   #phone-canvas {
     width: 100% !important; height: 100% !important;
     display: block; touch-action: none;
+    cursor: grab;
   }
+  #phone-canvas:active { cursor: grabbing; }
 
   /* loading overlay */
   .phone-loader {
@@ -184,12 +201,12 @@
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     background: rgba(11,24,18,0.97);
-    z-index: 20; gap: 10px;
+    z-index: 20; gap: 12px;
     transition: opacity 0.6s ease;
   }
   .phone-loader.hidden { opacity: 0; pointer-events: none; }
   .phone-spinner {
-    width: 26px; height: 26px;
+    width: 32px; height: 32px;
     border: 2px solid rgba(0,88,73,0.2);
     border-top-color: #67C187;
     border-radius: 50%;
@@ -197,37 +214,46 @@
   }
   @keyframes phoneSpin { to { transform: rotate(360deg); } }
   .phone-loader-txt {
-    font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase;
-    color: rgba(255,255,255,0.28); font-family: 'DM Sans', sans-serif;
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: rgba(255,255,255,0.32); font-family: 'DM Sans', sans-serif;
+  }
+  .phone-loader-bar {
+    width: 110px; height: 2px; border-radius: 2px;
+    background: rgba(255,255,255,0.08); overflow: hidden;
+  }
+  .phone-loader-bar i {
+    display: block; height: 100%; width: 0%;
+    background: #67C187; transition: width 0.25s ease;
   }
 
   /* bottom bar overlay inside screen */
   .phone-overlay-bottom {
     position: absolute; bottom: 0; left: 0; right: 0;
     background: linear-gradient(to top, rgba(5,14,10,0.88) 0%, transparent 100%);
-    padding: 10px 13px 8px;
+    padding: 12px 16px 10px;
     display: flex; justify-content: space-between; align-items: flex-end;
     z-index: 5; pointer-events: none;
   }
-  .phone-model-lbl { font-size: 9px; font-weight: 300; color: rgba(255,255,255,0.45); font-family: 'DM Sans', sans-serif; }
+  .phone-model-lbl { font-size: 10.5px; font-weight: 300; color: rgba(255,255,255,0.5); font-family: 'DM Sans', sans-serif; line-height: 1.5; }
+  .phone-model-lbl small { display: block; font-size: 8.5px; color: rgba(103,193,135,0.75); letter-spacing: 0.08em; text-transform: uppercase; }
   .phone-3d-badge {
-    font-size: 7.5px; font-weight: 500; letter-spacing: 0.1em;
+    font-size: 9px; font-weight: 500; letter-spacing: 0.1em;
     text-transform: uppercase; color: #67C187;
     background: rgba(0,88,73,0.3);
     border: 1px solid rgba(103,193,135,0.3);
-    padding: 2px 6px; border-radius: 2px;
+    padding: 3px 7px; border-radius: 2px;
   }
 
   /* home indicator */
   .phone-home {
-    padding: 7px 0 5px;
+    padding: 9px 0 6px;
     display: flex; justify-content: center; flex-shrink: 0;
   }
   .phone-home::after {
     content: '';
-    width: 92px; height: 3.5px;
+    width: 115px; height: 4.5px;
     background: rgba(255,255,255,0.2);
-    border-radius: 2px;
+    border-radius: 3px;
   }
 
   /* TAGLINE abaixo do celular */
@@ -236,12 +262,12 @@
   }
   .phone-caption-big {
     font-family: 'Syne', sans-serif; font-weight: 800;
-    font-size: 1.45rem; line-height: 1.15; letter-spacing: -0.01em;
+    font-size: 1.55rem; line-height: 1.15; letter-spacing: -0.01em;
     color: var(--branco);
   }
   .phone-caption-big em { color: var(--verde); font-style: normal; }
   .phone-caption-sub {
-    font-size: 0.73rem; font-weight: 300;
+    font-size: 0.76rem; font-weight: 300;
     color: rgba(255,255,255,0.3);
     margin-top: 0.45rem;
     letter-spacing: 0.05em;
@@ -255,7 +281,8 @@
   .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.06); }
   .service-card { background: var(--pedra); padding: 2.5rem; transition: background 0.3s; cursor: default; }
   .service-card:hover { background: #353533; }
-  .service-icon { width: 50px; height: 50px; border-radius: 4px; background: rgba(0,88,73,0.08); border: 1px solid rgba(0,88,73,0.18); display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; }
+  .service-icon { width: 50px; height: 50px; border-radius: 4px; background: rgba(0,88,73,0.08); border: 1px solid rgba(0,88,73,0.18); display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; transition: transform 0.3s ease, border-color 0.3s; }
+  .service-card:hover .service-icon { transform: translateY(-3px); border-color: rgba(103,193,135,0.4); }
   .service-icon svg { width: 26px; height: 26px; stroke: var(--verde); fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
   .service-title { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 1.1rem; margin-bottom: 1rem; color: var(--branco); }
   .service-items { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
@@ -281,7 +308,8 @@
   .sobre-section { padding: 6rem 3rem; display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center; border-top: 1px solid rgba(255,255,255,0.06); }
   .sobre-content p { font-size: 1rem; font-weight: 300; line-height: 1.8; color: rgba(255,255,255,0.55); margin-bottom: 1.5rem; }
   .sobre-details { display: flex; flex-direction: column; gap: 1.25rem; }
-  .detail-item { display: flex; align-items: flex-start; gap: 1rem; padding: 1.25rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 2px; }
+  .detail-item { display: flex; align-items: flex-start; gap: 1rem; padding: 1.25rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 2px; transition: border-color 0.3s; }
+  .detail-item:hover { border-color: rgba(0,88,73,0.35); }
   .detail-icon { width: 36px; height: 36px; min-width: 36px; background: rgba(0,88,73,0.1); border-radius: 2px; display: flex; align-items: center; justify-content: center; }
   .detail-icon svg { width: 16px; height: 16px; stroke: var(--verde); fill: none; stroke-width: 1.5; stroke-linecap: round; }
   .detail-text strong { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.2rem; }
@@ -293,7 +321,7 @@
   .contato-info p { font-size: 0.95rem; font-weight: 300; color: rgba(255,255,255,0.48); line-height: 1.7; margin-bottom: 2.5rem; }
   .contato-items { display: flex; flex-direction: column; gap: 1rem; }
   .contato-item { display: flex; align-items: center; gap: 1rem; font-size: 0.9rem; color: rgba(255,255,255,0.65); text-decoration: none; transition: color 0.2s; }
-  .contato-item:hover { color: var(--verde); }
+  .contato-item:hover { color: var(--verde-vivo); }
   .contato-item-icon { width: 38px; height: 38px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 2px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .contato-item-icon svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
   .contato-form { display: flex; flex-direction: column; gap: 1rem; }
@@ -301,7 +329,7 @@
   .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
   .form-group label { font-size: 0.72rem; font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.38); }
   .form-group input, .form-group textarea { font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 300; color: var(--branco); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 2px; padding: 0.75rem 1rem; outline: none; transition: border-color 0.2s; width: 100%; }
-  .form-group input:focus, .form-group textarea:focus { border-color: rgba(0,88,73,0.5); }
+  .form-group input:focus, .form-group textarea:focus { border-color: rgba(103,193,135,0.55); }
   .form-group textarea { resize: vertical; min-height: 120px; }
   .btn-submit { font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #ffffff; background: var(--verde); border: none; padding: 1rem 2rem; border-radius: 2px; cursor: pointer; transition: all 0.2s; align-self: flex-start; }
   .btn-submit:hover { background: #67C187; }
@@ -315,6 +343,9 @@
   .footer-text { font-size: 0.72rem; font-weight: 300; color: rgba(255,255,255,0.22); }
   .crea-badge { font-size: 0.68rem; font-weight: 400; letter-spacing: 0.06em; color: rgba(255,255,255,0.28); border: 1px solid rgba(255,255,255,0.1); padding: 0.25rem 0.75rem; border-radius: 2px; }
 
+  @media (max-width: 1200px) {
+    .phone-frame { width: 270px; height: 551px; }
+  }
   @media (max-width: 900px) {
     nav { padding: 1rem 1.5rem; }
     .nav-links { display: none; }
@@ -378,14 +409,14 @@
             <span class="phone-time">9:41</span>
             <div class="phone-icons">
               <!-- Signal bars -->
-              <svg width="13" height="9" viewBox="0 0 13 9" fill="rgba(255,255,255,0.75)">
+              <svg width="16" height="11" viewBox="0 0 13 9" fill="rgba(255,255,255,0.75)">
                 <rect x="0" y="5.5" width="2.2" height="3.5" rx="0.4"/>
                 <rect x="3.2" y="3.5" width="2.2" height="5.5" rx="0.4"/>
                 <rect x="6.4" y="1.5" width="2.2" height="7.5" rx="0.4"/>
                 <rect x="9.6" y="0" width="2.2" height="9" rx="0.4"/>
               </svg>
               <!-- Battery -->
-              <svg width="19" height="9" viewBox="0 0 19 9" fill="none">
+              <svg width="24" height="11" viewBox="0 0 19 9" fill="none">
                 <rect x="0.4" y="0.8" width="14" height="7.4" rx="1.8" stroke="rgba(255,255,255,0.65)" stroke-width="0.9"/>
                 <rect x="1.8" y="2.2" width="8.5" height="4.6" rx="0.8" fill="rgba(255,255,255,0.72)"/>
                 <path d="M15.5 3v3" stroke="rgba(255,255,255,0.55)" stroke-width="1.4" stroke-linecap="round"/>
@@ -399,10 +430,11 @@
             <canvas id="phone-canvas"></canvas>
             <div class="phone-loader" id="phone-loader">
               <div class="phone-spinner"></div>
-              <div class="phone-loader-txt">Carregando modelo</div>
+              <div class="phone-loader-txt" id="phone-loader-txt">Carregando modelo</div>
+              <div class="phone-loader-bar"><i id="phone-loader-fill"></i></div>
             </div>
             <div class="phone-overlay-bottom">
-              <span class="phone-model-lbl">Imóvel Rural · Serra SC</span>
+              <span class="phone-model-lbl">Imóvel Rural · Serra SC<small>Curvas de nível 0,5 m</small></span>
               <span class="phone-3d-badge">3D ao vivo</span>
             </div>
           </div>
@@ -415,7 +447,7 @@
     <!-- Tagline -->
     <div class="phone-caption">
       <div class="phone-caption-big">Seu terreno,<br><em>na sua mão</em></div>
-      <div class="phone-caption-sub">Modelos 3D interativos · Funciona no celular</div>
+      <div class="phone-caption-sub">Modelos 3D interativos · Curvas de nível reais · Funciona no celular</div>
     </div>
   </div><!-- hero-phone-wrap -->
 
@@ -633,105 +665,128 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-/* ─── PHONE 3D VIEWER ───────────────────────────────────────── */
+/* ─── PHONE 3D VIEWER ───────────────────────────────────────────
+   Modelo: modelo_web.glb  (otimizado — exportado em UTM SIRGAS2000 22S,
+   shift E=624000 N=6893000;  X = E−shiftE, Y = cota, Z = shiftN − N)
+   Curvas: curvas3d.json    (pré-drapeadas sobre modeloground.glb,
+   já no mesmo sistema local do GLB — nenhum raycast em runtime)
+─────────────────────────────────────────────────────────────────── */
 (function () {
-  // Only run if phone mockup exists in DOM (hidden on mobile via CSS but still rendered)
-  var container = document.getElementById('phone-3d-area');
-  if (!container) return;
+  var area = document.getElementById('phone-3d-area');
+  if (!area) return;
+  /* Não inicializa se o mockup estiver oculto (mobile) */
+  if (window.matchMedia && window.matchMedia('(max-width: 900px)').matches) return;
 
-  // Load Three.js, then set up the viewer
-  var t3script = document.createElement('script');
-  t3script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
-  t3script.onload = function () { startPhoneViewer(); };
-  document.head.appendChild(t3script);
+  var MODEL_URL  = 'modelo_web.glb';
+  var CURVAS_URL = 'curvas3d.json';
 
-  function startPhoneViewer() {
-    var canvas  = document.getElementById('phone-canvas');
-    var area    = document.getElementById('phone-3d-area');
-    if (!canvas || !area) return;
+  var t3 = document.createElement('script');
+  t3.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+  t3.onload = function () {
+    var gl = document.createElement('script');
+    gl.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js';
+    gl.onload = boot;
+    document.head.appendChild(gl);
+  };
+  document.head.appendChild(t3);
 
-    // Dimensions — defer until layout is done
-    function tryInit() {
-      var W = area.clientWidth;
-      var H = area.clientHeight;
+  function boot() {
+    var canvas = document.getElementById('phone-canvas');
+    if (!canvas) return;
+    (function tryInit() {
+      var W = area.clientWidth, H = area.clientHeight;
       if (!W || !H) { setTimeout(tryInit, 80); return; }
-      initRenderer(W, H, canvas, area);
-    }
-    setTimeout(tryInit, 100);
+      init(W, H, canvas);
+    })();
   }
 
-  function initRenderer(W, H, canvas, area) {
-    /* ── Renderer ── */
-    var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: false, powerPreference: 'low-power' });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  function init(W, H, canvas) {
+    var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
     renderer.setSize(W, H);
     renderer.outputEncoding = THREE.sRGBEncoding;
-    renderer.toneMapping   = THREE.NoToneMapping;
+    renderer.toneMapping = THREE.NoToneMapping;
 
-    var scene  = new THREE.Scene();
+    var scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0b1812);
-    scene.add(new THREE.AmbientLight(0xffffff, 1.0));
 
     var camera = new THREE.PerspectiveCamera(45, W / H, 0.01, 500);
 
-    /* ── Camera state ── */
-    var theta  = -0.6;
-    var phi    = 1.05;
-    var radius = 5;
+    /* Grupo raiz: modelo + curvas compartilham o mesmo espaço local */
+    var root = new THREE.Group();
+    scene.add(root);
+
+    /* ── Estado da câmera ── */
+    var theta = -0.5, phi = 1.0, radius = 5;
+    var baseRadius = 5;
     var target = new THREE.Vector3(0, 0, 0);
-    var autoRotate    = true;
-    var autoTimer     = null;
-    var isDragging    = false;
-    var prevM         = { x: 0, y: 0 };
-    var lastTouchDist = 0;
-    var modelReady    = false;
+    var autoRotate = true, autoTimer = null;
+    var isDragging = false, prevM = { x: 0, y: 0 };
+    var lastTouchDist = 0, modelReady = false;
+    var velTheta = 0, velPhi = 0;            /* inércia */
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var inView = true;
 
     function updateCam() {
-      var sinPhi = Math.sin(phi);
+      var sp = Math.sin(phi);
       camera.position.set(
-        target.x + radius * sinPhi * Math.sin(theta),
+        target.x + radius * sp * Math.sin(theta),
         target.y + radius * Math.cos(phi),
-        target.z + radius * sinPhi * Math.cos(theta)
+        target.z + radius * sp * Math.cos(theta)
       );
       camera.lookAt(target);
     }
     updateCam();
 
+    function clampPhi(p) { return Math.max(0.12, Math.min(1.5, p)); }
+    function clampRadius(r) { return Math.max(baseRadius * 0.3, Math.min(baseRadius * 2.4, r)); }
+
+    function pauseAuto() {
+      autoRotate = false;
+      clearTimeout(autoTimer);
+    }
     function resumeAuto() {
       clearTimeout(autoTimer);
       autoTimer = setTimeout(function () { autoRotate = true; }, 3500);
     }
 
-    /* ── Mouse controls ── */
+    /* ── Mouse ── */
     canvas.addEventListener('mousedown', function (e) {
-      isDragging = true; autoRotate = false;
+      isDragging = true; pauseAuto();
+      velTheta = 0; velPhi = 0;
       prevM = { x: e.clientX, y: e.clientY };
       e.stopPropagation();
     });
-    canvas.addEventListener('mousemove', function (e) {
+    window.addEventListener('mousemove', function (e) {
       if (!isDragging) return;
-      theta -= (e.clientX - prevM.x) * 0.005;
-      phi = Math.max(0.12, Math.min(1.5, phi - (e.clientY - prevM.y) * 0.005));
+      var dT = -(e.clientX - prevM.x) * 0.005;
+      var dP = -(e.clientY - prevM.y) * 0.005;
+      theta += dT; phi = clampPhi(phi + dP);
+      velTheta = dT; velPhi = dP;
       prevM = { x: e.clientX, y: e.clientY };
-      updateCam();
     });
-    canvas.addEventListener('mouseup',    function () { isDragging = false; resumeAuto(); });
-    canvas.addEventListener('mouseleave', function () { isDragging = false; });
+    window.addEventListener('mouseup', function () {
+      if (!isDragging) return;
+      isDragging = false; resumeAuto();
+    });
     canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
     canvas.addEventListener('wheel', function (e) {
-      radius = Math.max(0.5, Math.min(15, radius + e.deltaY * 0.002));
-      updateCam();
-    }, { passive: true });
+      e.preventDefault();
+      pauseAuto(); resumeAuto();
+      radius = clampRadius(radius + e.deltaY * 0.0016 * baseRadius);
+    }, { passive: false });
 
-    /* ── Touch controls ── */
+    /* ── Touch ── */
     canvas.addEventListener('touchstart', function (e) {
       e.preventDefault();
-      autoRotate = false;
+      pauseAuto();
+      velTheta = 0; velPhi = 0;
       if (e.touches.length === 1) {
         isDragging = true;
         prevM = { x: e.touches[0].clientX, y: e.touches[0].clientY };
       }
       if (e.touches.length === 2) {
+        isDragging = false;
         lastTouchDist = Math.hypot(
           e.touches[0].clientX - e.touches[1].clientX,
           e.touches[0].clientY - e.touches[1].clientY
@@ -742,72 +797,81 @@ document.addEventListener('DOMContentLoaded', () => {
     canvas.addEventListener('touchmove', function (e) {
       e.preventDefault();
       if (e.touches.length === 1 && isDragging) {
-        theta -= (e.touches[0].clientX - prevM.x) * 0.007;
-        phi = Math.max(0.12, Math.min(1.5, phi - (e.touches[0].clientY - prevM.y) * 0.007));
+        var dT = -(e.touches[0].clientX - prevM.x) * 0.007;
+        var dP = -(e.touches[0].clientY - prevM.y) * 0.007;
+        theta += dT; phi = clampPhi(phi + dP);
+        velTheta = dT; velPhi = dP;
         prevM = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        updateCam();
       }
       if (e.touches.length === 2) {
         var d = Math.hypot(
           e.touches[0].clientX - e.touches[1].clientX,
           e.touches[0].clientY - e.touches[1].clientY
         );
-        radius = Math.max(0.5, Math.min(15, radius - (d - lastTouchDist) * 0.025));
+        radius = clampRadius(radius - (d - lastTouchDist) * 0.008 * baseRadius * 0.2);
         lastTouchDist = d;
-        updateCam();
       }
     }, { passive: false });
 
-    canvas.addEventListener('touchend', function () { isDragging = false; resumeAuto(); });
+    canvas.addEventListener('touchend', function () {
+      isDragging = false; resumeAuto();
+    });
 
-    /* ── Render loop ── */
+    /* Pausa a renderização quando fora da tela (economiza GPU) */
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        inView = entries[0].isIntersecting;
+      }, { threshold: 0 }).observe(area);
+    }
+
+    /* ── Loop (delta-time → velocidade independente de FPS) ── */
+    var clock = new THREE.Clock();
     function animate() {
       requestAnimationFrame(animate);
-      if (modelReady && autoRotate) {
-        theta += 0.0028;
+      var dt = Math.min(clock.getDelta(), 0.05);
+      if (!inView) return;
+      if (modelReady) {
+        if (autoRotate && !reduceMotion && !isDragging) {
+          theta += 0.16 * dt;   /* rad/s — suave e constante */
+        }
+        /* inércia após soltar o arrasto */
+        if (!isDragging && (Math.abs(velTheta) > 0.0004 || Math.abs(velPhi) > 0.0004)) {
+          theta += velTheta; phi = clampPhi(phi + velPhi);
+          velTheta *= 0.92; velPhi *= 0.92;
+        }
         updateCam();
       }
       renderer.render(scene, camera);
     }
     animate();
 
-    /* ── Load GLB ── */
-    var s1 = document.createElement('script');
-    s1.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js';
-    s1.onload = function () {
-      var s2 = document.createElement('script');
-      s2.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js';
-      s2.onload = function () {
-        var draco = new THREE.DRACOLoader();
-        draco.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
-        var loader = new THREE.GLTFLoader();
-        loader.setDRACOLoader(draco);
+    /* ── Carrega o modelo ── */
+    var loaderTxt  = document.getElementById('phone-loader-txt');
+    var loaderFill = document.getElementById('phone-loader-fill');
+    var gltfLoader = new THREE.GLTFLoader();
 
-        loader.load(
-          'https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/modelo_mozara2048.glb',
-          function (gltf) { onLoad(gltf); },
-          undefined,
-          function (err) { console.log('[phone3d] model load error:', err); }
-        );
-      };
-      document.head.appendChild(s2);
-    };
-    document.head.appendChild(s1);
+    gltfLoader.load(
+      MODEL_URL,
+      function (gltf) { onModel(gltf); },
+      function (xhr) {
+        if (xhr.lengthComputable && xhr.total > 0) {
+          var pct = Math.round((xhr.loaded / xhr.total) * 100);
+          if (loaderTxt)  loaderTxt.textContent = 'Carregando modelo ' + pct + '%';
+          if (loaderFill) loaderFill.style.width = pct + '%';
+        } else if (loaderTxt) {
+          loaderTxt.textContent = 'Carregando ' + (xhr.loaded / 1048576).toFixed(1) + ' MB';
+        }
+      },
+      function (err) {
+        console.log('[phone3d] erro ao carregar modelo:', err);
+        if (loaderTxt) loaderTxt.textContent = 'Erro ao carregar modelo';
+      }
+    );
 
-    /* ── On model loaded ── */
-    function onLoad(gltf) {
+    function onModel(gltf) {
       var model = gltf.scene;
-      var box   = new THREE.Box3().setFromObject(model);
-      var center = box.getCenter(new THREE.Vector3());
-      var size   = box.getSize(new THREE.Vector3());
-      var maxDim = Math.max(size.x, size.y, size.z);
-      var scale  = 3 / maxDim;
 
-      model.scale.setScalar(scale);
-      model.position.sub(center.multiplyScalar(scale));
-      model.position.y -= (size.y * scale) / 2;
-
-      /* Apply MeshBasicMaterial to preserve baked texture */
+      /* Material básico para preservar a textura "baked" */
       var maxAniso = renderer.capabilities.getMaxAnisotropy();
       model.traverse(function (node) {
         if (!node.isMesh) return;
@@ -815,8 +879,8 @@ document.addEventListener('DOMContentLoaded', () => {
         mats.forEach(function (mat, idx) {
           var basic = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
           if (mat.map) {
-            mat.map.encoding  = THREE.sRGBEncoding;
-            mat.map.anisotropy = Math.min(maxAniso, 4);
+            mat.map.encoding = THREE.sRGBEncoding;
+            mat.map.anisotropy = Math.min(maxAniso, 8);
             mat.map.needsUpdate = true;
             basic.map = mat.map;
           }
@@ -825,144 +889,63 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       });
 
-      scene.add(model);
+      root.add(model);
 
-      /* Set initial view */
-      radius = maxDim * scale * 1.55;
-      phi    = 1.0;
-      theta  = -0.5;
+      /* Centraliza e escala o GRUPO (modelo + curvas juntos) */
+      var box    = new THREE.Box3().setFromObject(model);
+      var center = box.getCenter(new THREE.Vector3());
+      var size   = box.getSize(new THREE.Vector3());
+      var maxDim = Math.max(size.x, size.y, size.z);
+      var s      = 3 / maxDim;
+
+      root.scale.setScalar(s);
+      root.position.set(-center.x * s, -center.y * s - (size.y * s) * 0.5, -center.z * s);
+
+      baseRadius = maxDim * s * 1.45;
+      radius = baseRadius;
+      phi = 1.0; theta = -0.5;
       updateCam();
 
       modelReady = true;
+      var ld = document.getElementById('phone-loader');
+      if (ld) ld.classList.add('hidden');
 
-      /* Hide loader */
-      var loader = document.getElementById('phone-loader');
-      if (loader) loader.classList.add('hidden');
-
-      /* Generate contour lines after short delay */
-      var scaledBox = new THREE.Box3().setFromObject(model);
-      setTimeout(function () { generateContours(model, scaledBox); }, 300);
+      loadCurvas();
     }
 
-    /* ── Contour draping (async, row-by-row to avoid UI freeze) ── */
-    function generateContours(model, box) {
-      var RES  = 58;   // grid resolution
-      var NLEV = 11;   // number of contour levels
-      var BW   = box.max.x - box.min.x;
-      var BD   = box.max.z - box.min.z;
-      var BH   = box.max.y - box.min.y;
-
-      /* Collect all meshes for raycasting */
-      var meshes = [];
-      model.traverse(function (n) { if (n.isMesh) meshes.push(n); });
-      if (meshes.length === 0) return;
-
-      /* Build height grid row by row */
-      var grid = [];
-      for (var r = 0; r < RES; r++) { grid.push(new Array(RES).fill(null)); }
-
-      var rc   = new THREE.Raycaster();
-      var down = new THREE.Vector3(0, -1, 0);
-      var row  = 0;
-
-      function processRows() {
-        /* Process 6 rows per tick */
-        var end = Math.min(row + 6, RES);
-        for (var i = row; i < end; i++) {
-          for (var j = 0; j < RES; j++) {
-            var x = box.min.x + (i / (RES - 1)) * BW;
-            var z = box.min.z + (j / (RES - 1)) * BD;
-            rc.set(new THREE.Vector3(x, box.max.y + 0.5, z), down);
-            var hits = rc.intersectObjects(meshes, false);
-            /* Take the LOWEST hit (closest to ground, skipping tree tops) */
-            if (hits.length > 0) {
-              var minY = hits[0].point.y;
-              for (var h = 1; h < hits.length; h++) {
-                if (hits[h].point.y < minY) minY = hits[h].point.y;
-              }
-              grid[i][j] = minY;
+    /* ── Curvas de nível pré-drapeadas (mesmo espaço local do GLB) ── */
+    function loadCurvas() {
+      fetch(CURVAS_URL)
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function (data) {
+          var normais = [], mestras = [];
+          data.lines.forEach(function (ln) {
+            var isMestra = (ln.e % 5) === 0;          /* mestras a cada 5 m */
+            var dest = isMestra ? mestras : normais;
+            var p = ln.p;
+            for (var i = 0; i < p.length - 1; i++) {
+              dest.push(p[i][0], p[i][1], p[i][2], p[i+1][0], p[i+1][1], p[i+1][2]);
             }
-          }
-        }
-        row = end;
-
-        if (row < RES) {
-          setTimeout(processRows, 0); /* yield to browser */
-        } else {
-          buildLines(grid, box, BW, BD, BH, NLEV);
-        }
-      }
-      setTimeout(processRows, 0);
-    }
-
-    /* ── Build contour line geometry (marching squares) ── */
-    function buildLines(grid, box, BW, BD, BH, NLEV) {
-      var RES    = grid.length;
-      var YSTEP  = BH / (NLEV + 1);
-      var OFFSET = 0.018; /* float slightly above terrain */
-      var group  = new THREE.Group();
-
-      for (var c = 1; c <= NLEV; c++) {
-        var level = box.min.y + c * YSTEP;
-        var pts   = [];
-
-        for (var i = 0; i < RES - 1; i++) {
-          for (var j = 0; j < RES - 1; j++) {
-            var h00 = grid[i][j];
-            var h10 = grid[i + 1][j];
-            var h01 = grid[i][j + 1];
-            var h11 = grid[i + 1][j + 1];
-            if (h00 === null || h10 === null || h01 === null || h11 === null) continue;
-
-            var x0 = box.min.x + (i       / (RES - 1)) * BW;
-            var x1 = box.min.x + ((i + 1) / (RES - 1)) * BW;
-            var z0 = box.min.z + (j       / (RES - 1)) * BD;
-            var z1 = box.min.z + ((j + 1) / (RES - 1)) * BD;
-
-            var ep = []; /* edge points for this cell */
-
-            /* bottom edge: h00 → h10 */
-            if ((h00 >= level) !== (h10 >= level)) {
-              var t = (level - h00) / (h10 - h00);
-              ep.push(new THREE.Vector3(x0 + t * (x1 - x0), level + OFFSET, z0));
-            }
-            /* right edge: h10 → h11 */
-            if ((h10 >= level) !== (h11 >= level)) {
-              var t = (level - h10) / (h11 - h10);
-              ep.push(new THREE.Vector3(x1, level + OFFSET, z0 + t * (z1 - z0)));
-            }
-            /* top edge: h11 → h01 */
-            if ((h11 >= level) !== (h01 >= level)) {
-              var t = (level - h11) / (h01 - h11);
-              ep.push(new THREE.Vector3(x1 + t * (x0 - x1), level + OFFSET, z1));
-            }
-            /* left edge: h01 → h00 */
-            if ((h01 >= level) !== (h00 >= level)) {
-              var t = (level - h01) / (h00 - h01);
-              ep.push(new THREE.Vector3(x0, level + OFFSET, z1 + t * (z0 - z1)));
-            }
-
-            if (ep.length === 2) { pts.push(ep[0], ep[1]); }
-          }
-        }
-
-        if (pts.length > 0) {
-          /* Vary color: low elevations darker green, higher brighter */
-          var frac = (c - 1) / (NLEV - 1);
-          var geo  = new THREE.BufferGeometry().setFromPoints(pts);
-          var mat  = new THREE.LineBasicMaterial({
-            color:       new THREE.Color(0, 0.48 + frac * 0.44, 0.18 + frac * 0.28),
-            transparent: true,
-            opacity:     0.55 + frac * 0.3,
-            depthTest:   true
           });
-          group.add(new THREE.LineSegments(geo, mat));
-        }
-      }
 
-      scene.add(group);
+          function makeLines(arr, color, opacity) {
+            if (!arr.length) return null;
+            var geo = new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(arr, 3));
+            var mat = new THREE.LineBasicMaterial({ color: color, transparent: true, opacity: opacity, depthTest: true });
+            return new THREE.LineSegments(geo, mat);
+          }
+
+          var g = new THREE.Group();
+          var l1 = makeLines(normais, 0x4fa86f, 0.45);
+          var l2 = makeLines(mestras, 0x9bf0bd, 0.85);
+          if (l1) g.add(l1);
+          if (l2) g.add(l2);
+          root.add(g);
+        })
+        .catch(function (err) { console.log('[phone3d] curvas indisponíveis:', err); });
     }
-  } /* initRenderer */
+  } /* init */
 })();
 </script>
 
