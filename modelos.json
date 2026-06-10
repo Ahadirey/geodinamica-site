@@ -68,7 +68,7 @@
   {
     "id": "rpab",
     "nome": "RPAB",
-    "descricao": "MODEL",
+    "descricao": "model",
     "arquivo": "rpab.glb",
     "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/rpab.glb",
     "tipo": "topografia",
