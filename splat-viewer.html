@@ -317,27 +317,88 @@ viewer.addSplatScene(splatUrl, {
 
   // Configura OrbitControls para orbita livre e limita zoom-out
   const configureControls = () => {
-    const ctrl = viewer.controls || viewer.orbitControls || viewer.camera?.controls;
-    if (ctrl) {
-      ctrl.minDistance        = 0.1;
-      ctrl.maxDistance        = 6;
-      ctrl.minPolarAngle      = 0;           // rotação vertical livre (de cima)
-      ctrl.maxPolarAngle      = Math.PI;     // rotação vertical livre (de baixo)
-      ctrl.enableDamping      = true;
-      ctrl.dampingFactor      = 0.07;
-      ctrl.screenSpacePanning = true;        // pan direito = XY da tela, sem zoom
-      if (ctrl.target) ctrl.target.set(0, 0, 0);
+    const ctrl   = viewer.controls || viewer.orbitControls || viewer.camera?.controls;
+    const camera = viewer.camera;
+    if (!ctrl || !camera) { setTimeout(configureControls, 100); return; }
 
-      // Esquerdo = orbit | Scroll (middle) = orbit também | Direito = pan XY
-      if (ctrl.mouseButtons !== undefined)
-        ctrl.mouseButtons = { LEFT: 0, MIDDLE: 0, RIGHT: 2 };
+    // Desativa OrbitControls — controle 100% manual
+    ctrl.enabled = false;
 
-      // Bloqueia menu de contexto do browser no canvas
-      const canvas = viewer.renderer?.domElement || document.querySelector('canvas');
-      canvas.addEventListener('contextmenu', (e) => e.preventDefault());
-    } else {
-      setTimeout(configureControls, 100);
+    const canvas = viewer.renderer?.domElement
+                || document.querySelector('canvas:not(#axis-gizmo)');
+    const T = ctrl.target; // alvo do orbit (referência direta)
+
+    // ── Estado esférico turntable ──────────────────────────────────────────
+    const d0 = camera.position.distanceTo(T) || 2;
+    let radius = Math.max(0.1, Math.min(6, d0));
+    let theta  = Math.atan2(camera.position.x - T.x, camera.position.z - T.z);
+    let phi    = Math.acos(Math.max(-1, Math.min(1,
+                   (camera.position.y - T.y) / radius)));
+
+    function applyCamera() {
+      const sP = Math.sin(phi), cP = Math.cos(phi);
+      const sT = Math.sin(theta), cT = Math.cos(theta);
+      camera.position.set(
+        T.x + radius * sP * sT,
+        T.y + radius * cP,
+        T.z + radius * sP * cT
+      );
+      camera.up.set(0, 1, 0);
+      camera.lookAt(T);
     }
+    applyCamera();
+
+    // ── Eventos de ponteiro ───────────────────────────────────────────────
+    let drag = null;
+
+    canvas.addEventListener('pointerdown', (e) => {
+      if (drag) return;
+      if (e.button !== 0 && e.button !== 1 && e.button !== 2) return;
+      e.preventDefault();
+      drag = { button: e.button, lastX: e.clientX, lastY: e.clientY };
+      canvas.setPointerCapture(e.pointerId);
+    });
+
+    canvas.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      const dx = e.clientX - drag.lastX;
+      const dy = e.clientY - drag.lastY;
+      drag.lastX = e.clientX;
+      drag.lastY = e.clientY;
+
+      if (drag.button === 0 || drag.button === 1) {
+        // ORBIT — turntable
+        // Horizontal → gira em torno do eixo Y mundial (ver lateral)
+        // Vertical   → muda elevação (ver cima/baixo)
+        theta -= dx * 0.005;
+        phi = Math.max(0.05, Math.min(Math.PI - 0.05, phi + dy * 0.005));
+        applyCamera();
+
+      } else if (drag.button === 2) {
+        // PAN — desloca câmera + alvo no plano da câmera
+        const s = radius * 0.001;
+        const sinT = Math.sin(theta), cosT = Math.cos(theta);
+        const sinP = Math.sin(phi),   cosP = Math.cos(phi);
+        const dpx = (-cosT * dx - sinT * cosP * dy) * s;
+        const dpy = ( sinP * dy) * s;
+        const dpz = ( sinT * dx - cosT * cosP * dy) * s;
+        T.x += dpx; T.y += dpy; T.z += dpz;
+        camera.position.x += dpx;
+        camera.position.y += dpy;
+        camera.position.z += dpz;
+      }
+    });
+
+    canvas.addEventListener('pointerup',   (e) => { if (drag?.button === e.button) drag = null; });
+    canvas.addEventListener('pointerout',  ()  => { drag = null; });
+    canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    // ZOOM — scroll
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      radius = Math.max(0.1, Math.min(6, radius + e.deltaY * 0.003));
+      applyCamera();
+    }, { passive: false });
   };
   configureControls();
 })
