@@ -255,3 +255,7 @@ NexusObject.prototype.raycast = function(raycaster, intersects) {
 	intersects.push({ distance: distance, point: intersect, face: face, object: this} );
 	return;
 }
+
+// `class NexusObject` é uma declaração léxica global e NÃO vira window.NexusObject
+// automaticamente — expomos explicitamente para o módulo do viewer poder usá-la.
+window.NexusObject = NexusObject;
