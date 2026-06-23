@@ -319,7 +319,9 @@ updateCamera();
 // IMPORTANTE: o material precisa de um `map` (mesmo placeholder) para a lib ativar o
 // caminho de textura — ela substitui este map pelas texturas de cada patch do Nexus.
 // Sem map, o modelo renderiza branco/sem textura.
-const material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
+// side: FrontSide — DoubleSide causava z-fighting frente/verso (flicker "psicodélico")
+// na malha fotogramétrica quando texturizada. FrontSide elimina o piscar.
+const material = new THREE.MeshBasicMaterial({ side: THREE.FrontSide });
 const _dummyTex = new THREE.DataTexture(new Uint8Array([255, 255, 255, 255]), 1, 1, THREE.RGBAFormat);
 _dummyTex.colorSpace = THREE.SRGBColorSpace;
 _dummyTex.needsUpdate = true;
