@@ -45,11 +45,11 @@
   },
   {
     "id": "portico-sao-joaquim",
-    "nome": "Pórtico SJ",
-    "descricao": "Fotogrametria",
+    "nome": "Obra Pórtico",
+    "descricao": "Acompanhamento de obras em andamento",
     "arquivo": "PORTICO_SAO_JOAQUIM.glb",
     "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/PORTICO_SAO_JOAQUIM.glb",
-    "tipo": "ambiental",
+    "tipo": "3D - Alta resolução",
     "publico": true,
     "data": "2026-06-02",
     "vista": {
