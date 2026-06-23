@@ -324,13 +324,28 @@ _dummyTex.colorSpace = THREE.SRGBColorSpace;
 _dummyTex.needsUpdate = true;
 material.map = _dummyTex;
 
+// ─── ORIENTAÇÃO ───────────────────────────────────────────────────────────────
+// Modelos de fotogrametria (Metashape/OBJ coords locais) vêm Z-up; o viewer é Y-up.
+// Sem correção o modelo aparece "deitado/de pé". ?up=z (padrão) gira -90° em X
+// (Z-up→Y-up). ?up=z2 gira +90° (caso fique de cabeça pra baixo). ?up=y = não gira.
+const UP = (params.get('up') || 'z').toLowerCase();
+function applyOrientation(mesh) {
+  if (UP === 'z')       mesh.rotation.x = -Math.PI / 2;
+  else if (UP === 'z2') mesh.rotation.x =  Math.PI / 2;
+  // 'y' → sem rotação
+  mesh.updateMatrixWorld(true);
+}
+
 let centered = false;
 function centerModel(mesh) {
   if (centered) return;
   const sphere = mesh.boundingSphere;   // Nexus3D expõe aqui (geometry é só placeholder)
   if (!sphere || !sphere.radius) return;
   centered = true;
-  target.copy(sphere.center);
+  mesh.updateMatrixWorld(true);
+  // centro em espaço de mundo (após a rotação de orientação)
+  const wc = sphere.center.clone().applyMatrix4(mesh.matrixWorld);
+  target.copy(wc);
   spherical.radius = sphere.radius * 2.2;
   camera.far  = Math.max(5000, sphere.radius * 50);
   camera.near = Math.max(0.01, sphere.radius * 0.001);
@@ -357,17 +372,19 @@ try {
         mesh.__rbdWrapped = true;
       }
       scene.add(mesh);
+      applyOrientation(mesh);
       centerModel(mesh);
       if (DEBUG && sph && sph.radius) {
         // marcador de posição/extensão do modelo: se aparecer mas o modelo não,
         // o problema é streaming/material; se não aparecer nada, é câmera.
+        const wc = sph.center.clone().applyMatrix4(mesh.matrixWorld);
         const wire = new THREE.Mesh(
           new THREE.SphereGeometry(sph.radius, 24, 16),
           new THREE.MeshBasicMaterial({ color: 0x67C187, wireframe: true, transparent: true, opacity: 0.35 }));
-        wire.position.copy(sph.center);
+        wire.position.copy(wc);
         scene.add(wire);
         const ax = new THREE.AxesHelper(sph.radius * 1.3);
-        ax.position.copy(sph.center);
+        ax.position.copy(wc);
         scene.add(ax);
       }
       dbgRender();
