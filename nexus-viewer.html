@@ -189,6 +189,7 @@ function dbgRender() {
     `frames render:   ${dbgState.frames}\n` +
     `renderBufferDir: ${dbgState.rbdCalls}  (>0 = traversal ativo)\n` +
     `nós carregados:  ${dbgState.nodesAvail} / ${dbgState.nodesTotal}\n` +
+    `targetError:     ${(window.__nx && window.__nx.cache && window.__nx.cache.getTargetError) ? window.__nx.cache.getTargetError().toFixed(2) : '-'}\n` +
     `${dbgCam()}` +
     (dbgState.errs.length ? `\nERROS:\n` + dbgState.errs.slice(-6).join('\n') : `\n(sem erros capturados)`);
 }
@@ -409,6 +410,20 @@ try {
   });
   dbgState.ctor = 'sim';
   dbgRender();
+
+  // ── Ajuste de LOD/cache (anti-flicker) via URL ──────────────────────────────
+  // ?error=N  → targetError em pixels (maior = LOD mais estável, menos thrashing)
+  // ?minfps=N → fps mínimo do controlador adaptativo
+  const cache = nexus.cache;
+  const _te = parseFloat(params.get('error'));
+  const _mf = parseFloat(params.get('minfps'));
+  if (cache) {
+    if (!isNaN(_te) && cache.setTargetError) cache.setTargetError(_te);
+    if (!isNaN(_mf) && cache.setMinFps)      cache.setMinFps(_mf);
+  }
+  // expõe internals p/ depuração ao vivo (ex.: window.__nx.cache.setTargetError(4))
+  window.__nx = { nexus, scene, camera, renderer, THREE, cache,
+                  setError: e => cache && cache.setTargetError && cache.setTargetError(e) };
 } catch (e) {
   dbgState.ctor = 'FALHOU';
   dbgErr('ctor', e);
