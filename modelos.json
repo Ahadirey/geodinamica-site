@@ -23,11 +23,11 @@
   },
   {
     "id": "modelo-mozara-2048",
-    "nome": "Modelo 3D Mozara 2048",
-    "descricao": "Aerolevantamento com Mavic 3 Enterprise · Textura 2048",
+    "nome": "Terreno rural",
+    "descricao": "Aerolevantamento",
     "arquivo": "modelo_mozara2048.glb",
     "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/modelo_mozara2048.glb",
-    "tipo": "topografia",
+    "tipo": "Topografia",
     "publico": true,
     "data": "2026-05-31",
     "vista": {
