@@ -151,21 +151,25 @@
   font:11px/1.45 monospace;color:#9fe;white-space:pre-wrap;"></pre>
 
 <script type="module">
-// three é carregado como módulo ESM; o nexus3D.js é um bundle UMD que lê o THREE
-// global e define window.Nexus3D — por isso expomos o THREE e carregamos a lib como
-// script clássico antes de usá-la.
+// Lib clássica do Nexus (Ponchio): nexus.js (core + streaming + corto) e
+// nexus_three.js (NexusObject). São scripts clássicos que usam o THREE global e
+// vinculam as texturas dos patches via GL cru (casam com o corto.worker.js).
+// nexus.js descobre o próprio caminho pelo src da tag <script>, então carregamos
+// por tag (não por blob/módulo).
 import * as THREE from 'https://esm.sh/three@0.160.0';
 window.THREE = THREE;
-await new Promise((resolve, reject) => {
-  const s = document.createElement('script');
-  s.src = './nexus3D.js';
-  s.onload = resolve;
-  s.onerror = () => reject(new Error('falha ao carregar nexus3D.js'));
-  document.head.appendChild(s);
-});
-// O bundle UMD expõe um objeto { Nexus3D: classe }; pega o construtor de dentro
-const _NX = window.Nexus3D;
-const Nexus3D = (typeof _NX === 'function') ? _NX : _NX.Nexus3D;
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = () => reject(new Error('falha ao carregar ' + src));
+    document.head.appendChild(s);
+  });
+}
+await loadScript('./nexus.js');          // define window.Nexus
+await loadScript('./nexus_three.js');    // define window.NexusObject
+const NexusObject = window.NexusObject;
 
 const params    = new URLSearchParams(window.location.search);
 const modelUrl  = params.get('modelo') || '';
@@ -183,13 +187,13 @@ function dbgRender() {
   dbgPanel.textContent =
     `NEXUS DEBUG\n` +
     `lib carregada:   ${dbgState.lib}\n` +
-    `Nexus3D criado:  ${dbgState.ctor}\n` +
+    `NexusObject:     ${dbgState.ctor}\n` +
     `onLoad disparou: ${dbgState.onLoad}\n` +
     `boundingSphere:  ${dbgState.sphere}\n` +
     `frames render:   ${dbgState.frames}\n` +
-    `renderBufferDir: ${dbgState.rbdCalls}  (>0 = traversal ativo)\n` +
+    `onAfterRender:   ${dbgState.rbdCalls}  (>0 = traversal ativo)\n` +
     `nós carregados:  ${dbgState.nodesAvail} / ${dbgState.nodesTotal}\n` +
-    `targetError:     ${(window.__nx && window.__nx.cache && window.__nx.cache.getTargetError) ? window.__nx.cache.getTargetError().toFixed(2) : '-'}\n` +
+    `targetError:     ${dbgTargetError()}\n` +
     `${dbgCam()}` +
     (dbgState.errs.length ? `\nERROS:\n` + dbgState.errs.slice(-6).join('\n') : `\n(sem erros capturados)`);
 }
@@ -199,6 +203,10 @@ function dbgCam() {
            `raio câmera:     ${spherical.radius.toFixed(1)}\n`;
   } catch (_) { return ''; }
 }
+function dbgTargetError() {
+  try { return window.Nexus.getTargetError(renderer.getContext()).toFixed(2); }
+  catch (_) { return '-'; }
+}
 function dbgErr(where, e) {
   const msg = `[${where}] ${e && e.message ? e.message : e}`;
   dbgState.errs.push(msg);
@@ -206,7 +214,7 @@ function dbgErr(where, e) {
   dbgRender();
 }
 if (DEBUG) {
-  dbgState.lib = (typeof Nexus3D === 'function') ? 'sim' : 'FALHOU';
+  dbgState.lib = (typeof NexusObject === 'function') ? 'sim' : 'FALHOU';
   window.addEventListener('error', ev => dbgErr('window', ev.error || ev.message));
   window.addEventListener('unhandledrejection', ev => dbgErr('promise', ev.reason));
   dbgRender();
@@ -342,7 +350,7 @@ function applyOrientation(mesh) {
 let centered = false;
 function centerModel(mesh) {
   if (centered) return;
-  const sphere = mesh.boundingSphere;   // Nexus3D expõe aqui (geometry é só placeholder)
+  const sphere = mesh.geometry && mesh.geometry.boundingSphere;  // clássico expõe aqui
   if (!sphere || !sphere.radius) return;
   centered = true;
   mesh.updateMatrixWorld(true);
@@ -356,30 +364,36 @@ function centerModel(mesh) {
   updateCamera();
 }
 
-let nexus;
+function countNodes(instance) {
+  try {
+    const m = instance.mesh; let loaded = 0;
+    for (let i = 0; i < m.nodesCount; i++) if (m.status[i] === 1) loaded++;
+    dbgState.nodesAvail = loaded; dbgState.nodesTotal = m.nodesCount;
+  } catch (_) {}
+}
+
+let nexusObj;
 try {
-  nexus = new Nexus3D(modelUrl, renderer, {
-    material,
-    onLoad: (mesh) => {
-      const sph = mesh.boundingSphere;
-      console.log('[nexus] onLoad — boundingSphere:', sph,
-                  'center:', sph?.center, 'radius:', sph?.radius);
+  const gl = renderer.getContext();
+  // API clássica: new NexusObject(url, onLoad, onUpdate, renderer, material)
+  nexusObj = new NexusObject(
+    modelUrl,
+    (mesh) => {                                  // onLoad — recebe o NexusObject
+      const sph = mesh.geometry.boundingSphere;
+      console.log('[nexus] onLoad — boundingSphere:', sph);
       dbgState.onLoad = 'sim';
       dbgState.sphere = sph
         ? `c(${sph.center.x.toFixed(1)},${sph.center.y.toFixed(1)},${sph.center.z.toFixed(1)}) r=${sph.radius?.toFixed(1)}`
         : 'NULL';
-      // conta as chamadas de renderBufferDirect = prova de que o traversal roda
-      if (typeof mesh.renderBufferDirect === 'function' && !mesh.__rbdWrapped) {
-        const orig = mesh.renderBufferDirect.bind(mesh);
-        mesh.renderBufferDirect = (...a) => { dbgState.rbdCalls++; return orig(...a); };
-        mesh.__rbdWrapped = true;
-      }
-      scene.add(mesh);
       applyOrientation(mesh);
       centerModel(mesh);
+      // conta chamadas de onAfterRender = prova de que o traversal/render roda
+      if (typeof mesh.onAfterRender === 'function' && !mesh.__aarWrapped) {
+        const origAAR = mesh.onAfterRender;
+        mesh.onAfterRender = function (...a) { dbgState.rbdCalls++; return origAAR.apply(this, a); };
+        mesh.__aarWrapped = true;
+      }
       if (DEBUG && sph && sph.radius) {
-        // marcador de posição/extensão do modelo: se aparecer mas o modelo não,
-        // o problema é streaming/material; se não aparecer nada, é câmera.
         const wc = sph.center.clone().applyMatrix4(mesh.matrixWorld);
         const wire = new THREE.Mesh(
           new THREE.SphereGeometry(sph.radius, 24, 16),
@@ -395,37 +409,32 @@ try {
       stage.textContent = 'Pronto';
       setTimeout(() => document.getElementById('loading').classList.add('hidden'), 500);
     },
-    onUpdate: (mesh) => {
-      centerModel(mesh);
-      if (mesh.mesh) { dbgState.nodesAvail = mesh.mesh.availableNodes; dbgState.nodesTotal = mesh.mesh.n_nodes; }
-      dbgRender();
-    },
-    onProgress: (mesh, available, total) => {
-      if (total > 0) {
-        const pct = Math.min(99, Math.round(available / total * 100));
-        bar.style.width = pct + '%';
+    (instance) => {                              // onUpdate — recebe a Instance
+      countNodes(instance);
+      const tot = dbgState.nodesTotal, av = dbgState.nodesAvail;
+      if (tot > 0) {
+        bar.style.width = Math.min(99, Math.round(av / tot * 100)) + '%';
         stage.textContent = 'Carregando detalhe...';
       }
-      dbgState.nodesAvail = available; dbgState.nodesTotal = total;
       dbgRender();
-    }
-  });
+    },
+    renderer,
+    material
+  );
+  scene.add(nexusObj);
   dbgState.ctor = 'sim';
   dbgRender();
 
-  // ── Ajuste de LOD/cache (anti-flicker) via URL ──────────────────────────────
-  // ?error=N  → targetError em pixels (maior = LOD mais estável, menos thrashing)
+  // ── Ajuste de LOD via URL ───────────────────────────────────────────────────
+  // ?error=N  → targetError em pixels (maior = LOD mais estável)
   // ?minfps=N → fps mínimo do controlador adaptativo
-  const cache = nexus.cache;
   const _te = parseFloat(params.get('error'));
   const _mf = parseFloat(params.get('minfps'));
-  if (cache) {
-    if (!isNaN(_te) && cache.setTargetError) cache.setTargetError(_te);
-    if (!isNaN(_mf) && cache.setMinFps)      cache.setMinFps(_mf);
-  }
-  // expõe internals p/ depuração ao vivo (ex.: window.__nx.cache.setTargetError(4))
-  window.__nx = { nexus, scene, camera, renderer, THREE, cache,
-                  setError: e => cache && cache.setTargetError && cache.setTargetError(e) };
+  if (!isNaN(_te)) window.Nexus.setTargetError(gl, _te);
+  if (!isNaN(_mf)) window.Nexus.setMinFps(gl, _mf);
+  // expõe internals p/ depuração ao vivo
+  window.__nx = { nexusObj, scene, camera, renderer, THREE, gl,
+                  setError: e => window.Nexus.setTargetError(gl, e) };
 } catch (e) {
   dbgState.ctor = 'FALHOU';
   dbgErr('ctor', e);
@@ -441,10 +450,8 @@ function animate() {
     renderer.render(scene, camera);
     dbgState.frames++;
     if (DEBUG) {
-      if (nexus && nexus.mesh) {
-        dbgState.nodesAvail = nexus.mesh.availableNodes;
-        dbgState.nodesTotal = nexus.mesh.n_nodes;
-      }
+      if (nexusObj && nexusObj.geometry && nexusObj.geometry.instance)
+        countNodes(nexusObj.geometry.instance);
       if (dbgState.frames % 30 === 0) dbgRender();
     }
   } catch (e) {
