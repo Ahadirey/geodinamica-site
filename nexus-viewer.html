@@ -157,7 +157,9 @@ await new Promise((resolve, reject) => {
   s.onerror = () => reject(new Error('falha ao carregar nexus3D.js'));
   document.head.appendChild(s);
 });
-const Nexus3D = window.Nexus3D;
+// O bundle UMD expõe um objeto { Nexus3D: classe }; pega o construtor de dentro
+const _NX = window.Nexus3D;
+const Nexus3D = (typeof _NX === 'function') ? _NX : _NX.Nexus3D;
 
 const params    = new URLSearchParams(window.location.search);
 const modelUrl  = params.get('modelo') || '';
