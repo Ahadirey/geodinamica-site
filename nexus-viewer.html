@@ -236,7 +236,7 @@ canvas.addEventListener('mouseup',    () => { isDragging = false; isPanning = fa
 canvas.addEventListener('mouseleave', () => { isDragging = false; isPanning = false; });
 canvas.addEventListener('contextmenu', e => e.preventDefault());
 canvas.addEventListener('wheel', e => {
-  spherical.radius = Math.max(0.05, Math.min(500, spherical.radius * (1 + e.deltaY * 0.0008)));
+  spherical.radius = Math.max(0.05, Math.min(50000, spherical.radius * (1 + e.deltaY * 0.0008)));
   updateCamera();
 }, { passive: true });
 
@@ -255,7 +255,7 @@ canvas.addEventListener('touchmove', e => {
   }
   if (e.touches.length === 2) {
     const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-    spherical.radius = Math.max(0.05, Math.min(500, spherical.radius * (1 - (dist - lastTouchDist) * 0.004)));
+    spherical.radius = Math.max(0.05, Math.min(50000, spherical.radius * (1 - (dist - lastTouchDist) * 0.004)));
     lastTouchDist = dist; updateCamera();
   }
 }, { passive: true });
@@ -275,12 +275,14 @@ const material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
 let centered = false;
 function centerModel(mesh) {
   if (centered) return;
-  if (!mesh.geometry || !mesh.geometry.boundingSphere) return;
+  const sphere = mesh.boundingSphere;   // Nexus3D expõe aqui (geometry é só placeholder)
+  if (!sphere || !sphere.radius) return;
   centered = true;
-  mesh.geometry.computeBoundingBox?.();
-  const sphere = mesh.geometry.boundingSphere;
   target.copy(sphere.center);
   spherical.radius = sphere.radius * 2.2;
+  camera.far  = Math.max(5000, sphere.radius * 50);
+  camera.near = Math.max(0.01, sphere.radius * 0.001);
+  camera.updateProjectionMatrix();
   updateCamera();
 }
 
