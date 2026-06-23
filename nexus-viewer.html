@@ -97,10 +97,6 @@
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
 
-<!-- Mapeia o specifier "three" usado internamente pelo nexus3D.js para o CDN -->
-<script type="importmap">
-{ "imports": { "three": "https://esm.sh/three@0.160.0" } }
-</script>
 </head>
 <body>
 
@@ -149,8 +145,19 @@
 <div class="geo-badge">geodinamicasa.com.br</div>
 
 <script type="module">
-import * as THREE from 'three';
-import { Nexus3D } from './nexus3D.js';
+// three é carregado como módulo ESM; o nexus3D.js é um bundle UMD que lê o THREE
+// global e define window.Nexus3D — por isso expomos o THREE e carregamos a lib como
+// script clássico antes de usá-la.
+import * as THREE from 'https://esm.sh/three@0.160.0';
+window.THREE = THREE;
+await new Promise((resolve, reject) => {
+  const s = document.createElement('script');
+  s.src = './nexus3D.js';
+  s.onload = resolve;
+  s.onerror = () => reject(new Error('falha ao carregar nexus3D.js'));
+  document.head.appendChild(s);
+});
+const Nexus3D = window.Nexus3D;
 
 const params    = new URLSearchParams(window.location.search);
 const modelUrl  = params.get('modelo') || '';
