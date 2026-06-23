@@ -144,6 +144,12 @@
 <div class="splat-badge">Malha multiresolução · Nexus</div>
 <div class="geo-badge">geodinamicasa.com.br</div>
 
+<!-- Painel de diagnóstico (ativa com ?debug=1) -->
+<pre id="dbg-panel" style="display:none;position:absolute;top:64px;right:12px;z-index:30;
+  width:340px;max-height:80vh;overflow:auto;margin:0;padding:10px 12px;
+  background:rgba(0,0,0,0.82);border:1px solid #67C187;border-radius:4px;
+  font:11px/1.45 monospace;color:#9fe;white-space:pre-wrap;"></pre>
+
 <script type="module">
 // three é carregado como módulo ESM; o nexus3D.js é um bundle UMD que lê o THREE
 // global e define window.Nexus3D — por isso expomos o THREE e carregamos a lib como
@@ -165,6 +171,45 @@ const params    = new URLSearchParams(window.location.search);
 const modelUrl  = params.get('modelo') || '';
 const modelName = params.get('nome')   || 'Modelo 3D';
 document.getElementById('model-title').textContent = modelName;
+
+// ─── DIAGNÓSTICO (ativa com ?debug=1) ─────────────────────────────────────────
+const DEBUG = params.has('debug');
+const dbgState = { lib:'?', ctor:'?', onLoad:'não', sphere:'-', frames:0,
+                   rbdCalls:0, nodesAvail:'-', nodesTotal:'-', errs:[] };
+const dbgPanel = document.getElementById('dbg-panel');
+function dbgRender() {
+  if (!DEBUG) return;
+  dbgPanel.style.display = 'block';
+  dbgPanel.textContent =
+    `NEXUS DEBUG\n` +
+    `lib carregada:   ${dbgState.lib}\n` +
+    `Nexus3D criado:  ${dbgState.ctor}\n` +
+    `onLoad disparou: ${dbgState.onLoad}\n` +
+    `boundingSphere:  ${dbgState.sphere}\n` +
+    `frames render:   ${dbgState.frames}\n` +
+    `renderBufferDir: ${dbgState.rbdCalls}  (>0 = traversal ativo)\n` +
+    `nós carregados:  ${dbgState.nodesAvail} / ${dbgState.nodesTotal}\n` +
+    `${dbgCam()}` +
+    (dbgState.errs.length ? `\nERROS:\n` + dbgState.errs.slice(-6).join('\n') : `\n(sem erros capturados)`);
+}
+function dbgCam() {
+  try {
+    return `target câmera:   ${target.x.toFixed(1)}, ${target.y.toFixed(1)}, ${target.z.toFixed(1)}\n` +
+           `raio câmera:     ${spherical.radius.toFixed(1)}\n`;
+  } catch (_) { return ''; }
+}
+function dbgErr(where, e) {
+  const msg = `[${where}] ${e && e.message ? e.message : e}`;
+  dbgState.errs.push(msg);
+  console.error(msg, e);
+  dbgRender();
+}
+if (DEBUG) {
+  dbgState.lib = (typeof Nexus3D === 'function') ? 'sim' : 'FALHOU';
+  window.addEventListener('error', ev => dbgErr('window', ev.error || ev.message));
+  window.addEventListener('unhandledrejection', ev => dbgErr('promise', ev.reason));
+  dbgRender();
+}
 
 const stage = document.getElementById('loading-stage');
 const bar   = document.getElementById('loading-bar');
@@ -291,22 +336,58 @@ try {
   nexus = new Nexus3D(modelUrl, renderer, {
     material,
     onLoad: (mesh) => {
+      const sph = mesh.boundingSphere;
+      console.log('[nexus] onLoad — boundingSphere:', sph,
+                  'center:', sph?.center, 'radius:', sph?.radius);
+      dbgState.onLoad = 'sim';
+      dbgState.sphere = sph
+        ? `c(${sph.center.x.toFixed(1)},${sph.center.y.toFixed(1)},${sph.center.z.toFixed(1)}) r=${sph.radius?.toFixed(1)}`
+        : 'NULL';
+      // conta as chamadas de renderBufferDirect = prova de que o traversal roda
+      if (typeof mesh.renderBufferDirect === 'function' && !mesh.__rbdWrapped) {
+        const orig = mesh.renderBufferDirect.bind(mesh);
+        mesh.renderBufferDirect = (...a) => { dbgState.rbdCalls++; return orig(...a); };
+        mesh.__rbdWrapped = true;
+      }
       scene.add(mesh);
       centerModel(mesh);
+      if (DEBUG && sph && sph.radius) {
+        // marcador de posição/extensão do modelo: se aparecer mas o modelo não,
+        // o problema é streaming/material; se não aparecer nada, é câmera.
+        const wire = new THREE.Mesh(
+          new THREE.SphereGeometry(sph.radius, 24, 16),
+          new THREE.MeshBasicMaterial({ color: 0x67C187, wireframe: true, transparent: true, opacity: 0.35 }));
+        wire.position.copy(sph.center);
+        scene.add(wire);
+        const ax = new THREE.AxesHelper(sph.radius * 1.3);
+        ax.position.copy(sph.center);
+        scene.add(ax);
+      }
+      dbgRender();
       bar.style.width = '100%';
       stage.textContent = 'Pronto';
       setTimeout(() => document.getElementById('loading').classList.add('hidden'), 500);
     },
-    onUpdate: (mesh) => { centerModel(mesh); },
+    onUpdate: (mesh) => {
+      centerModel(mesh);
+      if (mesh.mesh) { dbgState.nodesAvail = mesh.mesh.availableNodes; dbgState.nodesTotal = mesh.mesh.n_nodes; }
+      dbgRender();
+    },
     onProgress: (mesh, available, total) => {
       if (total > 0) {
         const pct = Math.min(99, Math.round(available / total * 100));
         bar.style.width = pct + '%';
         stage.textContent = 'Carregando detalhe...';
       }
+      dbgState.nodesAvail = available; dbgState.nodesTotal = total;
+      dbgRender();
     }
   });
+  dbgState.ctor = 'sim';
+  dbgRender();
 } catch (e) {
+  dbgState.ctor = 'FALHOU';
+  dbgErr('ctor', e);
   console.error(e);
   fail(modelUrl);
 }
@@ -315,7 +396,19 @@ try {
 // Render contínuo: o Nexus atualiza o nível de detalhe a cada frame conforme a câmera
 function animate() {
   requestAnimationFrame(animate);
-  renderer.render(scene, camera);
+  try {
+    renderer.render(scene, camera);
+    dbgState.frames++;
+    if (DEBUG) {
+      if (nexus && nexus.mesh) {
+        dbgState.nodesAvail = nexus.mesh.availableNodes;
+        dbgState.nodesTotal = nexus.mesh.n_nodes;
+      }
+      if (dbgState.frames % 30 === 0) dbgRender();
+    }
+  } catch (e) {
+    if (!animate.__erred) { animate.__erred = true; dbgErr('render', e); }
+  }
 }
 animate();
 
