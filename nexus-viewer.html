@@ -314,8 +314,15 @@ window.addEventListener('resize', () => {
 updateCamera();
 
 // ─── NEXUS (malha multiresolução com streaming) ───────────────────────────────
-// MeshBasicMaterial = unlit: mostra a textura fotogramétrica exatamente como exportada
+// MeshBasicMaterial = unlit: mostra a textura fotogramétrica exatamente como exportada.
+// IMPORTANTE: o material precisa de um `map` (mesmo placeholder) para a lib ativar o
+// caminho de textura — ela substitui este map pelas texturas de cada patch do Nexus.
+// Sem map, o modelo renderiza branco/sem textura.
 const material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
+const _dummyTex = new THREE.DataTexture(new Uint8Array([255, 255, 255, 255]), 1, 1, THREE.RGBAFormat);
+_dummyTex.colorSpace = THREE.SRGBColorSpace;
+_dummyTex.needsUpdate = true;
+material.map = _dummyTex;
 
 let centered = false;
 function centerModel(mesh) {
