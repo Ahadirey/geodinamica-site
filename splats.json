@@ -22,5 +22,16 @@
         -0.4444652759982633
       ]
     }
+  },
+  {
+    "id": "portico",
+    "nome": "Pórtico SJ",
+    "descricao": "Orbital",
+    "arquivo": "portico.ply",
+    "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/portico.ply",
+    "formato": "ply",
+    "tipo": "Gaussian ",
+    "publico": true,
+    "data": "2026-06-23"
   }
 ]
