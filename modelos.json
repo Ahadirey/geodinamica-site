@@ -86,5 +86,15 @@
       }
     },
     "thumb": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/thumb_rpab.jpg"
+  },
+  {
+    "id": "mozarahigh",
+    "nome": "Modelo 3D Mozara",
+    "descricao": "aero",
+    "arquivo": "mozarahigh.glb",
+    "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/mozarahigh.glb",
+    "tipo": "Topografia",
+    "publico": true,
+    "data": "2026-06-24"
   }
 ]
