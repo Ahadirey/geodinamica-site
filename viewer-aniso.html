@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geodinâmica – Visualizador 3D (teste anisotropia)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1e2422; color: #fff; font-family: 'DM Sans', sans-serif; height: 100vh; overflow: hidden; }
+
+  .topbar {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(to bottom, rgba(13,26,21,0.95) 0%, transparent 100%);
+  }
+  .topbar-brand { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+  .brand-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.95rem; letter-spacing: 0.04em; color: #fff; }
+  .brand-text span { color: #67C187; }
+  .topbar-info { position: absolute; left: 50%; transform: translateX(-50%); text-align: center; pointer-events: none; }
+  .model-name { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 600; color: #fff; margin-bottom: 0.1rem; }
+  .model-meta { font-size: 0.72rem; font-weight: 300; color: rgba(255,255,255,0.4); letter-spacing: 0.06em; text-transform: uppercase; }
+
+  #axis-gizmo {
+    position: absolute; bottom: 4.5rem; left: 1.5rem; z-index: 5;
+    width: 86px; height: 86px; border-radius: 50%;
+    cursor: grab; touch-action: none;
+  }
+  #axis-gizmo:active { cursor: grabbing; }
+  .back-btn {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.78rem; font-weight: 400; letter-spacing: 0.06em; text-transform: uppercase;
+    color: rgba(255,255,255,0.45); text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.1); padding: 0.45rem 1rem; border-radius: 2px; transition: all 0.2s;
+  }
+  .back-btn:hover { color: #fff; border-color: rgba(255,255,255,0.25); }
+  .back-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; }
+
+  #viewer-canvas { width: 100%; height: 100vh; display: block; }
+
+  #loading {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: #1e2422; z-index: 20; gap: 1.5rem; transition: opacity 0.6s ease;
+  }
+  #loading.hidden { opacity: 0; pointer-events: none; }
+  .loading-icon svg { width: 48px; height: 48px; animation: spin 2s linear infinite; }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .loading-text { font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+  .loading-bar-wrap { width: 160px; height: 2px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+  .loading-bar { height: 100%; background: #005849; width: 0%; transition: width 0.3s ease; border-radius: 2px; }
+
+  .controls-hint {
+    position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 1.5rem;
+    background: rgba(13,26,21,0.7); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 3px; padding: 0.6rem 1.25rem; backdrop-filter: blur(8px);
+    opacity: 1; transition: opacity 1s ease;
+  }
+  .controls-hint.fade { opacity: 0; }
+  .hint-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; font-weight: 300; color: rgba(255,255,255,0.4); }
+  .hint-key { font-size: 0.65rem; color: #67C187; border: 1px solid rgba(103,193,135,0.3); padding: 0.1rem 0.4rem; border-radius: 2px; }
+
+  .geo-badge {
+    position: absolute; bottom: 1.5rem; right: 1.5rem;
+    font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.08);
+    padding: 0.25rem 0.6rem; border-radius: 2px;
+  }
+
+  /* Painel de teste de anisotropia */
+  #aniso-panel {
+    position: absolute; top: 64px; left: 1.5rem; z-index: 15;
+    background: rgba(13,26,21,0.85); border: 1px solid #67C187; border-radius: 4px;
+    padding: 0.7rem 0.9rem; font-size: 0.8rem; line-height: 1.5;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+  #aniso-panel .lbl { font-family: 'Syne', sans-serif; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.45); }
+  #aniso-panel .val { font-size: 1.3rem; font-weight: 700; color: #67C187; }
+  #aniso-panel .hint { font-size: 0.68rem; color: rgba(255,255,255,0.4); margin-top: 0.25rem; }
+  #aniso-panel button {
+    margin-top: 0.5rem; width: 100%; cursor: pointer;
+    background: #005849; color: #fff; border: none; border-radius: 3px;
+    padding: 0.4rem 0.6rem; font-family: inherit; font-size: 0.78rem; letter-spacing: 0.04em;
+  }
+  #aniso-panel button:hover { background: #00735f; }
+
+  @media (max-width: 768px) {
+    .topbar { padding: 0.6rem 1rem; }
+    .topbar-info { display: none; }
+    .brand-text { font-size: 0.78rem; letter-spacing: 0.02em; }
+    .back-btn { font-size: 0.68rem; padding: 0.35rem 0.65rem; letter-spacing: 0.03em; }
+    #axis-gizmo { width: 60px; height: 60px; bottom: 3.5rem; left: 1rem; }
+    .geo-badge { display: none; }
+    .controls-hint { gap: 0.75rem; padding: 0.5rem 1rem; white-space: nowrap; }
+    .hint-item { font-size: 0.65rem; }
+    #aniso-panel { top: 56px; left: 1rem; }
+  }
+
+  #error-msg {
+    display: none; position: absolute; inset: 0;
+    flex-direction: column; align-items: center; justify-content: center;
+    gap: 1rem; background: #1e2422; z-index: 25;
+    color: rgba(255,255,255,0.5); font-size: 0.9rem; font-weight: 300;
+  }
+  #error-msg.visible { display: flex; }
+  #error-msg svg { width: 40px; height: 40px; stroke: rgba(255,255,255,0.2); }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="topbar">
+  <a href="modelos.html" class="topbar-brand">
+    <span class="brand-text">GEO<span>DINÂMICA</span></span>
+  </a>
+  <div class="topbar-info">
+    <div class="model-name" id="model-title">Modelo 3D</div>
+    <div class="model-meta">Teste de anisotropia</div>
+  </div>
+  <a href="modelos.html" class="back-btn">
+    <svg viewBox="0 0 16 16"><path d="M10 4l-4 4 4 4"/></svg>
+    Portfólio
+  </a>
+</div>
+
+<div id="aniso-panel">
+  <div class="lbl">Anisotropia</div>
+  <div><span class="val" id="aniso-val">—</span><span id="aniso-max" style="font-size:0.8rem;color:rgba(255,255,255,0.35)"></span></div>
+  <div class="hint">Tecla <b>A</b> alterna os níveis</div>
+  <button id="aniso-btn">Trocar nível (A)</button>
+</div>
+
+<div id="loading">
+  <div class="loading-icon">
+    <svg viewBox="0 0 48 48" fill="none" stroke="#005849" stroke-width="2" stroke-linecap="round">
+      <circle cx="24" cy="24" r="20" stroke="rgba(0,88,73,0.2)"/>
+      <path d="M24 4 A20 20 0 0 1 44 24"/>
+    </svg>
+  </div>
+  <div class="loading-text">Carregando modelo</div>
+  <div class="loading-bar-wrap"><div class="loading-bar" id="loading-bar"></div></div>
+</div>
+
+<div id="error-msg">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round">
+    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+  </svg>
+  Não foi possível carregar o modelo.
+  <span style="font-size:0.75rem;color:rgba(255,255,255,0.3)" id="error-detail"></span>
+</div>
+
+<canvas id="viewer-canvas"></canvas>
+
+<div class="controls-hint" id="controls-hint">
+  <div class="hint-item"><span class="hint-key">⟳</span> Arrastar para rotacionar</div>
+  <div class="hint-item"><span class="hint-key">⊕</span> Scroll para zoom</div>
+  <div class="hint-item"><span class="hint-key">A</span> Anisotropia</div>
+</div>
+
+<canvas id="axis-gizmo" width="86" height="86"></canvas>
+<div class="geo-badge">geodinamicasa.com.br</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const params = new URLSearchParams(window.location.search);
+const modelUrl = params.get('modelo') || 'https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/modelo.glb';
+const modelName = params.get('nome') || 'Modelo 3D';
+
+document.getElementById('model-title').textContent = modelName;
+
+if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+  document.getElementById('controls-hint').innerHTML = `
+    <div class="hint-item"><span class="hint-key">1 dedo</span> Rotacionar</div>
+    <div class="hint-item"><span class="hint-key">2 dedos</span> Zoom</div>
+  `;
+}
+setTimeout(() => document.getElementById('controls-hint').classList.add('fade'), 6000);
+
+// ─── RENDERER ─────────────────────────────────────────────────────────────────
+const canvas = document.getElementById('viewer-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.NoToneMapping;
+renderer.shadowMap.enabled = false;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1e2422);
+
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
+camera.position.set(0, 2, 5);
+
+const ambient = new THREE.AmbientLight(0xffffff, 1.0);
+scene.add(ambient);
+
+// ─── TESTE DE ANISOTROPIA ──────────────────────────────────────────────────────
+const MAX_ANISO = renderer.capabilities.getMaxAnisotropy();   // normalmente 16
+// níveis para comparar: 1 (desligada) → máximo do hardware
+const NIVEIS = [1, 2, 4, 8, MAX_ANISO].filter((v,i,a) => a.indexOf(v) === i);
+const texturas = [];                 // todas as texturas do modelo
+let nivelIdx = NIVEIS.length - 1;    // começa no máximo
+// permite forçar um nível inicial via URL: ?aniso=1 / 4 / 16 ...
+const anisoParam = parseFloat(params.get('aniso'));
+if (!isNaN(anisoParam)) {
+  const idx = NIVEIS.indexOf(anisoParam);
+  if (idx >= 0) nivelIdx = idx;
+}
+
+document.getElementById('aniso-max').textContent = '  (máx ' + MAX_ANISO + ')';
+
+function aplicarAniso() {
+  const nivel = NIVEIS[nivelIdx];
+  texturas.forEach(t => { t.anisotropy = nivel; t.needsUpdate = true; });
+  const el = document.getElementById('aniso-val');
+  el.textContent = (nivel === 1 ? '1 (desligada)' : nivel + 'x');
+}
+function cicloAniso() {
+  nivelIdx = (nivelIdx + 1) % NIVEIS.length;
+  aplicarAniso();
+}
+window.addEventListener('keydown', e => { if (e.key === 'a' || e.key === 'A') cicloAniso(); });
+document.getElementById('aniso-btn').addEventListener('click', cicloAniso);
+
+// ─── ORBIT CONTROLS ───────────────────────────────────────────────────────────
+let isDragging = false, isPanning = false;
+let prevMouse = { x: 0, y: 0 };
+let spherical = { theta: 0.3, phi: 1.0, radius: 5 };
+let target = new THREE.Vector3();
+let panOffset = new THREE.Vector3();
+
+function updateCamera() {
+  const x = spherical.radius * Math.sin(spherical.phi) * Math.sin(spherical.theta);
+  const y = spherical.radius * Math.cos(spherical.phi);
+  const z = spherical.radius * Math.sin(spherical.phi) * Math.cos(spherical.theta);
+  camera.position.set(target.x + x + panOffset.x, target.y + y + panOffset.y, target.z + z + panOffset.z);
+  camera.lookAt(target.x + panOffset.x, target.y + panOffset.y, target.z + panOffset.z);
+}
+
+canvas.addEventListener('mousedown', e => {
+  if (e.button === 2) isPanning = true; else isDragging = true;
+  prevMouse = { x: e.clientX, y: e.clientY };
+});
+canvas.addEventListener('mousemove', e => {
+  const dx = e.clientX - prevMouse.x, dy = e.clientY - prevMouse.y;
+  if (isDragging) {
+    spherical.theta -= dx * 0.005;
+    spherical.phi = Math.max(0.01, Math.min(Math.PI - 0.01, spherical.phi - dy * 0.005));
+  }
+  if (isPanning) {
+    const s = 0.003;
+    const sinT = Math.sin(spherical.theta), cosT = Math.cos(spherical.theta);
+    const sinP = Math.sin(spherical.phi),   cosP = Math.cos(spherical.phi);
+    panOffset.x += (-cosT * dx - sinT * cosP * dy) * s;
+    panOffset.y += (sinP * dy) * s;
+    panOffset.z += (sinT * dx - cosT * cosP * dy) * s;
+  }
+  prevMouse = { x: e.clientX, y: e.clientY };
+  updateCamera();
+});
+canvas.addEventListener('mouseup', () => { isDragging = false; isPanning = false; });
+canvas.addEventListener('mouseleave', () => { isDragging = false; isPanning = false; });
+canvas.addEventListener('contextmenu', e => e.preventDefault());
+canvas.addEventListener('wheel', e => {
+  spherical.radius = Math.max(0.5, Math.min(50, spherical.radius + e.deltaY * 0.003));
+  updateCamera();
+}, { passive: true });
+
+let lastTouchDist = 0;
+canvas.addEventListener('touchstart', e => {
+  if (e.touches.length === 1) { isDragging = true; prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }
+  if (e.touches.length === 2) lastTouchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+}, { passive: true });
+canvas.addEventListener('touchmove', e => {
+  if (e.touches.length === 1 && isDragging) {
+    const dx = e.touches[0].clientX - prevMouse.x, dy = e.touches[0].clientY - prevMouse.y;
+    spherical.theta -= dx * 0.005;
+    spherical.phi = Math.max(0.01, Math.min(Math.PI - 0.01, spherical.phi - dy * 0.005));
+    prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    updateCamera();
+  }
+  if (e.touches.length === 2) {
+    const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    spherical.radius = Math.max(0.5, Math.min(50, spherical.radius - (dist - lastTouchDist) * 0.02));
+    lastTouchDist = dist; updateCamera();
+  }
+}, { passive: true });
+canvas.addEventListener('touchend', () => { isDragging = false; });
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ─── GLB LOADER ───────────────────────────────────────────────────────────────
+function loadGLB(url) {
+  const s1 = document.createElement('script');
+  s1.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js';
+  s1.onload = () => {
+    const s2 = document.createElement('script');
+    s2.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js';
+    s2.onload = () => {
+      const dracoLoader = new THREE.DRACOLoader();
+      dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+      const loader = new THREE.GLTFLoader();
+      loader.setDRACOLoader(dracoLoader);
+      const bar = document.getElementById('loading-bar');
+
+      loader.load(url,
+        (gltf) => {
+          const model = gltf.scene;
+          const box = new THREE.Box3().setFromObject(model);
+          const center = box.getCenter(new THREE.Vector3());
+          const size = box.getSize(new THREE.Vector3());
+          const maxDim = Math.max(size.x, size.y, size.z);
+          const scale = 3 / maxDim;
+
+          model.scale.setScalar(scale);
+          model.position.sub(center.multiplyScalar(scale));
+          model.position.y -= (size.y * scale) / 2;
+
+          model.traverse(node => {
+            if (!node.isMesh) return;
+            const mats = Array.isArray(node.material) ? node.material : [node.material];
+            mats.forEach(mat => {
+              if (mat.map) {
+                mat.map.encoding = THREE.sRGBEncoding;
+                // garante filtro com mipmap (necessário p/ anisotropia funcionar)
+                mat.map.minFilter = THREE.LinearMipMapLinearFilter;
+                mat.map.magFilter = THREE.LinearFilter;
+                mat.map.generateMipmaps = true;
+                mat.map.needsUpdate = true;
+                if (texturas.indexOf(mat.map) === -1) texturas.push(mat.map);
+              }
+              const basic = new THREE.MeshBasicMaterial({
+                map: mat.map,
+                side: THREE.DoubleSide,
+                transparent: mat.transparent || false,
+                alphaTest: mat.alphaTest || 0,
+              });
+              if (Array.isArray(node.material)) {
+                const idx = node.material.indexOf(mat);
+                node.material[idx] = basic;
+              } else {
+                node.material = basic;
+              }
+            });
+          });
+
+          aplicarAniso();   // aplica o nível inicial às texturas coletadas
+
+          scene.add(model);
+          spherical.radius = maxDim * scale * 1.4;
+          updateCamera();
+
+          bar.style.width = '100%';
+          setTimeout(() => document.getElementById('loading').classList.add('hidden'), 400);
+        },
+        (progress) => { if (progress.total > 0) bar.style.width = (progress.loaded / progress.total * 100) + '%'; },
+        (error) => {
+          console.error(error);
+          document.getElementById('loading').classList.add('hidden');
+          document.getElementById('error-msg').classList.add('visible');
+          document.getElementById('error-detail').textContent = url;
+        }
+      );
+    };
+    document.head.appendChild(s2);
+  };
+  document.head.appendChild(s1);
+}
+
+loadGLB(modelUrl);
+updateCamera();
+aplicarAniso();
+
+function animate() { requestAnimationFrame(animate); renderer.render(scene, camera); }
+animate();
+
+// ─── GIZMO ────────────────────────────────────────────────────────────────────
+(function initGizmo() {
+  const g = document.getElementById('axis-gizmo');
+  const ctx = g.getContext('2d');
+  const W = g.width, H = g.height, cx = W/2, cy = H/2, LEN = 28;
+
+  let ox = 0, oy = 0, dragging = false;
+  g.addEventListener('pointerdown', e => {
+    dragging = true;
+    ox = e.clientX - g.offsetLeft;
+    oy = e.clientY - g.offsetTop;
+    g.setPointerCapture(e.pointerId);
+    e.stopPropagation();
+  });
+  window.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    g.style.left = (e.clientX - ox) + 'px';
+    g.style.top  = (e.clientY - oy) + 'px';
+    g.style.bottom = 'auto'; g.style.right = 'auto';
+  });
+  window.addEventListener('pointerup', () => { dragging = false; });
+
+  function drawGizmo() {
+    camera.updateMatrixWorld();
+    const e = camera.matrixWorldInverse.elements;
+    const axes = [
+      { sx: e[0], sy: e[1], sz: e[2],  color: '#ff4444', label: 'X' },
+      { sx: e[4], sy: e[5], sz: e[6],  color: '#44dd55', label: 'Y' },
+      { sx: e[8], sy: e[9], sz: e[10], color: '#4488ff', label: 'Z' },
+    ];
+    axes.sort((a, b) => a.sz - b.sz);
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.beginPath();
+    ctx.arc(cx, cy, cx - 1, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(13,26,21,0.65)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    axes.forEach(ax => {
+      const behind = ax.sz > 0;
+      const alpha  = behind ? 0.3 : 0.92;
+      const ex = cx + ax.sx * LEN;
+      const ey = cy - ax.sy * LEN;
+
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = ax.color;
+      ctx.lineWidth   = behind ? 1.2 : 2;
+      if (behind) ctx.setLineDash([3, 3]); else ctx.setLineDash([]);
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(ex, ey); ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.beginPath();
+      ctx.arc(ex, ey, behind ? 2 : 3, 0, Math.PI * 2);
+      ctx.fillStyle = ax.color; ctx.fill();
+
+      ctx.font = 'bold 9px sans-serif';
+      ctx.fillStyle = ax.color;
+      const lx = ex + (ax.sx >= 0 ? 4 : -11);
+      const ly = ey + (ax.sy <= 0 ? -3 :  10);
+      ctx.fillText(ax.label, lx, ly);
+      ctx.globalAlpha = 1;
+    });
+    requestAnimationFrame(drawGizmo);
+  }
+  drawGizmo();
+})();
+</script>
+</body>
+</html>
