@@ -67,11 +67,11 @@
   },
   {
     "id": "rpab",
-    "nome": "RPAB",
-    "descricao": "model",
+    "nome": "Terreno rural",
+    "descricao": "Aerolevantamento Planialtimétrico",
     "arquivo": "rpab.glb",
     "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/rpab.glb",
-    "tipo": "topografia",
+    "tipo": "Topografia 3D",
     "publico": true,
     "data": "2026-06-10",
     "vista": {
