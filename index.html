@@ -92,6 +92,7 @@
   .btn-ghost:hover { color: var(--branco); }
   .btn-ghost svg { transition: transform 0.2s; }
   .btn-ghost:hover svg { transform: translateX(3px); }
+  .hero-cta-mobile { display: none; }  /* só aparece no mobile */
 
   /* ─── PHONE MOCKUP (25% maior) ─────────────────────────── */
   .hero-phone-wrap {
@@ -350,6 +351,19 @@
   @media (max-width: 900px) {
     nav { padding: 1rem 1.5rem; }
     .nav-links { display: none; }
+    .nav-cta { display: none; }  /* removido do topo no mobile */
+    /* Botões da hero empilhados, todos como caixa verde */
+    .hero-actions { flex-direction: column; align-items: stretch; gap: 0.9rem; }
+    .hero-actions .btn-primary { text-align: center; }
+    .hero-cta-mobile { display: block; }
+    .btn-ghost {
+      justify-content: center;
+      background: var(--verde);
+      color: #ffffff;
+      font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 0.9rem 2rem; border-radius: 2px;
+    }
+    .btn-ghost svg { display: none; }
     .hero { grid-template-columns: 1fr; padding: 0 1.5rem; }
     .hero-phone-wrap { display: none; }
     .hero h1 { font-size: clamp(1.9rem, 8vw, 2.8rem); }
@@ -389,11 +403,12 @@
     <div class="hero-actions">
       <a href="#servicos" class="btn-primary">Ver serviços</a>
       <a href="modelos.html" class="btn-ghost">
-        Modelos 3D
+        Portfólio 3D
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 8h10M9 4l4 4-4 4"/>
         </svg>
       </a>
+      <a href="#contato" class="btn-primary hero-cta-mobile">Solicitar orçamento</a>
     </div>
   </div>
 
@@ -607,7 +622,7 @@
     <div class="contato-items">
       <a href="https://wa.me/554991676406" class="contato-item">
         <div class="contato-item-icon"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></div>
-        (49) 9 9167-6406
+        (49) 9 9167-6406 (link WhatsApp)
       </a>
       <a href="mailto:geodinamica@hotmail.com" class="contato-item">
         <div class="contato-item-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
