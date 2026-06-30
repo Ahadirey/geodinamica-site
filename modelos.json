@@ -95,6 +95,19 @@
     "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/mozarahigh.glb",
     "tipo": "Topografia",
     "publico": true,
-    "data": "2026-06-24"
+    "data": "2026-06-24",
+    "vista": {
+      "spherical": {
+        "theta": 1.4349999999999974,
+        "phi": 1.11,
+        "radius": 2.7
+      },
+      "panOffset": {
+        "x": 0.1989580227264666,
+        "y": -0.8746476650268094,
+        "z": 0.1862368579415065
+      }
+    },
+    "thumb": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/thumb_mozarahigh.jpg"
   }
 ]
