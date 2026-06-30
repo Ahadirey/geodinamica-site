@@ -2,11 +2,11 @@
   {
     "id": "modelo",
     "nome": "Lote urbano SJ",
-    "descricao": "Aerolevantamento",
+    "descricao": "Aerolevantamento Planialtimétrico",
     "arquivo": "modelo.splat",
     "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/modelo.splat",
     "formato": "splat",
-    "tipo": "Topografia",
+    "tipo": "Topografia 3D",
     "publico": true,
     "data": "2026-06-08",
     "thumb": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/thumb_modelo.jpg",
