@@ -24,10 +24,10 @@
   {
     "id": "modelo-mozara-2048",
     "nome": "Terreno rural",
-    "descricao": "Aerolevantamento",
+    "descricao": "Aerolevantamento Planialtimétrico",
     "arquivo": "modelo_mozara2048.glb",
     "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/modelo_mozara2048.glb",
-    "tipo": "Topografia",
+    "tipo": "Topografia 3D",
     "publico": true,
     "data": "2026-05-31",
     "vista": {
