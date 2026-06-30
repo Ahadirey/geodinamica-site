@@ -330,6 +330,11 @@ function loadGLB(url) {
           model.position.sub(center.multiplyScalar(scale));
           model.position.y -= (size.y * scale) / 2;
 
+          // Pivô da rotação no CENTRO do modelo (não no topo).
+          // Sem isto, ao dar zoom a câmera orbita em torno do topo e o
+          // terreno "arrasta" pela tela em vez de apenas inclinar.
+          target.set(0, -(size.y * scale) / 2, 0);
+
           const maxAniso = renderer.capabilities.getMaxAnisotropy();
 
           model.traverse(node => {
