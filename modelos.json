@@ -89,11 +89,11 @@
   },
   {
     "id": "mozarahigh",
-    "nome": "Modelo 3D Mozara",
-    "descricao": "aero",
+    "nome": "Terreno rural",
+    "descricao": "Aerolevantamento Planialtimétrico",
     "arquivo": "mozarahigh.glb",
     "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/mozarahigh.glb",
-    "tipo": "Topografia",
+    "tipo": "Topografia 3D",
     "publico": true,
     "data": "2026-06-24",
     "vista": {
