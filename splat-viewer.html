@@ -389,6 +389,7 @@ viewer.addSplatScene(splatUrl, {
     let drag = null;
     const activePointers = new Map(); // pointerId → {x, y}
     let lastPinchDist = null;
+    let lastPinchMid = null;
 
     canvas.addEventListener('pointerdown', (e) => {
       e.preventDefault();
@@ -402,6 +403,7 @@ viewer.addSplatScene(splatUrl, {
         drag = null; // cancela orbit ao iniciar pinça
         const pts = [...activePointers.values()];
         lastPinchDist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+        lastPinchMid = { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 };
       }
     });
 
@@ -409,15 +411,26 @@ viewer.addSplatScene(splatUrl, {
       if (!activePointers.has(e.pointerId)) return;
       activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
-      // PINCH-TO-ZOOM (2 dedos)
+      // 2 dedos: pinça → zoom  +  arrastar → pan
       if (activePointers.size === 2) {
         const pts = [...activePointers.values()];
         const dist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+        const midx = (pts[0].x + pts[1].x) / 2, midy = (pts[0].y + pts[1].y) / 2;
         if (lastPinchDist !== null) {
           radius = Math.max(0.1, Math.min(3, radius - (dist - lastPinchDist) * 0.008));
-          applyCamera();
+        }
+        if (lastPinchMid !== null) {
+          const dx = midx - lastPinchMid.x, dy = midy - lastPinchMid.y;
+          const s = radius * 0.001;
+          const sinT = Math.sin(theta), cosT = Math.cos(theta);
+          const sinP = Math.sin(phi),   cosP = Math.cos(phi);
+          T.x += ( sinT * dx - cosP * cosT * dy) * s;
+          T.y += (-cosT * dx - cosP * sinT * dy) * s;
+          T.z += ( sinP * dy) * s;
         }
         lastPinchDist = dist;
+        lastPinchMid = { x: midx, y: midy };
+        applyCamera();
         return;
       }
 
@@ -427,14 +440,14 @@ viewer.addSplatScene(splatUrl, {
       drag.lastX = e.clientX;
       drag.lastY = e.clientY;
 
-      if (drag.button === 0 || drag.button === 1) {
-        // ORBIT turntable Z-up
+      if (drag.button === 0) {
+        // Botão esquerdo = ORBIT turntable Z-up (rotaciona/inclina)
         theta -= dx * 0.005;
         phi = Math.max(0.05, Math.min(Math.PI / 2, phi - dy * 0.005));
         applyCamera();
 
-      } else if (drag.button === 2) {
-        // PAN Z-up
+      } else {
+        // Botão do meio (scroll-click) ou direito = PAN Z-up (arrasta)
         const s = radius * 0.001;
         const sinT = Math.sin(theta), cosT = Math.cos(theta);
         const sinP = Math.sin(phi),   cosP = Math.cos(phi);
@@ -451,12 +464,12 @@ viewer.addSplatScene(splatUrl, {
     canvas.addEventListener('pointerup', (e) => {
       activePointers.delete(e.pointerId);
       if (drag?.button === e.button) drag = null;
-      if (activePointers.size < 2) lastPinchDist = null;
+      if (activePointers.size < 2) { lastPinchDist = null; lastPinchMid = null; }
     });
     canvas.addEventListener('pointerout', (e) => {
       activePointers.delete(e.pointerId);
       if (activePointers.size === 0) drag = null;
-      if (activePointers.size < 2) lastPinchDist = null;
+      if (activePointers.size < 2) { lastPinchDist = null; lastPinchMid = null; }
     });
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
