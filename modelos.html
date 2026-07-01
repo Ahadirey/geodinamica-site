@@ -9,7 +9,7 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --verde: #005849;
-    --verde-claro: #67C187;
+    --verde-claro: #3FBF8F;
     --pedra: #222825;
     --branco: #ffffff;
   }
@@ -29,6 +29,18 @@
   .nav-logo svg { width: 32px; height: 32px; }
   .nav-logo-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; letter-spacing: 0.04em; color: #fff; }
   .nav-logo-text span { color: var(--verde-claro); }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.82rem; font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase;
+    color: rgba(255,255,255,0.55); text-decoration: none; transition: color 0.2s;
+    position: relative; padding-bottom: 3px;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; left: 0; bottom: 0; height: 1px; width: 0;
+    background: var(--verde-claro); transition: width 0.25s ease;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--verde-claro); }
+  .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
   .nav-back {
     display: flex; align-items: center; gap: 0.5rem;
     font-size: 0.78rem; font-weight: 400; letter-spacing: 0.06em; text-transform: uppercase;
@@ -162,6 +174,9 @@
   .footer-text { font-size: 0.72rem; font-weight: 300; color: rgba(255,255,255,0.22); }
   .crea-badge { font-size: 0.68rem; color: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.08); padding: 0.25rem 0.6rem; border-radius: 2px; }
 
+  @media (max-width: 900px) {
+    .nav-links { display: none; }
+  }
   @media (max-width: 768px) {
     nav, .page-header, .section-block, .modelos-grid-wrap, footer { padding-left: 1.5rem; padding-right: 1.5rem; }
     .modelos-grid { grid-template-columns: 1fr; }
@@ -174,6 +189,12 @@
   <a href="index.html" class="nav-logo">
     <span class="nav-logo-text">GEO<span>DINÂMICA</span></span>
   </a>
+  <ul class="nav-links">
+    <li><a href="index.html#servicos">Serviços</a></li>
+    <li><a href="modelos.html" class="active">Portfólio 3D</a></li>
+    <li><a href="index.html#sobre">Sobre</a></li>
+    <li><a href="index.html#contato">Contato</a></li>
+  </ul>
   <a href="index.html" class="nav-back">
     <svg viewBox="0 0 16 16"><path d="M10 4l-4 4 4 4"/></svg>
     Voltar ao site

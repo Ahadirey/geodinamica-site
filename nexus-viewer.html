@@ -16,7 +16,7 @@
   }
   .topbar-brand { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
   .brand-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.95rem; letter-spacing: 0.04em; color: #fff; }
-  .brand-text span { color: #67C187; }
+  .brand-text span { color: #3FBF8F; }
   .topbar-info { position: absolute; left: 50%; transform: translateX(-50%); text-align: center; pointer-events: none; }
   .model-name { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 600; color: #fff; margin-bottom: 0.1rem; }
   .model-meta { font-size: 0.72rem; font-weight: 300; color: rgba(255,255,255,0.4); letter-spacing: 0.06em; text-transform: uppercase; }
@@ -49,18 +49,26 @@
   .loading-text { font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
   .loading-sub { font-size: 0.72rem; font-weight: 300; color: rgba(255,255,255,0.25); letter-spacing: 0.06em; }
   .loading-bar-wrap { width: 160px; height: 2px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
-  .loading-bar { height: 100%; background: #005849; width: 0%; transition: width 0.3s ease; border-radius: 2px; }
+  .loading-bar { height: 100%; background: #3FBF8F; width: 0%; transition: width 0.3s ease; border-radius: 2px; }
 
   .controls-hint {
     position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
-    display: flex; gap: 1.5rem;
+    display: flex; gap: 1.6rem; align-items: center;
     background: rgba(13,26,21,0.7); border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 3px; padding: 0.6rem 1.25rem; backdrop-filter: blur(8px);
-    opacity: 1; transition: opacity 1s ease; z-index: 5;
+    border-radius: 6px; padding: 0.55rem 1.2rem; backdrop-filter: blur(8px);
+    opacity: 1; transition: opacity 0.8s ease; pointer-events: none; z-index: 6;
   }
-  .controls-hint.fade { opacity: 0; }
-  .hint-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; font-weight: 300; color: rgba(255,255,255,0.4); }
-  .hint-key { font-size: 0.65rem; color: #67C187; border: 1px solid rgba(103,193,135,0.3); padding: 0.1rem 0.4rem; border-radius: 2px; }
+  .controls-hint.fade { opacity: 0.32; }
+  .hint-item { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+  .hint-item svg { width: 26px; height: 26px; display: block; }
+  .hint-item .g-stroke { fill: none; stroke: #3FBF8F; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .hint-item .g-fill { fill: rgba(63,191,143,0.28); stroke: none; }
+  .hint-label { font-size: 0.6rem; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+  .hint-touch { display: none; }
+  @media (hover: none) and (pointer: coarse) {
+    .hint-desktop { display: none; }
+    .hint-touch { display: flex; }
+  }
 
   .geo-badge {
     position: absolute; bottom: 1.5rem; right: 1.5rem; z-index: 5;
@@ -71,7 +79,7 @@
   .splat-badge {
     position: absolute; bottom: 1.5rem; left: 1.5rem; z-index: 5;
     font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase;
-    color: #67C187; border: 1px solid rgba(103,193,135,0.2);
+    color: #3FBF8F; border: 1px solid rgba(63,191,143,0.25);
     background: rgba(0,40,30,0.6); padding: 0.25rem 0.6rem; border-radius: 2px;
   }
 
@@ -82,8 +90,9 @@
     .back-btn { font-size: 0.68rem; padding: 0.35rem 0.65rem; letter-spacing: 0.03em; }
     #axis-gizmo { width: 60px; height: 60px; bottom: 3.5rem; left: 1rem; }
     .geo-badge, .splat-badge { display: none; }
-    .controls-hint { gap: 0.75rem; padding: 0.5rem 1rem; white-space: nowrap; }
-    .hint-item { font-size: 0.65rem; }
+    .controls-hint { gap: 1.1rem; padding: 0.45rem 0.9rem; bottom: 1.2rem; }
+    .hint-item svg { width: 23px; height: 23px; }
+    .hint-label { font-size: 0.55rem; }
   }
 
   #error-msg {
@@ -116,8 +125,8 @@
 
 <div id="loading">
   <div class="loading-icon">
-    <svg viewBox="0 0 48 48" fill="none" stroke="#005849" stroke-width="2" stroke-linecap="round">
-      <circle cx="24" cy="24" r="20" stroke="rgba(0,88,73,0.2)"/>
+    <svg viewBox="0 0 48 48" fill="none" stroke="#3FBF8F" stroke-width="2" stroke-linecap="round">
+      <circle cx="24" cy="24" r="20" stroke="rgba(63,191,143,0.2)"/>
       <path d="M24 4 A20 20 0 0 1 44 24"/>
     </svg>
   </div>
@@ -135,9 +144,68 @@
 <canvas id="viewer-canvas"></canvas>
 
 <div class="controls-hint" id="controls-hint">
-  <div class="hint-item"><span class="hint-key">⟳</span> Arrastar para rotacionar</div>
-  <div class="hint-item"><span class="hint-key">⊕</span> Scroll para zoom</div>
-  <div class="hint-item"><span class="hint-key">⇥</span> Botão direito para mover</div>
+  <div class="hint-item hint-desktop">
+    <svg viewBox="0 0 24 26" aria-hidden="true">
+      <path class="g-fill" d="M7 9.5V7A5 5 0 0 1 12 2V9.5Z"/>
+      <rect class="g-stroke" x="7" y="2" width="10" height="20" rx="5"/>
+      <line class="g-stroke" x1="7" y1="9.5" x2="17" y2="9.5"/>
+      <line class="g-stroke" x1="12" y1="2" x2="12" y2="9.5"/>
+    </svg>
+    <span class="hint-label">Girar</span>
+  </div>
+  <div class="hint-item hint-desktop">
+    <svg viewBox="0 0 24 26" aria-hidden="true">
+      <path class="g-fill" d="M12 2A5 5 0 0 1 17 7V9.5H12Z"/>
+      <rect class="g-stroke" x="7" y="2" width="10" height="20" rx="5"/>
+      <line class="g-stroke" x1="7" y1="9.5" x2="17" y2="9.5"/>
+      <line class="g-stroke" x1="12" y1="2" x2="12" y2="9.5"/>
+    </svg>
+    <span class="hint-label">Mover</span>
+  </div>
+  <div class="hint-item hint-desktop">
+    <svg viewBox="0 0 24 26" aria-hidden="true">
+      <rect class="g-stroke" x="7" y="2" width="10" height="20" rx="5"/>
+      <line class="g-stroke" x1="7" y1="9.5" x2="17" y2="9.5"/>
+      <rect class="g-fill" x="11" y="3.6" width="2" height="4" rx="1"/>
+      <rect class="g-stroke" x="11" y="3.6" width="2" height="4" rx="1"/>
+      <path class="g-stroke" d="M19.6 6.4l1.4-1.6 1.4 1.6"/>
+      <path class="g-stroke" d="M19.6 17.6l1.4 1.6 1.4-1.6"/>
+    </svg>
+    <span class="hint-label">Zoom</span>
+  </div>
+  <div class="hint-item hint-touch">
+    <svg viewBox="0 0 26 26" aria-hidden="true">
+      <circle class="g-fill" cx="13" cy="14.5" r="2.6"/>
+      <circle class="g-stroke" cx="13" cy="14.5" r="2.6"/>
+      <path class="g-stroke" d="M6.8 12.2A7 7 0 1 1 6.6 16.4"/>
+      <path class="g-stroke" d="M6.8 12.2l2.7 0.2M6.8 12.2l-0.5 2.7"/>
+    </svg>
+    <span class="hint-label">Girar</span>
+  </div>
+  <div class="hint-item hint-touch">
+    <svg viewBox="0 0 26 26" aria-hidden="true">
+      <circle class="g-fill" cx="10" cy="11" r="2.4"/>
+      <circle class="g-stroke" cx="10" cy="11" r="2.4"/>
+      <circle class="g-fill" cx="16" cy="11" r="2.4"/>
+      <circle class="g-stroke" cx="16" cy="11" r="2.4"/>
+      <path class="g-stroke" d="M4.5 18.5H21.5"/>
+      <path class="g-stroke" d="M4.5 18.5l2.4-1.8M4.5 18.5l2.4 1.8"/>
+      <path class="g-stroke" d="M21.5 18.5l-2.4-1.8M21.5 18.5l-2.4 1.8"/>
+    </svg>
+    <span class="hint-label">Mover</span>
+  </div>
+  <div class="hint-item hint-touch">
+    <svg viewBox="0 0 26 26" aria-hidden="true">
+      <circle class="g-fill" cx="7.5" cy="7.5" r="2.3"/>
+      <circle class="g-stroke" cx="7.5" cy="7.5" r="2.3"/>
+      <circle class="g-fill" cx="18.5" cy="18.5" r="2.3"/>
+      <circle class="g-stroke" cx="18.5" cy="18.5" r="2.3"/>
+      <path class="g-stroke" d="M10.6 10.6L15.4 15.4"/>
+      <path class="g-stroke" d="M10.6 10.6H13.4M10.6 10.6V13.4"/>
+      <path class="g-stroke" d="M15.4 15.4H12.6M15.4 15.4V12.6"/>
+    </svg>
+    <span class="hint-label">Zoom</span>
+  </div>
 </div>
 
 <canvas id="axis-gizmo" width="86" height="86"></canvas>
@@ -223,11 +291,7 @@ if (DEBUG) {
 const stage = document.getElementById('loading-stage');
 const bar   = document.getElementById('loading-bar');
 
-if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-  document.getElementById('controls-hint').innerHTML = `
-    <div class="hint-item"><span class="hint-key">1 dedo</span> Rotacionar</div>
-    <div class="hint-item"><span class="hint-key">2 dedos</span> Zoom</div>`;
-}
+// Tutorial de controles: desktop x toque tratado por CSS (@media pointer: coarse)
 setTimeout(() => document.getElementById('controls-hint').classList.add('fade'), 5000);
 
 function fail(detail) {
