@@ -59,7 +59,7 @@
   }
   .controls-hint.fade { opacity: 0.32; }
   .hint-item { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
-  .hint-item svg { height: 30px; width: auto; display: block; }
+  .hint-item img { height: 30px; width: auto; display: block; }
   .hint-item .g-stroke { fill: none; stroke: #3FBF8F; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
   .hint-item .g-fill { fill: rgba(63,191,143,0.28); stroke: none; }
   .hint-item .g-solid { fill: #3FBF8F; stroke: none; }
@@ -102,7 +102,7 @@
     #axis-gizmo { width: 60px; height: 60px; bottom: 3.5rem; left: 1rem; }
     .geo-badge { display: none; }
     .controls-hint { gap: 1.1rem; padding: 0.45rem 0.9rem; bottom: 1.2rem; }
-    .hint-item svg { height: 26px; width: auto; }
+    .hint-item img { height: 26px; width: auto; }
     .hint-label { font-size: 0.55rem; }
     #aniso-panel { top: 56px; left: 1rem; }
   }
@@ -164,70 +164,27 @@
 
 <div class="controls-hint" id="controls-hint">
   <div class="hint-item hint-desktop">
-    <svg viewBox="0 0 30 40" aria-hidden="true">
-      <path class="g-stroke" d="M12 6L9 3"/>
-      <path class="g-stroke" d="M10.5 6.8L7.5 3.8"/>
-      <path class="g-stroke" d="M9 7.6L6 4.6"/>
-      <path class="g-solid" d="M7 20V16A8 8 0 0 1 15 8V20Z"/>
-      <rect class="g-stroke" x="7" y="8" width="16" height="30" rx="8"/>
-      <line class="g-stroke" x1="7" y1="20" x2="23" y2="20"/>
-      <line class="g-stroke" x1="15" y1="8" x2="15" y2="20"/>
-    </svg>
+    <img class="hint-img" src="desktop-girar.png" alt="">
     <span class="hint-label">Girar</span>
   </div>
   <div class="hint-item hint-desktop">
-    <svg viewBox="0 0 30 40" aria-hidden="true">
-      <path class="g-stroke" d="M18 6L21 3"/>
-      <path class="g-stroke" d="M19.5 6.8L22.5 3.8"/>
-      <path class="g-stroke" d="M21 7.6L24 4.6"/>
-      <path class="g-solid" d="M15 8A8 8 0 0 1 23 16V20H15Z"/>
-      <rect class="g-stroke" x="7" y="8" width="16" height="30" rx="8"/>
-      <line class="g-stroke" x1="7" y1="20" x2="23" y2="20"/>
-      <line class="g-stroke" x1="15" y1="8" x2="15" y2="20"/>
-    </svg>
+    <img class="hint-img" src="desktop-mover.png" alt="">
     <span class="hint-label">Mover</span>
   </div>
   <div class="hint-item hint-desktop">
-    <svg viewBox="0 0 30 40" aria-hidden="true">
-      <rect class="g-stroke" x="7" y="8" width="16" height="30" rx="8"/>
-      <line class="g-stroke" x1="7" y1="20" x2="23" y2="20"/>
-      <rect class="g-solid" x="13.5" y="10" width="3" height="7" rx="1.5"/>
-      <path class="g-stroke" d="M25 12.5L26.6 10.5 28.2 12.5"/>
-      <path class="g-stroke" d="M25 20.5L26.6 22.5 28.2 20.5"/>
-    </svg>
+    <img class="hint-img" src="desktop-zoom.png" alt="">
     <span class="hint-label">Zoom</span>
   </div>
   <div class="hint-item hint-touch">
-    <svg viewBox="0 0 26 26" aria-hidden="true">
-      <circle class="g-fill" cx="13" cy="14.5" r="2.6"/>
-      <circle class="g-stroke" cx="13" cy="14.5" r="2.6"/>
-      <path class="g-stroke" d="M6.8 12.2A7 7 0 1 1 6.6 16.4"/>
-      <path class="g-stroke" d="M6.8 12.2l2.7 0.2M6.8 12.2l-0.5 2.7"/>
-    </svg>
+    <img class="hint-img" src="mobile-girar.png" alt="">
     <span class="hint-label">Girar</span>
   </div>
   <div class="hint-item hint-touch">
-    <svg viewBox="0 0 26 26" aria-hidden="true">
-      <circle class="g-fill" cx="10" cy="11" r="2.4"/>
-      <circle class="g-stroke" cx="10" cy="11" r="2.4"/>
-      <circle class="g-fill" cx="16" cy="11" r="2.4"/>
-      <circle class="g-stroke" cx="16" cy="11" r="2.4"/>
-      <path class="g-stroke" d="M4.5 18.5H21.5"/>
-      <path class="g-stroke" d="M4.5 18.5l2.4-1.8M4.5 18.5l2.4 1.8"/>
-      <path class="g-stroke" d="M21.5 18.5l-2.4-1.8M21.5 18.5l-2.4 1.8"/>
-    </svg>
+    <img class="hint-img" src="mobile-mover.png" alt="">
     <span class="hint-label">Mover</span>
   </div>
   <div class="hint-item hint-touch">
-    <svg viewBox="0 0 26 26" aria-hidden="true">
-      <circle class="g-fill" cx="7.5" cy="7.5" r="2.3"/>
-      <circle class="g-stroke" cx="7.5" cy="7.5" r="2.3"/>
-      <circle class="g-fill" cx="18.5" cy="18.5" r="2.3"/>
-      <circle class="g-stroke" cx="18.5" cy="18.5" r="2.3"/>
-      <path class="g-stroke" d="M10.6 10.6L15.4 15.4"/>
-      <path class="g-stroke" d="M10.6 10.6H13.4M10.6 10.6V13.4"/>
-      <path class="g-stroke" d="M15.4 15.4H12.6M15.4 15.4V12.6"/>
-    </svg>
+    <img class="hint-img" src="mobile-zoom.png" alt="">
     <span class="hint-label">Zoom</span>
   </div>
 </div>
