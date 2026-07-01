@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Geodinâmica – Visualizador 3D</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -37,7 +37,7 @@
   .back-btn:hover { color: #fff; border-color: rgba(255,255,255,0.25); }
   .back-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; }
 
-  #viewer-canvas { width: 100%; height: 100vh; display: block; }
+  #viewer-canvas { width: 100%; height: 100vh; display: block; touch-action: none; }
 
   #loading {
     position: absolute; inset: 0; display: flex; flex-direction: column;
@@ -275,6 +275,9 @@ canvas.addEventListener('wheel', e => {
 let lastTouchDist = 0;
 let lastTouchMid = { x: 0, y: 0 };
 canvas.addEventListener('touchstart', e => {
+  // Impede o navegador de tratar o gesto (scroll/pinch-zoom da página),
+  // que no mobile competia com os controles do viewer.
+  e.preventDefault();
   if (e.touches.length === 1) {
     // 1 dedo = rotacionar/inclinar
     isDragging = true; isPanning = false;
@@ -286,8 +289,10 @@ canvas.addEventListener('touchstart', e => {
     lastTouchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
     lastTouchMid = { x: (e.touches[0].clientX + e.touches[1].clientX) / 2, y: (e.touches[0].clientY + e.touches[1].clientY) / 2 };
   }
-}, { passive: true });
+}, { passive: false });
 canvas.addEventListener('touchmove', e => {
+  // preventDefault → sem scroll/pan da página por trás do gesto do viewer
+  e.preventDefault();
   if (e.touches.length === 1 && isDragging) {
     const dx = e.touches[0].clientX - prevMouse.x, dy = e.touches[0].clientY - prevMouse.y;
     spherical.theta -= dx * 0.005;
@@ -313,7 +318,7 @@ canvas.addEventListener('touchmove', e => {
     lastTouchMid = { x: midx, y: midy };
     updateCamera();
   }
-}, { passive: true });
+}, { passive: false });
 canvas.addEventListener('touchend', e => {
   if (e.touches.length === 0) { isDragging = false; isPanning = false; }
   else if (e.touches.length === 1) {
