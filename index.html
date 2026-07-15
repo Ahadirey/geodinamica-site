@@ -995,9 +995,16 @@ document.addEventListener('DOMContentLoaded', () => {
             geo.setAttribute('position', new THREE.Float32BufferAttribute(arr, 3));
             var mat = new THREE.LineBasicMaterial({
               color: color, transparent: true, opacity: opacity,
-              depthTest: true, blending: THREE.AdditiveBlending /* brilho "fosforescente" */
+              /* depthTest desligado de propósito: o drape nunca é 100% perfeito
+                 (rpab_ground.glb não é exatamente a mesma superfície das curvas),
+                 então em vez de deixar o terreno "comer" a linha por z-fighting,
+                 a curva sempre desenha por cima — sem mover a posição real dela */
+              depthTest: false, depthWrite: false,
+              blending: THREE.AdditiveBlending /* brilho "fosforescente" */
             });
-            return new THREE.LineSegments(geo, mat);
+            var seg = new THREE.LineSegments(geo, mat);
+            seg.renderOrder = 999; /* garante que desenha depois do modelo */
+            return seg;
           }
 
           var g = new THREE.Group();
@@ -1005,6 +1012,7 @@ document.addEventListener('DOMContentLoaded', () => {
           var l2 = makeLines(mestras, 0xffc14d, 1.0);   /* mestras mais claras */
           if (l1) g.add(l1);
           if (l2) g.add(l2);
+          g.renderOrder = 999;
           root.add(g);
         })
         .catch(function (err) { console.log('[phone3d] curvas indisponíveis:', err); });
