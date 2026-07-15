@@ -472,7 +472,7 @@
               <div class="phone-loader-bar"><i id="phone-loader-fill"></i></div>
             </div>
             <div class="phone-overlay-bottom">
-              <span class="phone-model-lbl">Imóvel Rural · Serra SC<small>Curvas de nível 0,5 m</small></span>
+              <span class="phone-model-lbl">Imóvel Rural<small>Curvas de nível 5 m</small></span>
               <span class="phone-3d-badge">3D ao vivo</span>
             </div>
           </div>
@@ -717,10 +717,16 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ─── PHONE 3D VIEWER ───────────────────────────────────────────
-   Modelo: modelo_web.glb  (otimizado — exportado em UTM SIRGAS2000 22S,
-   shift E=624000 N=6893000;  X = E−shiftE, Y = cota, Z = shiftN − N)
-   Curvas: curvas3d.json    (pré-drapeadas sobre modeloground.glb,
-   já no mesmo sistema local do GLB — nenhum raycast em runtime)
+   Modelo: rpab_web.glb  (simplificado via gltf-transform/meshoptimizer,
+   1,13M → 564k tris — exportado do Metashape em UTM SIRGAS2000 22S,
+   shift E=643000 N=6909000 A=1000 (conferido no diálogo de export);
+   X = E−shiftE, Z = shiftN − N — Y é o local do próprio GLB, não cota
+   crua (shift de altitude A=1000 já embutido no export))
+   Curvas: curvas_rpab3d.json (curvas_rpab.geojson → RDP 0,10 m +
+   densify 4 m + drape por interpolação bilinear direto na superfície
+   do rpab_2.glb original, offset +0,35 m — shift E/N confirmado por
+   correlação de elevação, entre malha e curvas, e validado contra o
+   export do Metashape; trechos fora da área escaneada descartados)
 ─────────────────────────────────────────────────────────────────── */
 (function () {
   var area = document.getElementById('phone-3d-area');
@@ -728,8 +734,8 @@ document.addEventListener('DOMContentLoaded', () => {
   /* Não inicializa se o mockup estiver oculto (mobile) */
   if (window.matchMedia && window.matchMedia('(max-width: 900px)').matches) return;
 
-  var MODEL_URL  = 'modelo_web.glb';
-  var CURVAS_URL = 'curvas3d.json';
+  var MODEL_URL  = 'rpab_web.glb';
+  var CURVAS_URL = 'curvas_rpab3d.json';
 
   var t3 = document.createElement('script');
   t3.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
@@ -971,7 +977,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(function (data) {
           var normais = [], mestras = [];
           data.lines.forEach(function (ln) {
-            var isMestra = (ln.e % 5) === 0;          /* mestras a cada 5 m */
+            var isMestra = (ln.e % 25) === 0;         /* mestras a cada 25 m (curvas de 5 m em 5 m) */
             var dest = isMestra ? mestras : normais;
             var p = ln.p;
             for (var i = 0; i < p.length - 1; i++) {
