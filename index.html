@@ -723,10 +723,14 @@ document.addEventListener('DOMContentLoaded', () => {
    X = E−shiftE, Z = shiftN − N — Y é o local do próprio GLB, não cota
    crua (shift de altitude A=1000 já embutido no export))
    Curvas: curvas_rpab3d.json (curvas_rpab.geojson → RDP 0,10 m +
-   densify 4 m + drape por interpolação bilinear direto na superfície
-   do rpab_2.glb original, offset +0,35 m — shift E/N confirmado por
-   correlação de elevação, entre malha e curvas, e validado contra o
-   export do Metashape; trechos fora da área escaneada descartados)
+   densify 4 m + drape por interpolação baricêntrica real (ponto-em-
+   -triângulo) na malha de CHÃO rpab_ground.glb — não no rpab_2.glb
+   visível, que inclui árvores/vegetação; usar o modelo com árvores
+   pro drape faz a curva "flutuar" no topo da copa em vez de grudar
+   no terreno. offset +0,35 m; shift E/N igual ao do modelo visível
+   (mesma origem Metashape, conferido por correlação 0,995); pontos
+   fora da área do modelo VISÍVEL (rpab_web.glb) descartados mesmo
+   que o chão os cubra, pra curva não flutuar além da malha renderizada)
 ─────────────────────────────────────────────────────────────────── */
 (function () {
   var area = document.getElementById('phone-3d-area');
