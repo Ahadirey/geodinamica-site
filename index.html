@@ -206,6 +206,8 @@
     width: 100% !important; height: 100% !important;
     display: block; touch-action: none;
     cursor: grab;
+    user-select: none; -webkit-user-select: none;
+    -webkit-user-drag: none;
   }
   #phone-canvas:active { cursor: grabbing; }
 
@@ -812,24 +814,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* ── Mouse ── */
+    function endDrag() {
+      if (!isDragging) return;
+      isDragging = false; resumeAuto();
+    }
     canvas.addEventListener('mousedown', function (e) {
+      e.preventDefault();           /* impede seleção/drag nativo do navegador */
       isDragging = true; pauseAuto();
       velTheta = 0; velPhi = 0;
       prevM = { x: e.clientX, y: e.clientY };
       e.stopPropagation();
     });
+    /* drag nativo (cursor de "proibido") engole o mouseup e deixa o
+       modelo preso ao mouse — bloqueia na origem */
+    canvas.addEventListener('dragstart', function (e) { e.preventDefault(); });
     window.addEventListener('mousemove', function (e) {
       if (!isDragging) return;
+      /* rede de segurança: se o mouseup se perdeu (drag nativo, alt-tab,
+         soltou fora da janela), nenhum botão está mais pressionado */
+      if (e.buttons === 0) { endDrag(); return; }
       var dT = -(e.clientX - prevM.x) * 0.005;
       var dP = -(e.clientY - prevM.y) * 0.005;
       theta += dT; phi = clampPhi(phi + dP);
       velTheta = dT; velPhi = dP;
       prevM = { x: e.clientX, y: e.clientY };
     });
-    window.addEventListener('mouseup', function () {
-      if (!isDragging) return;
-      isDragging = false; resumeAuto();
-    });
+    window.addEventListener('mouseup', endDrag);
+    window.addEventListener('blur', endDrag);
     canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
     canvas.addEventListener('wheel', function (e) {
       e.preventDefault();
