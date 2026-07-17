@@ -46,5 +46,16 @@
         -0.5008739937137192
       ]
     }
+  },
+  {
+    "id": "modelo-20260716-1727-crop",
+    "nome": "Terreno rural",
+    "descricao": "Aerolevantamento Planialtimétrico",
+    "arquivo": "modelo_20260716_1727_crop.splat",
+    "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/modelo_20260716_1727_crop.splat",
+    "formato": "splat",
+    "tipo": "3DGS",
+    "publico": true,
+    "data": "2026-07-17"
   }
 ]
