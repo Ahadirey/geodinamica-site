@@ -74,6 +74,7 @@
   .modelo-card-info { flex: 1; min-width: 0; }
   .modelo-card-nome { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .modelo-card-meta { font-size: 0.72rem; color: rgba(255,255,255,0.35); font-weight: 300; }
+  .modelo-card-arquivo { font-family: monospace; font-size: 0.68rem; color: rgba(103,193,135,0.55); margin-top: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .publico-badge { font-size: 0.6rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.2rem 0.5rem; border-radius: 2px; white-space: nowrap; flex-shrink: 0; }
   .publico-badge.sim { color: var(--verde-claro); background: rgba(103,193,135,0.1); border: 1px solid rgba(103,193,135,0.2); }
   .publico-badge.nao { color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
@@ -487,6 +488,7 @@ function renderGrid() {
         <div class="modelo-card-info">
           <div class="modelo-card-nome">${m.nome}</div>
           <div class="modelo-card-meta">${m.tipo} · ${m.data}</div>
+          <div class="modelo-card-arquivo" title="${m.arquivo || m.url || ''}">📄 ${m.arquivo || decodeURIComponent((m.url || '').split('/').pop() || '—')}</div>
         </div>
         <span class="publico-badge ${m.publico ? 'sim' : 'nao'}">${m.publico ? 'Público' : 'Oculto'}</span>
       </div>
@@ -539,6 +541,7 @@ function renderSplatGrid() {
         <div class="modelo-card-info">
           <div class="modelo-card-nome">${s.nome}</div>
           <div class="modelo-card-meta">${s.tipo} · ${s.data} · ${(s.formato || 'splat').toUpperCase()}</div>
+          <div class="modelo-card-arquivo" title="${s.arquivo || s.url || ''}">📄 ${s.arquivo || decodeURIComponent((s.url || '').split('/').pop() || '—')}</div>
         </div>
         <span class="publico-badge ${s.publico ? 'sim' : 'nao'}">${s.publico ? 'Público' : 'Oculto'}</span>
       </div>
