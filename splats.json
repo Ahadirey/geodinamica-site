@@ -80,6 +80,19 @@
     "formato": "ksplat",
     "tipo": "3DGS",
     "publico": true,
-    "data": "2026-07-18"
+    "data": "2026-07-18",
+    "thumb": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/thumb_modelo-eduardo-invernador.jpg",
+    "vista": {
+      "position": [
+        -0.11824751677915063,
+        0.9774622231398804,
+        0.025240855945588447
+      ],
+      "target": [
+        0.1750653279208506,
+        0.0605108123393885,
+        -0.5432375388636081
+      ]
+    }
   }
 ]
