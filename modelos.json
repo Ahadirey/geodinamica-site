@@ -119,6 +119,19 @@
     "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/3dfabiano.glb",
     "tipo": "Fotogrametria",
     "publico": true,
-    "data": "2026-07-23"
+    "data": "2026-07-23",
+    "vista": {
+      "spherical": {
+        "theta": -3.5449999999999817,
+        "phi": 1.0999999999999992,
+        "radius": 2.7
+      },
+      "panOffset": {
+        "x": -0.4409511941251921,
+        "y": -0.5821144352329972,
+        "z": 0.09463398445459034
+      }
+    },
+    "thumb": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/thumb_3dfabiano.jpg"
   }
 ]
