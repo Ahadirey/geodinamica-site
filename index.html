@@ -662,12 +662,16 @@
     </div>
   </div>
   <form class="contato-form" onsubmit="handleSubmit(event)">
+    <input type="hidden" name="access_key" value="adab8a4c-ec74-498b-9d5a-1542de9392cb">
+    <input type="hidden" name="subject" value="Novo contato pelo site Geodinâmica">
+    <input type="hidden" name="from_name" value="Site Geodinâmica">
+    <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
     <div class="form-row">
-      <div class="form-group"><label>Nome</label><input type="text" placeholder="Seu nome"></div>
-      <div class="form-group"><label>Email</label><input type="email" placeholder="seu@email.com"></div>
+      <div class="form-group"><label>Nome</label><input type="text" name="name" placeholder="Seu nome" required></div>
+      <div class="form-group"><label>Email</label><input type="email" name="email" placeholder="seu@email.com" required></div>
     </div>
-    <div class="form-group"><label>Assunto</label><input type="text" placeholder="Tipo de serviço ou projeto"></div>
-    <div class="form-group"><label>Mensagem</label><textarea placeholder="Descreva seu projeto ou dúvida..."></textarea></div>
+    <div class="form-group"><label>Assunto</label><input type="text" name="assunto" placeholder="Tipo de serviço ou projeto"></div>
+    <div class="form-group"><label>Mensagem</label><textarea name="message" placeholder="Descreva seu projeto ou dúvida..." required></textarea></div>
     <button type="submit" class="btn-submit">Enviar mensagem →</button>
   </form>
 </section>
@@ -682,13 +686,35 @@
 
 <!-- ─── SCRIPTS ──────────────────────────────────────────────── -->
 <script>
-/* Contact form */
-function handleSubmit(e) {
+/* Contact form — envia via Web3Forms (https://web3forms.com) */
+async function handleSubmit(e) {
   e.preventDefault();
-  const btn = e.target.querySelector('.btn-submit');
-  btn.textContent = 'Mensagem enviada ✓';
-  btn.style.background = '#67C187';
-  setTimeout(() => { btn.textContent = 'Enviar mensagem →'; btn.style.background = ''; e.target.reset(); }, 3000);
+  const form = e.target;
+  const btn = form.querySelector('.btn-submit');
+  const original = 'Enviar mensagem →';
+  btn.disabled = true;
+  btn.textContent = 'Enviando…';
+  btn.style.background = '';
+  try {
+    const res = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      body: new FormData(form)
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      btn.textContent = 'Mensagem enviada ✓';
+      btn.style.background = '#67C187';
+      form.reset();
+    } else {
+      throw new Error(data.message || 'Falha no envio');
+    }
+  } catch (err) {
+    btn.textContent = 'Erro — tente novamente';
+    btn.style.background = '#b3492f';
+  } finally {
+    setTimeout(() => { btn.textContent = original; btn.style.background = ''; btn.disabled = false; }, 4000);
+  }
 }
 
 /* Piscar o formulário ao clicar em "Solicitar orçamento" (#contato) —
