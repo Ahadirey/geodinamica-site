@@ -165,6 +165,19 @@
     "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/SERRABITU.glb",
     "tipo": "Topografia 3D",
     "publico": true,
-    "data": "2026-11-18"
+    "data": "2026-11-18",
+    "vista": {
+      "spherical": {
+        "theta": 2.139999999999998,
+        "phi": 1.0750000000000013,
+        "radius": 3.8999999999999995
+      },
+      "panOffset": {
+        "x": 0.2453587292920117,
+        "y": -0.8651167734159244,
+        "z": -0.17119167692022214
+      }
+    },
+    "thumb": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/thumb_serrabitu.jpg"
   }
 ]
