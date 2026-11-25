@@ -179,5 +179,15 @@
       }
     },
     "thumb": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/thumb_serrabitu.jpg"
+  },
+  {
+    "id": "vacas-gordas-jt",
+    "nome": "Terreno rural",
+    "descricao": "Fotogrametria",
+    "arquivo": "VACAS_GORDAS_JT.glb",
+    "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/VACAS_GORDAS_JT.glb",
+    "tipo": "3D - Alta resolução",
+    "publico": false,
+    "data": "2026-11-25"
   }
 ]
