@@ -188,6 +188,19 @@
     "url": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/VACAS_GORDAS_JT.glb",
     "tipo": "3D - Alta resolução",
     "publico": false,
-    "data": "2026-11-25"
+    "data": "2026-11-25",
+    "vista": {
+      "spherical": {
+        "theta": -0.6300000000000003,
+        "phi": 1.0500000000000007,
+        "radius": 2.4000000000000004
+      },
+      "panOffset": {
+        "x": -0.27115329742063393,
+        "y": -0.3641117275979539,
+        "z": 0.05379475843472838
+      }
+    },
+    "thumb": "https://pub-2a76e30d86404683aa14800e5a945b61.r2.dev/thumb_vacas-gordas-jt.jpg"
   }
 ]
